@@ -42,7 +42,6 @@ mysql 、mariaDB
 [文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/DOCUMENT.md)
 
 ## 快速开始
--   不依赖spring
->   参考单元测试(package:com.github.ibatis.statement.demo)
+[参考单元测试](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
 
   

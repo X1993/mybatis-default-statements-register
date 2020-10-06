@@ -13,11 +13,11 @@
         动态条件查询，另外基于默认where条件和默认赋值配置可实现乐观锁。
 
 ## 快速开始
--   1.不依赖spring：[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core) 
->   参考单元测试(package:com.github.ibatis.statement.demo)
+-   1.不依赖spring版本：[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core) 
+    演示：[参考单元测试](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
 
--   2.基于spring-boot组装：[spring-boot-starter-mdsr](https://github.com/X1993/spring-boot-starter-mdsr.git) 
-    [参考](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
+-   2.基于spring-boot组装版本：[spring-boot-starter-mdsr](https://github.com/X1993/spring-boot-starter-mdsr.git) 
+    演示：[demo](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
 
 
   
