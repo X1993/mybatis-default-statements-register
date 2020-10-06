@@ -12,7 +12,7 @@ JDK 8+, Maven, Mysql/MariaDB
         <dependency>
             <groupId>com.github.X1993</groupId>
             <artifactId>mdsr-core</artifactId>
-            <version>2.2.0-SNAPSHOT</version>
+            <version>3.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

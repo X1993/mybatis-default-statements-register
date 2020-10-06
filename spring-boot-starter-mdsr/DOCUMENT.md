@@ -4,7 +4,7 @@
 JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
 
 ## 快速开始
->   Spring-Boot项目 
+>   Spring-Boot项目 [参考](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample) 
 ### 配置参数
 -   maven依赖
 ```xml
@@ -12,7 +12,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         <dependency>
             <groupId>com.github.X1993</groupId>
             <artifactId>spring-boot-starter-mdsr</artifactId>
-            <version>2.2.0-SNAPSHOT</version>
+            <version>3.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

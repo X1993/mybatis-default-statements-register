@@ -6,9 +6,9 @@
 
     <groupId>com.github.X1993</groupId>
     <artifactId>mdsr-core</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <description>基于MyBatis二次开发，在MyBatis的基础上只做增强不做改变</description>
-    <url>https://github.com/X1993/mybatis-default-statement-register</url>
+    <url>https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core</url>
 
     <build>
         <plugins>

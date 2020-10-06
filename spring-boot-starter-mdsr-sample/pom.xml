@@ -3,21 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.aseit.elec</groupId>
-        <artifactId>aseit-elec-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
     </parent>
 
     <groupId>com.github.X1993</groupId>
     <artifactId>spring-boot-starter-mdsr-sample</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
-    <url>https://github.com/X1993/spring-boot-starter-mdsr-sample.git</url>
+    <version>3.0.0-SNAPSHOT</version>
+    <url>https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample</url>
 
     <dependencies>
         <dependency>
             <groupId>com.github.X1993</groupId>
             <artifactId>spring-boot-starter-mdsr</artifactId>
-            <version>2.2.0-SNAPSHOT</version>
+            <version>3.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

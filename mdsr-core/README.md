@@ -1,5 +1,5 @@
 ### 简介：
-[Mybatis-Default-Statement-Register](https://github.com/X1993/mybatis-default-statements-register)基于MyBatis二次开发，
+[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core)基于MyBatis二次开发，
 在MyBatis的基础上只做增强不做改变，提高开发效率。
 
 ### 特征：
@@ -26,7 +26,7 @@ mysql 、mariaDB
 ```
 
 ### 框架结构:
-./架构图.jpg
+[架构图](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg)
 
 ### 当前最新版本
 -   Maven
@@ -34,20 +34,15 @@ mysql 、mariaDB
     <dependency>
         <groupId>com.github.X1993</groupId>
         <artifactId>mdsr-core</artifactId>
-        <version>2.2.0-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </dependency>
 ```
 
 ### 文档
-./DOCUMENT.md
-
-### 基于spring-boot组装starter：[spring-boot-starter-mdsr](https://github.com/X1993/mybatis-default-statements-register)
+[文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/DOCUMENT.md)
 
 ## 快速开始
 -   不依赖spring
 >   参考单元测试(package:com.github.ibatis.statement.demo)
-
--   基于[spring-boot-starter-mdsr](https://github.com/X1993/spring-boot-starter-mdsr.git)
-    [参考项目](https://github.com/X1993/spring-boot-starter-mdsr-sample.git)
 
   
