@@ -1,7 +1,7 @@
 # 文档
 
 ## 运行环境:
-JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
+JDK 8+, Maven, Mysql/MariaDB
 
 ## 快速开始
 >   Spring-Boot项目 [参考](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample) 
@@ -116,6 +116,8 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
 
 ## 功能介绍
 ### 1.使用自动注册的Mapper方法
+#### 1.1.演示
+-   insert
 ```java
     @RunWith(SpringRunner.class)
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -133,7 +135,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   INSERT INTO `user` (`note`,`update_time`,`address`,`create_time`,`name`,`id`,`version`) VALUES (NULL ,NULL ,'杭州','2020-09-09 16:10:22.129','张三',NULL ,0); 
 ```
@@ -152,7 +154,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ``` 
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   SELECT `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE `id` = 2;
 ```
@@ -178,7 +180,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   UPDATE `user` SET `note` = NULL , `update_time` = NULL , `address` = '嘉兴', `create_time` = '2020-09-09 22:26:33.359', `name` = '张三', `version` = 0 WHERE `id` = 10;
 ```
@@ -203,12 +205,12 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   DELETE FROM `user` WHERE `id` = ? AND 1 = 1;
 ```
 
->   更多方法请参考接口*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
+>   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
 ####  1.2.自定义sql覆盖自动注册的方法
 -   通过XML或注解申明自定义sql
@@ -244,12 +246,12 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ``` 
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   SELECT `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE `id` = 2 and removed = 0;
 ```  
 
-####  1.3.方法匹配规则
+####  1.3.选择性注册
 -   方法签名与*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法兼容（不包含默认方法）,
      如果不想注册所有方法，可以自由选择注册的方法
 >   方法签名：返回值（兼容泛型实际声明的类型）+方法名+方法参数列表（兼容泛型实际声明的类型）
@@ -284,7 +286,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
     }
 ```
 
-### 2.实体类自定义表名解析
+### 2.实体类表名自定义解析
 -   将User类上的*@com.github.ibatis.statement.base.core.Entity*注解注释掉
 ```java
     package com.github.mdsr.sample.model;
@@ -301,13 +303,15 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         // ... (ellipsis get/set methods)
     }
 ```
-#### 2.1.表名默认Entity类名驼峰转下划线
+#### 2.1.默认Entity类名驼峰转下划线
 
     类名            |      表名 
     -----           |      -----
     User            |      user
     Location        |      location
     MerchantInfo    |      merchant_info    
+
+>   可关闭
     
 #### 2.2.自定义解析规则 
 -   实现*com.github.ibatis.statement.base.core.parse.TableSourceParser*自定义全局解析规则
@@ -345,14 +349,14 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
 -   映射结果
 
 
-    类名              |           表名 
-    ----                         -----
+    类名              |         表名 
+    ----                        ------
     User              |         act_user
     Location          |         act_location
     MerchantInfo      |         act_merchant_info
     
-#### 2.3.优先级    
--   @Entity指定 > 自定义TableNameParser实现（多个实现通过order()方法确定优先级）> 默认驼峰转下划线
+    
+>   优先级: @Entity指定 > 自定义TableNameParser实现（多个实现通过order()方法确定优先级）> 默认驼峰转下划线
 
 ### 3.实体类字段映射的列解析
 -   将User类属性上的*@com.github.ibatis.statement.base.core.Column*注解去掉
@@ -463,6 +467,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
     address          |         address
     createTime       |         create_time
     updateTime       |         update_time
+    
 
 ### 4.逻辑列
 #### 4.1.在实体类上使用注解申明逻辑列
@@ -543,7 +548,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   INSERT INTO `user` (`note`,`update_time`,`address`,`create_time`,`name`,`id`,`version`,`removed`) VALUES (NULL ,NULL ,'杭州','2020-09-09 16:10:22.129','张三',NULL ,0 ,0); 
 ```
@@ -562,7 +567,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ``` 
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   SELECT `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE `id` = 2 and removed = 0;
 ```
@@ -586,7 +591,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   UPDATE `user` SET `note` = NULL , `update_time` = NULL , `address` = '嘉兴', `create_time` = '2020-09-09 22:26:33.359', `name` = '张三', `version` = 0 WHERE `id` = 10 and removed = 0;
 ```
@@ -610,11 +615,11 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   UPDATE `user` SET `removed` = 1 WHERE `id` = 11 AND `removed` = 0; 
 ```
->   更多方法请参考接口*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
+>   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
 ### 5.复合主键
 -   schema.sql
@@ -779,7 +784,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   INSERT INTO `user` (`note`,`update_time`,`address`,`create_time`,`name`,`id`,`version`,`removed`) VALUES (null,now(),'杭州',now(),'张三',null,0,0);
 ```
@@ -804,12 +809,12 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   UPDATE `user` SET `note` = null, `update_time` = now(), `address` = '嘉兴', `create_time` = null, `name` = '张三', `version` = 0
    WHERE `id` = 10 AND `removed` = 0;
 ```
->   更多方法请参考接口*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
+>   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
 ### 7.默认where条件
 >   仅支持修改/删除/查询指令
@@ -963,7 +968,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ``` 
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   SELECT `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version`
    FROM `user`
@@ -991,7 +996,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   UPDATE `user` SET `note` = null , `update_time` = null , `address` = '嘉兴' , `create_time` = null , `name` = '张三' , `version` = 0
      WHERE `id` = 10 AND `create_time` between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00';
@@ -1018,14 +1023,14 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   DELETE
    FROM `user`
    WHERE `id` = 11 AND `create_time` < '2020-08-11 00:00:00' AND 1 = 1;
 ```
 
->   更多方法请参考接口*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
+>   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
 ### 8.禁止特定列查询/修改/新增
 -   使用@Column#commandTypeMappings属性指定允许的指令
@@ -1068,13 +1073,13 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   UPDATE `user` SET `note` = null , `update_time` = null , `address` = '嘉兴' , `name` = '张三' , `version` = 0
    WHERE `id` = 10 AND 1 = 1;
 ```
 
->   更多方法请参考接口*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
+>   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
 ### 9.动态条件查询
 -   Mapper接口继承*com.github.ibatis.statement.mapper.DynamicSelectMapper*
@@ -1153,7 +1158,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
     }
     
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
     select `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version`
      FROM `user`
@@ -1201,14 +1206,15 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
     }
     
 ```
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
     UPDATE `user` SET `note` = '无' , `update_time` = null , `address` = '杭州' , `name` = '张三' , 
     `version` = `version` + 1
      WHERE `id` = 11 AND `version` = 12 AND 1 = 1;
 ```
 
-#### 11.1指定table schema解析策略
+### 11.指定table schema解析策略
+#### 11.1.指定实体类配置
 ```java
     /**
      * @author junjie
@@ -1244,7 +1250,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         
     }
 ``` 
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
   SELECT `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version`,`no_exist_column`
    FROM `user`
@@ -1252,7 +1258,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
 ```
 >   java.sql.SQLException: Unknown column 'not_exist_column' in 'field list'
 
-#### 11.2全局配置
+#### 11.2全局默认配置
 ```yaml
   mybatis:
     mapped-statement:
@@ -1260,7 +1266,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         table-schema-resolution-strategy: entity    
 ```
 
-### 12.自定义mappedStatementFactory
+### 12.自定义MappedStatementFactory
 -   定义自定义方法
 ```java
     package com.github.mdsr.sample.mapper;
@@ -1358,7 +1364,7 @@ JDK 8+, Maven, Mysql/MariaDB, Spring-Boot
         }
     }
 ``` 
-    MyBatis-Plus will execute the following SQL
+    will execute the following SQL
 ```sql
     select `id` from `user` order by `id` desc limit 1; 
 ```
