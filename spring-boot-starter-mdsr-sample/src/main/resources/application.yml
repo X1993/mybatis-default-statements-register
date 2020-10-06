@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/test?allowMultiQueries=true
+    username: root
+    password: 123456
+    schema: classpath:db/schema.sql
+
+mybatis:
+  mapped-statement:
+    auto-register:
+      each-property-mapping-column: true #默认为每一个属性需要尝试映射列
+#      table-schema-resolution-strategy: entity

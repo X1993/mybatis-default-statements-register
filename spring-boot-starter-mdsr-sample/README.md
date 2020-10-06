@@ -1,0 +1,1 @@
+[spring-boot-starter-mdsr](https://github.com/X1993/spring-boot-starter-mdsr.git) demo
