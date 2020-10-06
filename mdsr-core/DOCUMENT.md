@@ -549,7 +549,7 @@ JDK 8+, Maven, Mysql/MariaDB
 
 
     类名              |         表名 
-    ----                        -----
+    ----              |         ------
     User              |         act_user
     Location          |         act_location
     MerchantInfo      |         act_merchant_info
