@@ -305,8 +305,9 @@ JDK 8+, Maven, Mysql/MariaDB
 ```
 #### 2.1.默认Entity类名驼峰转下划线
 
-    类名            |      表名 
-    -----           |      -----
+
+    类名             |     表名 
+    ------          |      -------
     User            |      user
     Location        |      location
     MerchantInfo    |      merchant_info    
@@ -350,7 +351,7 @@ JDK 8+, Maven, Mysql/MariaDB
 
 
     类名              |         表名 
-    ----              |         -------
+    ----              |         ------
     User              |         act_user
     Location          |         act_location
     MerchantInfo      |         act_merchant_info

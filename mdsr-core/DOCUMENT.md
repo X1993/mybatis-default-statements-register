@@ -411,7 +411,8 @@ JDK 8+, Maven, Mysql/MariaDB
         // ... (ellipsis get/set methods)
     }
 ```
-#### 2.1.表名默认Entity类名驼峰转下划线
+#### 2.1.默认Entity类名驼峰转下划线
+
 
     类名            |      表名 
     -----           |      -----
