@@ -304,6 +304,7 @@ JDK 8+, Maven, Mysql/MariaDB
     }
 ```
 #### 2.1.默认Entity类名驼峰转下划线
+-   映射结果
 
 
     类名             |     表名 
