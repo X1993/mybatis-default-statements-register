@@ -299,38 +299,6 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
         return entityMateData;
     }
 
-    /**
-     * 尝试获取已加载的实体类元数据
-     * 这个方法可以不暴露出去，但是某些情况下比较有用，所以开放给开发者
-     * @param entityClazz
-     * @return
-     */
-    public Optional<EntityMateData> tryGetLoadedEntityMateData(DataSource dataSource ,Class<?> entityClazz)
-    {
-         return Optional.ofNullable(databaseEntityMateDataCache.get(dataSource))
-                 .map(map -> map.get(entityClazz))
-                 .filter(entityMateData -> NULL != entityMateData);
-    }
-
-    /**
-     * 尝试获取所有已加载的实体类元数据
-     * 这个方法可以不暴露出去，但是某些情况下比较有用，所以开放给开发者
-     * @return
-     */
-    public Optional<EntityMateData> tryGetLoadedEntityMateData(Class<?> entityClass)
-    {
-        Set<EntityMateData> entityMateDataSet = databaseEntityMateDataCache.values()
-                .stream()
-                .map(map -> map.get(entityClass))
-                .filter(entityMateData -> entityMateData != null && NULL != entityMateData)
-                .collect(Collectors.toSet());
-        if (entityMateDataSet.size() > 1){
-            throw new IllegalArgumentException("There are " + entityMateDataSet.size() +
-                    " data sources that define the entity Mapper, please specify the specific data source");
-        }
-        return entityMateDataSet.stream().findFirst();
-    }
-
     public TableSourceParser getTableSourceParser() {
         return tableSourceParser;
     }
