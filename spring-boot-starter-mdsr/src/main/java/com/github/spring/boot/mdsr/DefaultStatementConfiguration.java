@@ -160,8 +160,8 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public TableSchemaQueryRegister tableSchemaQueryRegister(@Autowired(required = false) List<TableSchemaQuery> tableSchemaQueries){
+    @ConditionalOnMissingBean(value = TableSchemaQueryRegister.class)
+    public DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister(@Autowired(required = false) List<TableSchemaQuery> tableSchemaQueries){
         DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
         if (tableSchemaQueries != null){
             defaultTableSchemaQueryRegister.register(tableSchemaQueries);
@@ -170,8 +170,8 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     }
 
     @Bean
-    @Primary
-    public EntityMateDataParser entityMateDataParser(
+    @ConditionalOnMissingBean(value = EntityMateDataParser.class)
+    public DefaultEntityMateDataParser defaultEntityMateDataParser(
             @Autowired TableSourceParser tableSourceParser,
             @Autowired LogicalColumnMateDataParser logicalColumnMateDataParser,
             @Autowired PropertyMateDataParser propertyMateDataParser,
@@ -196,10 +196,11 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public StatementAutoRegister statementAutoRegister(DefaultMapperEntityParser defaultMapperEntityParser ,
-                                                       DefaultEntityMateDataParser defaultEntityMateDataParser ,
-                                                       @Autowired(required = false) List<MappedStatementFactory> mappedStatementFactories)
+    @ConditionalOnMissingBean(value = StatementAutoRegister.class)
+    public DefaultStatementAutoRegister statementAutoRegister(
+            MapperEntityParser defaultMapperEntityParser ,
+            EntityMateDataParser defaultEntityMateDataParser ,
+            @Autowired(required = false) List<MappedStatementFactory> mappedStatementFactories)
     {
         DefaultStatementAutoRegister.Builder builder = new DefaultStatementAutoRegister.Builder()
                 .setEntityMateDataParser(defaultEntityMateDataParser)
