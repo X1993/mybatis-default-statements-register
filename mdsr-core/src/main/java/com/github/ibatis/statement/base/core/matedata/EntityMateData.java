@@ -207,9 +207,7 @@ public class EntityMateData implements Cloneable{
     public Map<String ,ColumnPropertyMapping> getSelectColumnPropertyMapping(){
         return getColumnPropertyMappings().entrySet()
                 .stream()
-                .filter(entry -> entry.getValue().getPropertyMateData().isSelectMapping() && (
-                        logicalColumnMateData == null || !logicalColumnMateData.getColumnName().equals(entry.getKey())
-                ))
+                .filter(entry -> entry.getValue().getPropertyMateData().isSelectMapping())
                 .collect(Collectors.toMap(entry -> entry.getKey() ,entry -> entry.getValue()));
     }
 

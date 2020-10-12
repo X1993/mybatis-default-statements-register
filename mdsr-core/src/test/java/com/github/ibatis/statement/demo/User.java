@@ -4,7 +4,6 @@ import com.github.ibatis.statement.base.condition.Condition;
 import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.core.Entity;
-import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.base.logical.Logical;
 import com.github.ibatis.statement.mapper.param.ConditionRule;
