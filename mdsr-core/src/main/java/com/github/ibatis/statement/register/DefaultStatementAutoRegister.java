@@ -61,7 +61,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
     {
         Class<?> mapperEntityClass = mapperEntityParser.parse(mapperClass).orElse(null);
         if (mapperEntityClass == null){
-            LOGGER.info("can't parse mapper {} mapping entity class ," +
+            LOGGER.debug("can't parse mapper {} mapping entity class ," +
                     "can't auto register default mappedStatement" ,mapperClass);
             return;
         }

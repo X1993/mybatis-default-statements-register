@@ -62,26 +62,32 @@ public class DefaultColumnValueParser implements ColumnValueParser {
 
                 if (!tableColumnNames.contains(columnName)){
                     LOGGER.warn("table {} invalid column name {}" ,tableName ,columnName);
-                }else if (!columnDefaultValue.isOverwriteCustom() && !columnPropertyMappings.containsKey(columnName)){
-                    //使用自定义值但是不存在列映射的类字段
-                    LOGGER.warn("table {} column {} can't overwrite custom value and not exist " +
-                                    "mapping class-property", tableName ,columnName);
-                }else if (noDefaultValueMap.computeIfAbsent(sqlCommandType ,
-                        commandType -> Collections.EMPTY_SET).contains(columnName)){
+                    return;
+                }
+
+                if (noDefaultValueMap.computeIfAbsent(sqlCommandType ,commandType -> Collections.EMPTY_SET).contains(columnName)){
                     //禁止列使用默认值
                     LOGGER.warn("table {} column {} can't use default value when sqlCommandType is {}",
                             tableName ,columnName ,sqlCommandType);
+                    return;
+                }
+
+                if (!columnDefaultValue.isOverwriteCustom() && !columnPropertyMappings.containsKey(columnName)){
+                    //使用自定义值但是不存在列映射的类字段,直接使用默认值
+                    LOGGER.warn("table {} column {} can't overwrite custom value and not exist " +
+                                    "mapping class-property", tableName ,columnName);
+                    columnDefaultValue.setOverwriteCustom(true);
+                }
+
+                Map<String, ColumnDefaultValue> columnDefaultValueMap = commandTypeColumnDefaultValueMap
+                        .computeIfAbsent(sqlCommandType, commandType -> new HashMap<>());
+                if (columnDefaultValueMap.containsKey(columnName)){
+                    LOGGER.warn("table {} column {} defines multiple {} value rule",
+                            tableName, columnName ,sqlCommandType);
                 }else {
-                    Map<String, ColumnDefaultValue> columnDefaultValueMap = commandTypeColumnDefaultValueMap
-                            .computeIfAbsent(sqlCommandType, commandType -> new HashMap<>());
-                    if (columnDefaultValueMap.containsKey(columnName)){
-                        LOGGER.warn("table {} column {} defines multiple {} value rule",
-                                tableName, columnName ,sqlCommandType);
-                    }else {
-                        columnDefaultValue.setValue(expressionParser.parse(columnName ,
-                                columnDefaultValue.getValue() ,entityMateData));
-                        columnDefaultValueMap.put(columnName ,columnDefaultValue);
-                    }
+                    columnDefaultValue.setValue(expressionParser.parse(columnName ,
+                            columnDefaultValue.getValue() ,entityMateData));
+                    columnDefaultValueMap.put(columnName ,columnDefaultValue);
                 }
             }
         };

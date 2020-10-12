@@ -17,6 +17,7 @@ import java.util.Date;
 @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列
 @Entity(tableName = "user")//申明实体映射的表
 @DefaultValue(columnName = "note" ,value = "CONCAT(&{column} ,'1')")
+@DefaultValue(columnName = "address2" ,value = "'中国'" ,overwriteCustom = false)
 public class User
 {
     @Column(value = "id")//申明字段映射的列
