@@ -28,7 +28,7 @@ public class DefaultMapperEntityParser implements MapperEntityParser {
     @Override
     public final Optional<Class<?>> parse(Class<?> mapperClass)
     {
-        Type variableType = TypeUtils.parseSuperTypeVariable(mapperClass, EntityType.class, "T");
+        Type variableType = TypeUtils.parseSuperTypeVariable(mapperClass, EntityType.class.getTypeParameters()[0]);
         if (variableType != null){
             if (variableType instanceof Class) {
                 return Optional.of((Class<?>) variableType);
@@ -40,7 +40,9 @@ public class DefaultMapperEntityParser implements MapperEntityParser {
         //如果默认解析失败再尝试自定义解析
         for (MapperEntityParser customParser : customParsers) {
             Optional<Class<?>> optional = customParser.parse(mapperClass);
-            if (optional.isPresent()) return optional;
+            if (optional.isPresent()) {
+                return optional;
+            }
         }
 
         return Optional.empty();
