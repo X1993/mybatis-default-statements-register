@@ -61,7 +61,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
     {
         Class<?> mapperEntityClass = mapperEntityParser.parse(mapperClass).orElse(null);
         if (mapperEntityClass == null){
-            LOGGER.warn("can't parse mapper {} mapping entity class ," +
+            LOGGER.info("can't parse mapper {} mapping entity class ," +
                     "can't auto register default mappedStatement" ,mapperClass);
             return;
         }
@@ -143,7 +143,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         private EntityMateDataParser entityMateDataParser;
 
         private MapperEntityParser mapperEntityParser;
-        
+
         private List<MappedStatementFactory> mappedStatementFactories = new ArrayList<>();
 
         public Builder setEntityMateDataParser(EntityMateDataParser entityMateDataParser) {
@@ -163,7 +163,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             mappedStatementFactories.add(mappedStatementFactory);
             return this;
         }
-        
+
         public Builder addDefaultMappedStatementFactories()
         {
             mappedStatementFactories.add(new SelectByPrimaryKeyMappedStatementFactory());
