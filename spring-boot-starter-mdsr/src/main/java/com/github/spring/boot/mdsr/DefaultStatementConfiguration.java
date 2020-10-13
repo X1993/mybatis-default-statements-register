@@ -10,6 +10,7 @@ import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataPars
 import com.github.ibatis.statement.base.logical.LogicalColumnMateDataParser;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.MappedStatementFactory;
+import com.github.ibatis.statement.register.MappedStatementRegisterFailureConsumer;
 import com.github.ibatis.statement.register.StatementAutoRegister;
 import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
 import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
@@ -197,9 +198,10 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
 
     @Bean
     @ConditionalOnMissingBean(value = StatementAutoRegister.class)
-    public DefaultStatementAutoRegister statementAutoRegister(
+    public DefaultStatementAutoRegister defaultStatementAutoRegister(
             MapperEntityParser defaultMapperEntityParser ,
             EntityMateDataParser defaultEntityMateDataParser ,
+            @Autowired(required = false) MappedStatementRegisterFailureConsumer registerFailureConsumer,
             @Autowired(required = false) List<MappedStatementFactory> mappedStatementFactories)
     {
         DefaultStatementAutoRegister.Builder builder = new DefaultStatementAutoRegister.Builder()
@@ -214,6 +216,10 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
             for (MappedStatementFactory mappedStatementFactory : mappedStatementFactories) {
                 builder.addMappedStatementFactory(mappedStatementFactory);
             }
+        }
+
+        if (registerFailureConsumer != null){
+            builder.setMappedStatementRegisterFailureConsumer(registerFailureConsumer);
         }
 
         return builder.build();

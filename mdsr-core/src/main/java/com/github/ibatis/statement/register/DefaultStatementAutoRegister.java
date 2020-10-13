@@ -34,6 +34,8 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
     private EntityMateDataParser entityMateDataParser;
 
+    private MappedStatementRegisterFailureConsumer registerFailureConsumer = mappedStatementMateData -> {};
+
     public DefaultStatementAutoRegister() {
         this(new DefaultMapperEntityParser() ,new DefaultEntityMateDataParser());
     }
@@ -102,6 +104,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
             if (mappedStatement == null){
                 LOGGER.warn("can't build mappedStatement for [{}]" ,mappedStatementId);
+                registerFailureConsumer.accept(mappedStatementMateData);
             }
         }
     }
@@ -135,6 +138,16 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         return mappedStatementFactories;
     }
 
+
+    public MappedStatementRegisterFailureConsumer getRegisterFailureConsumer() {
+        return registerFailureConsumer;
+    }
+
+    public void setRegisterFailureConsumer(MappedStatementRegisterFailureConsumer registerFailureConsumer) {
+        Objects.requireNonNull(registerFailureConsumer);
+        this.registerFailureConsumer = registerFailureConsumer;
+    }
+
     /**
      * 默认构造器
      */
@@ -143,6 +156,8 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         private EntityMateDataParser entityMateDataParser;
 
         private MapperEntityParser mapperEntityParser;
+
+        private MappedStatementRegisterFailureConsumer registerFailureConsumer;
 
         private List<MappedStatementFactory> mappedStatementFactories = new ArrayList<>();
 
@@ -155,6 +170,12 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         public Builder setMapperEntityParser(MapperEntityParser mapperEntityParser) {
             Objects.requireNonNull(mapperEntityParser);
             this.mapperEntityParser = mapperEntityParser;
+            return this;
+        }
+
+        public Builder setMappedStatementRegisterFailureConsumer(MappedStatementRegisterFailureConsumer registerFailureConsumer){
+            Objects.requireNonNull(registerFailureConsumer);
+            this.registerFailureConsumer = registerFailureConsumer;
             return this;
         }
 
@@ -187,6 +208,10 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
                     entityMateDataParser == null ? new DefaultEntityMateDataParser() : entityMateDataParser);
 
             statementAutoRegister.addMappedStatementFactories(mappedStatementFactories);
+
+            if (registerFailureConsumer != null){
+                statementAutoRegister.setRegisterFailureConsumer(registerFailureConsumer);
+            }
 
             return statementAutoRegister;
         }

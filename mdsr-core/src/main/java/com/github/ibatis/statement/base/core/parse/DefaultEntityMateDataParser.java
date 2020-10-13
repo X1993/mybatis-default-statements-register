@@ -98,11 +98,11 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
             if (tableSource == null){
                 LOGGER.warn("can't parse table source for entity class [{}]" ,entityClazz);
             }else {
-                String tableName = tableSource.getTableName();
                 TableSchemaResolutionStrategy strategy = tableSource.getTableSchemaResolutionStrategy();
                 strategy = strategy == null || TableSchemaResolutionStrategy.GLOBAL.equals(strategy)
                         ? defaultTableSchemaResolutionStrategy : strategy;
 
+                String tableName = tableSource.getTableName();
                 if (tableName == null || "".equals(tableName)) {
                     LOGGER.warn("can' parse table name from entity class {}", entityClazz);
                 }else if (TableSchemaResolutionStrategy.DATA_BASE.equals(strategy)) {
