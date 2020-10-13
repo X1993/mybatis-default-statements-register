@@ -68,11 +68,8 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             return;
         }
 
-        EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession).orElse(null);
-        if (entityMateData == null){
-            LOGGER.warn("can't parse entityMateData for entity {}" ,mapperEntityClass);
-            return;
-        }
+        EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession)
+                .orElseThrow(() -> new IllegalArgumentException("can't parse EntityMateData for entity " + mapperEntityClass));
 
         Configuration configuration = sqlSession.getConfiguration();
         Collection<String> mappedStatementNames = new ArrayList<>(configuration.getMappedStatementNames());
