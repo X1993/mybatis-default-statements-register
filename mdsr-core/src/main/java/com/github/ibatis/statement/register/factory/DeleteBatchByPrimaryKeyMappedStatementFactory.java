@@ -37,6 +37,10 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
     {
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
+
+        if (entityMateData.getPrimaryKeyCount() < 1) {
+            return false;
+        }
         ParameterizedTypeImpl parameterizedType = ParameterizedTypeImpl.make(Collection.class,
             new Type[]{entityMateData.getReasonableKeyParameterClass()}, null);
 

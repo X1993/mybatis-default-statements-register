@@ -35,6 +35,10 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         Class<?> entityClass = entityMateData.getEntityClass();
+
+        if (entityMateData.getPrimaryKeyCount() < 1) {
+            return false;
+        }
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
         return super.isMatchMethodSignature(methodSignature ,new MethodSignature(entityClass ,

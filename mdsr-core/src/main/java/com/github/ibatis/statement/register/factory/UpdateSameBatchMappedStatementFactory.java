@@ -33,6 +33,10 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         Class<?> entityClass = entityMateData.getEntityClass();
+
+        if (entityMateData.getPrimaryKeyCount() < 1) {
+            return false;
+        }
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
         return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
