@@ -70,7 +70,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
         EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession).orElse(null);
         if (entityMateData == null){
-            LOGGER.warn("can't parse entityMateData for entity class {}" ,mapperEntityClass);
+            LOGGER.warn("can't parse entityMateData for entity {}" ,mapperEntityClass);
             return;
         }
 
