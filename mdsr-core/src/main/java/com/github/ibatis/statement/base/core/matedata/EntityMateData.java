@@ -181,8 +181,14 @@ public class EntityMateData implements Cloneable{
 
     public Class<?> getReasonableKeyParameterClass()
     {
+        //复合主键默认直接使用实体类型作为主键参数类型
         Class primaryKeyParameterClass = entityClass;
-        if (getPrimaryKeyCount() == 1){
+        int primaryKeyCount = getPrimaryKeyCount();
+        if (primaryKeyCount == 0){
+            throw new IllegalArgumentException("entity [" + entityClass
+                    + "] mapping table [" + getTableName() + "] don't exist primary key");
+        }
+        if (primaryKeyCount == 1){
             primaryKeyParameterClass = getKeyPrimaryColumnPropertyMappings().values()
                     .stream()
                     .findFirst()
