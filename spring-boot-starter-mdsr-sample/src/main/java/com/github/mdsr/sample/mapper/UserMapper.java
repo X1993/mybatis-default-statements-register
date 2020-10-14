@@ -16,4 +16,6 @@ public interface UserMapper extends KeyTableMapper<Integer ,User> {
 
     Integer selectMaxKey();
 
+//    Integer cannotRegisterMethod();
+
 }

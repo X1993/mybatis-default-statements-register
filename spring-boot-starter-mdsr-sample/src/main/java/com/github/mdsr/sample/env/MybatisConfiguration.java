@@ -1,20 +1,10 @@
 package com.github.mdsr.sample.env;
 
-import com.github.ibatis.statement.base.condition.ColumnConditionParser;
-import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
-import com.github.ibatis.statement.base.condition.Strategy;
-import com.github.ibatis.statement.base.core.parse.TableSourceParser;
-import com.github.ibatis.statement.base.dv.ColumnValueParser;
-import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
-import com.github.ibatis.statement.base.logical.LogicalColumnMateDataParser;
-import com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser;
-import com.github.ibatis.statement.mapper.param.ConditionRule;
-import com.github.ibatis.statement.util.StringUtils;
-import org.apache.ibatis.mapping.SqlCommandType;
+import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.Optional;
 
 /**
  * @author junjie
@@ -101,5 +91,15 @@ public class MybatisConfiguration {
 //                )
 //        );
 //    }
-    
+
+//    @Bean
+//    public DefaultStatementAutoRegister.Listener listener(){
+//        return new DefaultStatementAutoRegister.Listener() {
+//            @Override
+//            public void cannotRegisterMappedStatement(MappedStatementMateData mappedStatementMateData) {
+//                throw new IllegalArgumentException();
+//            }
+//        };
+//    }
+
 }

@@ -1,8 +1,10 @@
 package com.github.mdsr.sample.mapper;
 
+import com.github.ibatis.statement.base.core.parse.EntityMateDataParser;
 import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
 import com.github.mdsr.sample.model.User;
+import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,17 @@ public class UserMapperTest{
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private SqlSession sqlSession;
+
+    @Autowired
+    private EntityMateDataParser entityMateDataParser;
+
+    @Test
+    public void entityMateDataParser(){
+        entityMateDataParser.parse(User.class, sqlSession).get();
+    }
 
     @Test
     public void insert(){
@@ -83,7 +96,7 @@ public class UserMapperTest{
     @Test
     public void optimisticLock(){
         User user = new User();
-        user.setId(11);
+        user.setId(userMapper.selectMaxKey() + 1);
         user.setName("张三");
         user.setAddress("杭州");
         user.setCreateTime(new Date());
