@@ -201,7 +201,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         }
 
         public Builder setMapperEntityParser(MapperEntityParser mapperEntityParser) {
-            Objects.requireNonNull(entityMateDataParser);
+            Objects.requireNonNull(mapperEntityParser);
             this.mapperEntityParser = mapperEntityParser;
             return this;
         }
