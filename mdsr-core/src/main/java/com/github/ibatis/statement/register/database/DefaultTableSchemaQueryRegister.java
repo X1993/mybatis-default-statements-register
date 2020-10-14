@@ -1,6 +1,8 @@
 package com.github.ibatis.statement.register.database;
 
 import org.apache.ibatis.session.SqlSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -14,7 +16,9 @@ import java.util.Optional;
  */
 public class DefaultTableSchemaQueryRegister implements TableSchemaQueryRegister {
 
-    private Map<String ,TableSchemaQuery> tableSchemaQueryMap = new HashMap<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTableSchemaQueryRegister.class);
+
+    private final Map<String ,TableSchemaQuery> tableSchemaQueryMap = new HashMap<>();
 
     @Override
     public void register(Collection<TableSchemaQuery> tableSchemaQueries) {
@@ -38,11 +42,16 @@ public class DefaultTableSchemaQueryRegister implements TableSchemaQueryRegister
         Connection connection = sqlSession.getConnection();
         String databaseProductName = null;
         try {
-            databaseProductName = connection.getMetaData().getDatabaseProductName();
+            databaseProductName = connection.getMetaData().getDatabaseProductName().toUpperCase();
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
-        return Optional.ofNullable(tableSchemaQueryMap.get(databaseProductName.toUpperCase()));
+
+        TableSchemaQuery tableSchemaQuery = tableSchemaQueryMap.get(databaseProductName);
+        if (tableSchemaQuery == null){
+            LOGGER.warn("don't exist match TableSchemaQuery for database type [{}]" ,databaseProductName);
+        }
+        return Optional.ofNullable(tableSchemaQuery);
     }
 
 }

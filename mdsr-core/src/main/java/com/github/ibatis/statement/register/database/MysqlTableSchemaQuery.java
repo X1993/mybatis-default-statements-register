@@ -38,13 +38,18 @@ public class MysqlTableSchemaQuery implements TableSchemaQuery
 
     @Override
     public Optional<TableMateData> queryTable(SqlSession sqlSession ,String tableName) {
-        return this.getTableSchemaMapper(sqlSession)
+        Optional<TableMateData> optional = this.getTableSchemaMapper(sqlSession)
                 .map(mapper -> mapper.tableMateData(tableName))
                 .map(tableMateData -> {
                     tableMateData.setType(mappingTableType(tableMateData.getTableType()));
-                    tableMateData.setColumnMateDataList(queryTableColumns(sqlSession ,tableName));
+                    tableMateData.setColumnMateDataList(queryTableColumns(sqlSession, tableName));
                     return tableMateData;
                 });
+
+        if (!optional.isPresent()){
+            LOGGER.warn("not found table [{}]" ,tableName);
+        }
+        return optional;
     }
 
     @Override
