@@ -10,7 +10,6 @@ import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataPars
 import com.github.ibatis.statement.base.logical.LogicalColumnMateDataParser;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.MappedStatementFactory;
-import com.github.ibatis.statement.register.MappedStatementRegisterFailureConsumer;
 import com.github.ibatis.statement.register.StatementAutoRegister;
 import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
 import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
@@ -201,7 +200,7 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     public DefaultStatementAutoRegister defaultStatementAutoRegister(
             MapperEntityParser defaultMapperEntityParser ,
             EntityMateDataParser defaultEntityMateDataParser ,
-            @Autowired(required = false) MappedStatementRegisterFailureConsumer registerFailureConsumer,
+            @Autowired(required = false) List<DefaultStatementAutoRegister.Listener> listeners,
             @Autowired(required = false) List<MappedStatementFactory> mappedStatementFactories)
     {
         DefaultStatementAutoRegister.Builder builder = new DefaultStatementAutoRegister.Builder()
@@ -218,8 +217,8 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
             }
         }
 
-        if (registerFailureConsumer != null){
-            builder.setMappedStatementRegisterFailureConsumer(registerFailureConsumer);
+        if (listeners != null) {
+            builder.setListeners(listeners);
         }
 
         return builder.build();

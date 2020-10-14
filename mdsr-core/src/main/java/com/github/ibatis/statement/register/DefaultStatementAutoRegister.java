@@ -7,6 +7,7 @@ import com.github.ibatis.statement.base.core.matedata.RootMapperMethodMateData;
 import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
+import com.github.ibatis.statement.util.Sorter;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -34,7 +35,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
     private EntityMateDataParser entityMateDataParser;
 
-    private MappedStatementRegisterFailureConsumer registerFailureConsumer = mappedStatementMateData -> {};
+    private List<Listener> listeners = Collections.EMPTY_LIST;
 
     public DefaultStatementAutoRegister() {
         this(new DefaultMapperEntityParser() ,new DefaultEntityMateDataParser());
@@ -68,8 +69,14 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             return;
         }
 
-        EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession)
-                .orElseThrow(() -> new IllegalArgumentException("can't parse EntityMateData for entity " + mapperEntityClass));
+        EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession).orElse(null);
+        if (entityMateData == null){
+            LOGGER.warn("can't parse entityMateData for entity {}" ,mapperEntityClass);
+            for (Listener listener : listeners) {
+                listener.cannotParseEntityMateData(mapperEntityClass);
+            }
+            return;
+        }
 
         Configuration configuration = sqlSession.getConfiguration();
         Collection<String> mappedStatementNames = new ArrayList<>(configuration.getMappedStatementNames());
@@ -95,15 +102,45 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
                     configuration.addMappedStatement(mappedStatement);
                     mappedStatementNames.add(mappedStatementId);
                     LOGGER.debug("success register mappedStatement [{}]" ,mappedStatementId);
+                    for (Listener listener : listeners) {
+                        listener.mappedStatementRegister(mappedStatement);
+                    }
                     break;
                 }
             }
 
             if (mappedStatement == null){
                 LOGGER.warn("can't build mappedStatement for [{}]" ,mappedStatementId);
-                registerFailureConsumer.accept(mappedStatementMateData);
+                for (Listener listener : listeners) {
+                    listener.cannotRegisterMappedStatement(mappedStatementMateData);
+                }
             }
         }
+    }
+
+    /**
+     * @see DefaultStatementAutoRegister#registerDefaultMappedStatement(SqlSession, Class) 方法执行监听器
+     */
+    public interface Listener extends Sorter{
+
+        /**
+         * 不能解析实体类源数据
+         * @param entityClass
+         */
+        default void cannotParseEntityMateData(Class entityClass){}
+
+        /**
+         * 成功注册{@link MappedStatement}
+         * @param mappedStatement
+         */
+        default void mappedStatementRegister(MappedStatement mappedStatement){}
+
+        /**
+         * 不能注册缺失{@link MappedStatement}
+         * @param mappedStatementMateData
+         */
+        default void cannotRegisterMappedStatement(MappedStatementMateData mappedStatementMateData){}
+
     }
 
     @Override
@@ -135,14 +172,13 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         return mappedStatementFactories;
     }
 
-
-    public MappedStatementRegisterFailureConsumer getRegisterFailureConsumer() {
-        return registerFailureConsumer;
+    public List<Listener> getListeners() {
+        return listeners;
     }
 
-    public void setRegisterFailureConsumer(MappedStatementRegisterFailureConsumer registerFailureConsumer) {
-        Objects.requireNonNull(registerFailureConsumer);
-        this.registerFailureConsumer = registerFailureConsumer;
+    public void setListeners(List<Listener> listeners) {
+        Collections.sort(listeners);
+        this.listeners = listeners;
     }
 
     /**
@@ -154,7 +190,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
         private MapperEntityParser mapperEntityParser;
 
-        private MappedStatementRegisterFailureConsumer registerFailureConsumer;
+        private List<Listener> listeners;
 
         private List<MappedStatementFactory> mappedStatementFactories = new ArrayList<>();
 
@@ -165,14 +201,13 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         }
 
         public Builder setMapperEntityParser(MapperEntityParser mapperEntityParser) {
-            Objects.requireNonNull(mapperEntityParser);
+            Objects.requireNonNull(entityMateDataParser);
             this.mapperEntityParser = mapperEntityParser;
             return this;
         }
 
-        public Builder setMappedStatementRegisterFailureConsumer(MappedStatementRegisterFailureConsumer registerFailureConsumer){
-            Objects.requireNonNull(registerFailureConsumer);
-            this.registerFailureConsumer = registerFailureConsumer;
+        public Builder setListeners(List<Listener> listeners) {
+            this.listeners = listeners;
             return this;
         }
 
@@ -206,8 +241,8 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
             statementAutoRegister.addMappedStatementFactories(mappedStatementFactories);
 
-            if (registerFailureConsumer != null){
-                statementAutoRegister.setRegisterFailureConsumer(registerFailureConsumer);
+            if (listeners != null) {
+                statementAutoRegister.setListeners(listeners);
             }
 
             return statementAutoRegister;
