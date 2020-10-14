@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.base.core.parse;
 
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
-import com.github.ibatis.statement.util.Sorter;
 import org.apache.ibatis.session.SqlSession;
 import java.util.Optional;
 
@@ -10,7 +9,7 @@ import java.util.Optional;
  * @Author: junjie
  * @Date: 2020/2/24
  */
-public interface EntityMateDataParser extends Sorter {
+public interface EntityMateDataParser{
 
     /**
      * 解析
