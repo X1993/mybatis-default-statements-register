@@ -16,14 +16,15 @@
 JDK 8+, Maven, Mysql/MariaDB
 
 ### 支持的数据库:  
-mysql 、mariaDB 
-
-> 需要实现特定的适配器
+1.TableSchemaResolutionStrategy=DATA_BASE，适用mysql 、mariaDB 
+> 其他数据库只需实现特定的适配器
 ```java
     /**
     * @see com.github.ibatis.statement.register.database.TableSchemaQuery
     */
 ```
+
+2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
 
 ### 框架结构:
 [架构图](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg)
