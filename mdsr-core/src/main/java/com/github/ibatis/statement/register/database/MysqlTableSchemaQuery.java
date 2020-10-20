@@ -47,7 +47,7 @@ public class MysqlTableSchemaQuery implements TableSchemaQuery
                 });
 
         if (!optional.isPresent()){
-            LOGGER.warn("not found table [{}]" ,tableName);
+            LOGGER.warn("not exist table [{}]" ,tableName);
         }
         return optional;
     }

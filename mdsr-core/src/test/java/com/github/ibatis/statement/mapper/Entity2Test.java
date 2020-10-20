@@ -191,11 +191,15 @@ public class Entity2Test {
 
         Date now = new Date();
         Assert.assertNotNull(mapper.selectUniqueByDynamicParams(new DynamicParams()
-                .where(conditionParams -> conditionParams.eq("id" ,"1")
+                .where(conditionParams -> conditionParams
+                        .eq("id" ,"1")
                         .eq("id2" ,"3")
                         .or()
                         .gt("create_time" , now)
                         .lt("create_time" ,now)
+                        .like("value3" ,"12")
+                        .likeLeft("value3" ,"1")
+                        .likeRight("value3" ,"1")
                         .or())
                 .groupBy("id" ,"id2")
                 .having(conditionParams -> conditionParams.notIn("id" ,"3" ,"4")

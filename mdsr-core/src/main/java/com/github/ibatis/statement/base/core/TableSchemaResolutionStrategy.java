@@ -22,6 +22,12 @@ public enum TableSchemaResolutionStrategy {
     ENTITY,
 
     /**
+     * {@link TableSchemaResolutionStrategy#DATA_BASE}优先，获取失败使用{@link TableSchemaResolutionStrategy#ENTITY}
+     * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
+     */
+    DATA_BASE_PRIORITY,
+
+    /**
      * 默认使用全局配置
      * @see com.github.ibatis.statement.base.core.parse.DefaultEntityMateDataParser#defaultTableSchemaResolutionStrategy
      */

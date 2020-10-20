@@ -5,7 +5,6 @@ import com.github.ibatis.statement.base.core.matedata.ColumnMateData;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.TableMateData;
 import org.apache.ibatis.type.JdbcType;
-
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;

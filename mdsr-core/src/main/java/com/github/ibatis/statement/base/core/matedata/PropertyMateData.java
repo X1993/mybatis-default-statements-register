@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.base.core.matedata;
 
 import com.github.ibatis.statement.base.core.MappingStrategy;
-import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.register.MappedStatementFactory;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.type.TypeHandler;
@@ -39,6 +38,9 @@ public class PropertyMateData implements Cloneable{
      */
     private Class<? extends TypeHandler<?>> typeHandlerClass;
 
+    /**
+     * 列映射策略
+     */
     private MappingStrategy mappingStrategy = MappingStrategy.AUTO;
 
     public PropertyMateData() {

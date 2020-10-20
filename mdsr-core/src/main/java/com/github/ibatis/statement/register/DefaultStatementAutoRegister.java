@@ -4,6 +4,7 @@ import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.core.matedata.RootMapperMethodMateData;
+import com.github.ibatis.statement.mapper.KeyParameterType;
 import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
@@ -14,6 +15,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,18 +66,18 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
     {
         Class<?> mapperEntityClass = mapperEntityParser.parse(mapperClass).orElse(null);
         if (mapperEntityClass == null){
-            LOGGER.debug("can't parse mapper {} mapping entity class ," +
-                    "can't auto register default mappedStatement" ,mapperClass);
             return;
         }
 
-        EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession).orElse(null);
-        if (entityMateData == null){
-            LOGGER.warn("can't parse entityMateData for entity {}" ,mapperEntityClass);
-            for (Listener listener : listeners) {
-                listener.cannotParseEntityMateData(mapperEntityClass);
-            }
-            return;
+        EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession)
+                .orElseThrow(() -> new IllegalArgumentException(MessageFormat.format(
+                        "unable parse EntityMateData from mapper [{0}] entity class [{1}]" ,
+                        mapperClass ,mapperEntityClass)));
+
+        if (KeyParameterType.class.isAssignableFrom(mapperClass) && entityMateData.getPrimaryKeyCount() <= 0){
+            throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
+                    "but mapper entity mapping table [{2}] no primary key" ,
+                    mapperClass ,KeyParameterType.class ,entityMateData.getTableName()));
         }
 
         Configuration configuration = sqlSession.getConfiguration();
@@ -122,12 +124,6 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
      * @see DefaultStatementAutoRegister#registerDefaultMappedStatement(SqlSession, Class) 方法执行监听器
      */
     public interface Listener extends Sorter{
-
-        /**
-         * 不能解析实体类源数据
-         * @param entityClass
-         */
-        default void cannotParseEntityMateData(Class entityClass){}
 
         /**
          * 成功注册{@link MappedStatement}

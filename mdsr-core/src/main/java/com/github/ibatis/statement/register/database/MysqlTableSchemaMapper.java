@@ -27,7 +27,7 @@ public interface MysqlTableSchemaMapper {
      * @return
      */
     @Select("SELECT column_name as columnName, data_type as dataType, column_key = 'pri' as primaryKey\n" +
-            "FROM information_schema. COLUMNS WHERE table_name = #{0} AND table_schema = (SELECT DATABASE())")
+            "FROM information_schema.COLUMNS WHERE table_name = #{0} AND table_schema = (SELECT DATABASE())")
     List<ColumnMateData> tableColumnMateData(String tableName);
 
 }

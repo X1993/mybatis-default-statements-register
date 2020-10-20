@@ -1,5 +1,9 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.base.core.Entity;
+import com.github.ibatis.statement.base.core.MappingStrategy;
+import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
 import org.apache.ibatis.session.SqlSession;
@@ -18,10 +22,13 @@ import java.util.stream.IntStream;
 public class Entity5Test {
 
     @Removed
+    @Entity(resolutionStrategy = TableSchemaResolutionStrategy.ENTITY)
     static class Entity5 {
 
+        @Column(mappingStrategy = MappingStrategy.PRIMARY_KEY)
         private String id;
 
+        @Column(mappingStrategy = MappingStrategy.PRIMARY_KEY)
         private String id2;
 
         private String valueOne;
