@@ -31,7 +31,7 @@ public class MappedStatementProperties {
     /**
      * 默认table schema解析策略
      */
-    private TableSchemaResolutionStrategy tableSchemaResolutionStrategy = TableSchemaResolutionStrategy.DATA_BASE;
+    private TableSchemaResolutionStrategy tableSchemaResolutionStrategy = TableSchemaResolutionStrategy.DATA_BASE_PRIORITY;
 
     /**
      * 注册默认工厂
