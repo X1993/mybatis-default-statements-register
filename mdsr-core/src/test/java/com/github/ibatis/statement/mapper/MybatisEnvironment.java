@@ -1,9 +1,11 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.StatementAutoRegister;
 import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
+import com.github.ibatis.statement.register.database.H2TableSchemaQuery;
 import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
 import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
 import org.apache.ibatis.io.Resources;
@@ -26,7 +28,7 @@ public class MybatisEnvironment {
      * 读取配置文件初始化SqlSessionFactory
      */
     final SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
-            .build(Resources.getResourceAsStream("SqlMapConfig.xml"));
+            .build(Resources.getResourceAsStream("SqlMapConfig.xml") ,DataSourceEnvironment.H2.name());
 
     public static MybatisEnvironment ENVIRONMENT;
 
@@ -68,9 +70,8 @@ public class MybatisEnvironment {
     public void registerMappedStatementsForMappers(Class ... mapperClasses)
     {
         //不同数据库需要使用不同的TableMateDataQueryRegister实现
-        MysqlTableSchemaQuery tableMateDataQueryRegister = new MysqlTableSchemaQuery();
         TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-        tableSchemaQueryRegister.register(tableMateDataQueryRegister);
+        tableSchemaQueryRegister.register(new MysqlTableSchemaQuery() ,new H2TableSchemaQuery());
 
         StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
                 .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()

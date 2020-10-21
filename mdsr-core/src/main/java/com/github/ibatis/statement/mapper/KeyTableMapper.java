@@ -55,10 +55,12 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
 
     /**
      * 批量修改，set值为每个元素不为空的值
-     * 数据库连接需要配置allowMultiQueries=true，否则会报错
+     * mysql数据库url添加allowMultiQueries=true，否则会报错
      * @param list
      * @return
+     * @deprecated 某些数据库（如H2）不支持
      */
+    @Deprecated
     int updateBatch(Collection<T> list);
 
     /**

@@ -16,14 +16,7 @@ public interface TableSchemaQueryRegister {
      * @param tableSchemaQueries
      * @return
      */
-    void register(Collection<TableSchemaQuery> tableSchemaQueries);
-
-    /**
-     * 注册表结构查询器工厂
-     * @param tableSchemaQuery
-     * @return
-     */
-    void register(TableSchemaQuery tableSchemaQuery);
+    void register(TableSchemaQuery ... tableSchemaQueries);
 
     /**
      * 获取匹配的表结构查询器

@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.logical.Logical;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -74,22 +75,23 @@ public class Entity4Test {
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity4`;\n" +
             "CREATE TABLE `entity4` (\n" +
-            "  `id` varchar(255) NOT NULL,\n" +
+            "  `id` varchar(255) PRIMARY KEY NOT NULL,\n" +
             "  `value` varchar(255) DEFAULT NULL,\n" +
-            "  `removed` char(1) ,\n" +
-            "  PRIMARY KEY (`id`) USING BTREE\n" +
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+            "  `removed` char(1) \n" +
+            ") ;";
 
     @Test
-    public void mysqlTest(){
+    public void test(){
         MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity4Mapper.class);
-        testMapper(environment.getSqlSession());
+        testMapper(environment);
     }
 
-    private void testMapper(SqlSession sqlSession)
+    private void testMapper(MybatisEnvironment environment)
     {
+        String environmentId = environment.getSqlSession().getConfiguration().getEnvironment().getId();
+        SqlSession sqlSession = environment.getSqlSession();
         Entity4Mapper mapper = sqlSession.getMapper(Entity4Mapper.class);
         Entity4 entity4 = new Entity4("1" ,"value1" ,"rx");
         Assert.assertFalse(mapper.existByPrimaryKey(entity4.getId()));
@@ -106,7 +108,15 @@ public class Entity4Test {
         mapper.updateByPrimaryKey(entity4);
         mapper.updateByPrimaryKeySelective(entity42);
         List<Entity4> entity4s = Arrays.asList(entity4, entity42);
-        mapper.updateBatch(entity4s);
+
+        if (DataSourceEnvironment.MYSQL.name().equals(environmentId)) {
+            mapper.updateBatch(entity4s);
+        }else {
+            for (Entity4Test.Entity4 entity : entity4s) {
+                mapper.updateByPrimaryKey(entity);
+            }
+        }
+
         mapper.updateBatchSameValue(entity4s.stream().map(x -> x.getId()).collect(Collectors.toList()) , entity4);
 
         mapper.deleteByPrimaryKey(entity4.getId());

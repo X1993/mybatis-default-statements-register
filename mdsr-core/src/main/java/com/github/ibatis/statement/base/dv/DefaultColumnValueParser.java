@@ -61,7 +61,7 @@ public class DefaultColumnValueParser implements ColumnValueParser {
                 SqlCommandType sqlCommandType = columnDefaultValue.getSqlCommandType();
 
                 if (!tableColumnNames.contains(columnName)){
-                    LOGGER.warn("table {} invalid column name {}" ,tableName ,columnName);
+                    LOGGER.warn("column name [{}] not exist on table [{}] " ,columnName ,tableName);
                     return;
                 }
 

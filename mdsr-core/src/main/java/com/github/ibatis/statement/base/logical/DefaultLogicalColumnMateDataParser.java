@@ -37,7 +37,7 @@ public class DefaultLogicalColumnMateDataParser implements LogicalColumnMateData
 
         Logical logical = this.parseLogical(entityMateData.getEntityClass());
         if (logical != null) {
-            String logicalColumnName = logical.columnName();
+            String logicalColumnName = logical.columnName().toUpperCase();
             TableMateData tableMateData = entityMateData.getTableMateData();
 
             TableSchemaResolutionStrategy schemaResolutionStrategy = entityMateData.getSchemaResolutionStrategy();
@@ -48,7 +48,7 @@ public class DefaultLogicalColumnMateDataParser implements LogicalColumnMateData
                     throw new IllegalArgumentException(new StringBuilder("table [")
                             .append(tableMateData.getTableName())
                             .append("] not found column [")
-                            .append(logical.columnName())
+                            .append(logicalColumnName)
                             .append("]").toString());
                 } else if (TableSchemaResolutionStrategy.ENTITY.equals(schemaResolutionStrategy)){
                     logicalColumnMateData = new ColumnMateData();

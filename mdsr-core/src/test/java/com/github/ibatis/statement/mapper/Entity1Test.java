@@ -238,14 +238,13 @@ public class Entity1Test {
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity1`;\n" +
             "CREATE TABLE `entity1` (\n" +
-            "  `id` varchar(255) NOT NULL,\n" +
+            "  `id` varchar(255) PRIMARY KEY NOT NULL,\n" +
             "  `value` varchar(255) DEFAULT NULL,\n" +
-            "  `value_one` varchar(255) DEFAULT NULL,\n" +
-            "  PRIMARY KEY (`id`) USING BTREE\n" +
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+            "  `value_one` varchar(255) DEFAULT NULL\n" +
+            ");";
 
     @Test
-    public void mysqlTest(){
+    public void test(){
         MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity1Mapper.class);

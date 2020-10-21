@@ -11,11 +11,8 @@ import com.github.ibatis.statement.base.logical.LogicalColumnMateDataParser;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.MappedStatementFactory;
 import com.github.ibatis.statement.register.StatementAutoRegister;
-import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
+import com.github.ibatis.statement.register.database.*;
 import com.github.ibatis.statement.base.core.parse.*;
-import com.github.ibatis.statement.register.database.TableSchemaQuery;
-import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,17 +151,24 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     }
 
     @Bean
-    public MysqlTableSchemaQuery mysqlTableMateDataQueryRegister()
+    @ConditionalOnMissingBean
+    public MysqlTableSchemaQuery mysqlTableSchemaQuery()
     {
         return new MysqlTableSchemaQuery();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public H2TableSchemaQuery h2TableSchemaQuery(){
+        return new H2TableSchemaQuery();
     }
 
     @Bean
     @ConditionalOnMissingBean(value = TableSchemaQueryRegister.class)
     public DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister(@Autowired(required = false) List<TableSchemaQuery> tableSchemaQueries){
         DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-        if (tableSchemaQueries != null){
-            defaultTableSchemaQueryRegister.register(tableSchemaQueries);
+        if (tableSchemaQueries != null && tableSchemaQueries.size() > 0){
+            defaultTableSchemaQueryRegister.register(tableSchemaQueries.toArray(new TableSchemaQuery[tableSchemaQueries.size()]));
         }
         return defaultTableSchemaQueryRegister;
     }

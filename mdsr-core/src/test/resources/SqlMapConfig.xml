@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-    <environments default="mysql">
-        <environment id="mysql">
+    <environments default="MYSQL">
+        <environment id="MYSQL">
             <!-- 使用jdbc事务管理 -->
             <transactionManager type="JDBC" />
             <!-- 数据库连接池 -->
@@ -13,6 +13,18 @@
                 <property name="url" value="jdbc:mariadb://localhost:3306/test?allowMultiQueries=true" />
                 <property name="username" value="root" />
                 <property name="password" value="123456" />
+            </dataSource>
+        </environment>
+
+        <environment id="H2">
+            <!-- 使用jdbc事务管理 -->
+            <transactionManager type="JDBC" />
+            <!-- 数据库连接池 -->
+            <dataSource type="POOLED">
+                <property name="driver" value="org.h2.Driver" />
+                <property name="url" value="jdbc:h2:mem:Test;DB_CLOSE_DELAY=-1;MODE=MySQL" />
+                <property name="username" value="SA" />
+                <property name="password" value="" />
             </dataSource>
         </environment>
     </environments>

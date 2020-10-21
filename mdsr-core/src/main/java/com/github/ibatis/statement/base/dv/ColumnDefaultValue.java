@@ -55,7 +55,7 @@ public class ColumnDefaultValue implements Cloneable {
     }
 
     public void setColumnName(String columnName) {
-        this.columnName = columnName;
+        this.columnName = columnName.toUpperCase();
     }
 
     public String getValue() {

@@ -1,7 +1,7 @@
 # 文档
 
 ## 运行环境:
-JDK 8+, Maven, Mysql/MariaDB
+JDK 8+, Maven, Mysql/MariaDB/H2
 
 ## 快速开始
 ### 配置参数
@@ -20,22 +20,28 @@ JDK 8+, Maven, Mysql/MariaDB
             <artifactId>mariadb-java-client</artifactId>
             <version>2.2.5</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
+        </dependency>
     </dependencies>
 ```
 -   user表Schema脚本 
 ```sql
-    DROP TABLE IF EXISTS `user`;
-    CREATE TABLE `user` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `name` varchar(6) COLLATE utf8_bin DEFAULT NULL COMMENT '姓名',
-      `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-      `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-      `address` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '地址',
-      `note` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '备注',
-      `version` int(255) DEFAULT NULL COMMENT '版本号',
-      `removed` bit(1) DEFAULT b'0' COMMENT '逻辑列，是否已删除 1：已删除',
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+    DROP TABLE IF EXISTS user;
+    CREATE TABLE user (
+      id int(11) PRIMARY KEY AUTO_INCREMENT,
+      name varchar(6) DEFAULT NULL ,
+      create_time datetime DEFAULT NULL ,
+      update_time datetime DEFAULT NULL ,
+      address varchar(50) DEFAULT NULL ,
+      address2 varchar(50) DEFAULT NULL ,
+      note varchar(100) DEFAULT NULL ,
+      version int(255) DEFAULT NULL ,
+      removed bit(1) DEFAULT 0 COMMENT '是否已删除，1：已删除'
+    );
 ```
 -   Mybatis配置文件SqlMapConfig
 ```xml
@@ -44,8 +50,8 @@ JDK 8+, Maven, Mysql/MariaDB
             PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
             "http://mybatis.org/dtd/mybatis-3-config.dtd">
     <configuration>
-        <environments default="mysql">
-            <environment id="mysql">
+        <environments default="MYSQL">
+            <environment id="MYSQL">
                 <!-- 使用jdbc事务管理 -->
                 <transactionManager type="JDBC" />
                 <!-- 数据库连接池 -->
@@ -54,6 +60,18 @@ JDK 8+, Maven, Mysql/MariaDB
                     <property name="url" value="jdbc:mariadb://localhost:3306/test?allowMultiQueries=true" />
                     <property name="username" value="root" />
                     <property name="password" value="123456" />
+                </dataSource>
+            </environment>
+    
+            <environment id="H2">
+                <!-- 使用jdbc事务管理 -->
+                <transactionManager type="JDBC" />
+                <!-- 数据库连接池 -->
+                <dataSource type="POOLED">
+                    <property name="driver" value="org.h2.Driver" />
+                    <property name="url" value="jdbc:h2:mem:Test;DB_CLOSE_DELAY=-1;MODE=MySQL" />
+                    <property name="username" value="SA" />
+                    <property name="password" value="" />
                 </dataSource>
             </environment>
         </environments>
@@ -77,6 +95,7 @@ JDK 8+, Maven, Mysql/MariaDB
     import com.github.ibatis.statement.register.StatementAutoRegister;
     import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
     import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
+    import com.github.ibatis.statement.register.database.H2TableSchemaQuery;
     import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
     import org.apache.ibatis.io.Resources;
     import org.apache.ibatis.jdbc.ScriptRunner;
@@ -91,22 +110,30 @@ JDK 8+, Maven, Mysql/MariaDB
     
     public class Demo{
         
-        private UserMapper userMapper;
-    
-        public Demo() throws IOException {
-            SqlSessionFactory sqlSessionFactory = initSqlSessionFactory();
-            SqlSession sqlSession = sqlSessionFactory.openSession();
-            userMapper = sqlSessionFactory.getConfiguration().getMapper(UserMapper.class ,sqlSession);
-        }
+        private static SqlSession sqlSession;
         
-        /*
-         初始化SqlSessionFactory
-         */
-       public static SqlSessionFactory initSqlSessionFactory() throws IOException
-       {
-           SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
-                   .build(Resources.getResourceAsStream("demo/SqlMapConfig.xml"));
-           SqlSession sqlSession = sqlSessionFactory.openSession();
+        private final UserMapper userMapper;
+    
+        private final CustomUserMapper customUserMapper;
+    
+        static {
+            try {
+                sqlSession = initSqlSessionFactory("H2").openSession();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    
+        public Demo() {
+            userMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(UserMapper.class ,sqlSession);
+            customUserMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(CustomUserMapper.class ,sqlSession);
+        }
+    
+        public static SqlSessionFactory initSqlSessionFactory(String environment) throws IOException
+        {
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
+                    .build(Resources.getResourceAsStream("demo/SqlMapConfig.xml") ,environment);
+            SqlSession sqlSession = sqlSessionFactory.openSession();
    
            ScriptRunner scriptRunner = new ScriptRunner(sqlSession.getConnection());
            scriptRunner.setAutoCommit(true);
@@ -114,9 +141,8 @@ JDK 8+, Maven, Mysql/MariaDB
            scriptRunner.runScript(Resources.getResourceAsReader("demo/schema.sql"));
    
            //不同数据库需要使用不同的MysqlTableSchemaQuery实现
-           MysqlTableSchemaQuery mysqlTableSchemaQuery = new MysqlTableSchemaQuery();
            TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-           tableSchemaQueryRegister.register(mysqlTableSchemaQuery);
+           tableSchemaQueryRegister.register(new MysqlTableSchemaQuery() ,new H2TableSchemaQuery());
    
            StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
                    .setEntityMateDataParser(
@@ -891,14 +917,14 @@ JDK 8+, Maven, Mysql/MariaDB
 -   schema.sql
 ```sql
     DROP TABLE IF EXISTS `entity3`;
-    
+  
     CREATE TABLE `entity3` (
       `id1` int(32) ,
       `id2` int(32) ,
       `value` varchar(30) DEFAULT NULL,
       `value2` varchar(30) DEFAULT NULL,
-      PRIMARY KEY (`id1` ,`id2`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+      CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2)
+    );
 ```
 -   实体类
 ```java
@@ -1509,7 +1535,7 @@ JDK 8+, Maven, Mysql/MariaDB
          * @param dynamicParams
          * @return
          */
-        int countDynamicParams(DynamicParams dynamicParams);
+        int countByDynamicParams(DynamicParams dynamicParams);
     
         /**
          * 通过自定义规则查询符合条件的数据条数
@@ -1517,7 +1543,7 @@ JDK 8+, Maven, Mysql/MariaDB
          * @return
          */
         default int countWhereConditions(ConditionParams conditionParams){
-            return countDynamicParams(conditionParams == null ? null : conditionParams.dynamicParams());
+            return countByDynamicParams(conditionParams == null ? null : conditionParams.dynamicParams());
         }
     
     }

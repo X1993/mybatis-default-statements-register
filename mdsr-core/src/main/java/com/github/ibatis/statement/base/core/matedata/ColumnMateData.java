@@ -47,7 +47,7 @@ public class ColumnMateData implements Cloneable{
     }
 
     public void setColumnName(String columnName) {
-        this.columnName = columnName;
+        this.columnName = columnName.toUpperCase();
     }
 
     public String getDataType() {

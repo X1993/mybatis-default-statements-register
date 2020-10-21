@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author junjie
@@ -18,21 +15,12 @@ public class DefaultTableSchemaQueryRegister implements TableSchemaQueryRegister
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTableSchemaQueryRegister.class);
 
-    private final Map<String ,TableSchemaQuery> tableSchemaQueryMap = new HashMap<>();
+    private final List<TableSchemaQuery> tableSchemaQueries = new ArrayList<>();
 
     @Override
-    public void register(Collection<TableSchemaQuery> tableSchemaQueries) {
-        if (tableSchemaQueries != null){
-            for (TableSchemaQuery tableSchemaQuery : tableSchemaQueries) {
-                register(tableSchemaQuery);
-            }
-        }
-    }
-
-    @Override
-    public void register(TableSchemaQuery tableSchemaQuery) {
-        for (String databaseName : tableSchemaQuery.databaseType()) {
-            tableSchemaQueryMap.put(databaseName.toUpperCase() ,tableSchemaQuery);
+    public void register(TableSchemaQuery ... tableSchemaQueries) {
+        for (TableSchemaQuery tableSchemaQuery : tableSchemaQueries) {
+            this.tableSchemaQueries.add(tableSchemaQuery);
         }
     }
 
@@ -47,11 +35,14 @@ public class DefaultTableSchemaQueryRegister implements TableSchemaQueryRegister
             throw new IllegalStateException(e);
         }
 
-        TableSchemaQuery tableSchemaQuery = tableSchemaQueryMap.get(databaseProductName);
-        if (tableSchemaQuery == null){
-            LOGGER.warn("don't exist match TableSchemaQuery for database type [{}]" ,databaseProductName);
+        for (TableSchemaQuery tableSchemaQuery : tableSchemaQueries) {
+            if (tableSchemaQuery.match(sqlSession ,databaseProductName)){
+                return Optional.of(tableSchemaQuery);
+            }
         }
-        return Optional.ofNullable(tableSchemaQuery);
+
+        LOGGER.warn("don't match TableSchemaQuery for data base type [{}]" ,databaseProductName);
+        return Optional.empty();
     }
 
 }

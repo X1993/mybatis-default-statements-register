@@ -52,7 +52,7 @@ public class TableMateData implements Cloneable{
     }
 
     public void setTableName(String tableName) {
-        this.tableName = tableName;
+        this.tableName = tableName.toUpperCase();
     }
 
     public String getTableType() {
@@ -111,10 +111,22 @@ public class TableMateData implements Cloneable{
      */
     public enum Type {
 
-        BASE_TABLE,//基础表
-        VIEW,//视图
-        SYSTEM_VIEW,//系统视图
-        UNDEFINED,//未定义
+        /**
+         * 基础表
+         */
+        BASE_TABLE,
+        /**
+         * 视图
+         */
+        VIEW,
+        /**
+         * 系统视图
+         */
+        SYSTEM_VIEW,
+        /**
+         * 未定义
+         */
+        UNDEFINED,
 
     }
 

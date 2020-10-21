@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -133,6 +134,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
                                                          TableSchemaResolutionStrategy strategy ,
                                                          SqlSession sqlSession)
     {
+        LOGGER.debug("parse EntityMateData for [{}] from database table [{}]" ,entityClazz ,tableName);
         TableSchemaQuery tableSchemaQuery = tableSchemaQueryRegister.getTableSchemaQuery(sqlSession).orElse(null);
         if (tableSchemaQuery != null){
             TableMateData tableMateData = tableSchemaQuery.queryTable(sqlSession, tableName).orElse(null);
@@ -153,6 +155,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
                                                        TableSchemaResolutionStrategy strategy ,
                                                        SqlSession sqlSession)
     {
+        LOGGER.debug("parse EntityMateData for [{}] from entity class" ,entityClazz);
         Map<String, ColumnPropertyMapping> columnPropertyMappings = parseColumnPropertyMappings(entityClazz);
 
         TableMateData tableMateData = new TableMateData();
@@ -264,7 +267,8 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
         for (String keyColumnName : tableMateData.getKeyColumnMateDataMap().keySet()) {
             if (!columnPropertyMappings.containsKey(keyColumnName)){
-                throw new IllegalArgumentException("unable to map entity attributes for primary key column :" + keyColumnName);
+                throw new IllegalArgumentException(MessageFormat.format("unable to map entity " +
+                        "attributes for primary key column [{0}]" , keyColumnName));
             }
         }
 

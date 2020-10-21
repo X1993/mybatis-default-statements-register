@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.demo;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.condition.ColumnConditionParser;
 import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
 import com.github.ibatis.statement.base.condition.Strategy;
@@ -12,6 +13,7 @@ import com.github.ibatis.statement.mapper.param.DynamicParams;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.StatementAutoRegister;
 import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
+import com.github.ibatis.statement.register.database.H2TableSchemaQuery;
 import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
 import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
 import org.apache.ibatis.io.Resources;
@@ -40,7 +42,7 @@ public class Demo {
 
     static {
         try {
-            sqlSession = initSqlSessionFactory().openSession();
+            sqlSession = initSqlSessionFactory(DataSourceEnvironment.H2.name()).openSession();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -51,10 +53,10 @@ public class Demo {
         customUserMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(CustomUserMapper.class ,sqlSession);
     }
 
-    public static SqlSessionFactory initSqlSessionFactory() throws IOException
+    public static SqlSessionFactory initSqlSessionFactory(String environment) throws IOException
     {
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
-                .build(Resources.getResourceAsStream("demo/SqlMapConfig.xml"));
+                .build(Resources.getResourceAsStream("demo/SqlMapConfig.xml") ,environment);
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         ScriptRunner scriptRunner = new ScriptRunner(sqlSession.getConnection());
@@ -63,9 +65,8 @@ public class Demo {
         scriptRunner.runScript(Resources.getResourceAsReader("demo/schema.sql"));
 
         //不同数据库需要使用不同的MysqlTableSchemaQuery实现
-        MysqlTableSchemaQuery mysqlTableSchemaQuery = new MysqlTableSchemaQuery();
         TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-        tableSchemaQueryRegister.register(mysqlTableSchemaQuery);
+        tableSchemaQueryRegister.register(new MysqlTableSchemaQuery() ,new H2TableSchemaQuery());
 
         //列名为`update_time`的列在执行新增和修改指令时，如果没有指定值，使用默认值now()
         ColumnValueParser updateTimeColumnValueParser = new SpecificColumnValueParser(
@@ -236,7 +237,10 @@ public class Demo {
         List<User> users = Arrays.asList(user1, user2);
         userMapper.insertBatch(users);
         user1.setAddress(null);
-        userMapper.updateBatch(users);
+        //H2不支持批量更新
+        if (DataSourceEnvironment.MYSQL.name().equals(sqlSession.getConfiguration().getEnvironment().getId())) {
+            userMapper.updateBatch(users);
+        }
     }
 
     @Test

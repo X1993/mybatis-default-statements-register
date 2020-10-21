@@ -59,7 +59,7 @@ public class ColumnCondition implements Cloneable{
     }
 
     public void setColumnName(String columnName) {
-        this.columnName = columnName;
+        this.columnName = columnName.toUpperCase();
     }
 
     public ConditionRule getRule() {

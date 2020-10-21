@@ -1,0 +1,11 @@
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  mapped-statement:
+    auto-register:
+      each-property-mapping-column: true #默认为每一个属性需要尝试映射列
+#      table-schema-resolution-strategy: entity
+
+logging:
+  level:
+    root: debug

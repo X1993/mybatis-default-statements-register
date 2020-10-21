@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
@@ -76,19 +77,21 @@ public class Entity3Test {
             "  `id2` int(32) ,\n" +
             "  `value` varchar(30) DEFAULT NULL,\n" +
             "  `value2` varchar(30) DEFAULT NULL,\n" +
-            "  PRIMARY KEY (`id1` ,`id2`)\n" +
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+            "  CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2) \n" +
+            ");";
 
     @Test
-    public void mysqlTest(){
+    public void test(){
         MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity3Mapper.class);
-        testMapper(environment.getSqlSession());
+        testMapper(environment);
     }
 
-    private void testMapper(SqlSession sqlSession)
+    private void testMapper(MybatisEnvironment environment)
     {
+        String environmentId = environment.getSqlSession().getConfiguration().getEnvironment().getId();
+        SqlSession sqlSession = environment.getSqlSession();
         Entity3Mapper mapper = sqlSession.getMapper(Entity3Mapper.class);
         Entity3 entity31 = new Entity3(1 ,1 ,"1");
         Entity3 entity32 = new Entity3(2 ,2 ,null);
@@ -106,7 +109,15 @@ public class Entity3Test {
         mapper.updateByPrimaryKey(entity31);
         mapper.updateByPrimaryKeySelective(entity32);
         List<Entity3> entity3s = Arrays.asList(entity31, entity32);
-        mapper.updateBatch(entity3s);
+
+        if (DataSourceEnvironment.MYSQL.name().equals(environmentId)) {
+            mapper.updateBatch(entity3s);
+        }else {
+            for (Entity3Test.Entity3 entity3 : entity3s) {
+                mapper.updateByPrimaryKey(entity3);
+            }
+        }
+
         mapper.updateBatchSameValue(entity3s, entity32);
 
         Assert.assertNotNull(mapper.selectSelective(entity31));
@@ -127,6 +138,7 @@ public class Entity3Test {
         List<Entity3> list = IntStream.range(10, 20)
                 .mapToObj(i -> new Entity3(i ,i ,String.valueOf(i)))
                 .collect(Collectors.toList());
+
         mapper.insertBatch(list);
         Assert.assertEquals(mapper.selectAll().size() ,10);
         Entity3 condition = new Entity3();

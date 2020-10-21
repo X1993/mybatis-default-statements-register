@@ -1,7 +1,7 @@
 # 文档
 
 ## 运行环境:
-JDK 8+, Maven, Mysql/MariaDB
+JDK 8+, Maven, Mysql/MariaDB/H2
 
 ## 快速开始
 >   Spring-Boot项目 [参考](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample) 
@@ -30,18 +30,18 @@ JDK 8+, Maven, Mysql/MariaDB
 ```
 -   schema脚本 
 ```sql
-    DROP TABLE IF EXISTS `user`;
-    CREATE TABLE `user` (
-      `id` int(11) NOT NULL AUTO_INCREMENT,
-      `name` varchar(6) COLLATE utf8_bin DEFAULT NULL COMMENT '姓名',
-      `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-      `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-      `address` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT '地址',
-      `note` varchar(100) COLLATE utf8_bin DEFAULT NULL COMMENT '备注',
-      `version` int(255) DEFAULT NULL COMMENT '版本号',
-      `removed` bit(1) DEFAULT b'0' COMMENT '逻辑列，是否已删除 1：已删除',
-      PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+    DROP TABLE IF EXISTS user;
+    CREATE TABLE user (
+      id int(11) PRIMARY KEY AUTO_INCREMENT,
+      name varchar(6) DEFAULT NULL ,
+      create_time datetime DEFAULT NULL ,
+      update_time datetime DEFAULT NULL ,
+      address varchar(50) DEFAULT NULL ,
+      address2 varchar(50) DEFAULT NULL ,
+      note varchar(100) DEFAULT NULL ,
+      version int(255) DEFAULT NULL ,
+      removed bit(1) DEFAULT 0 COMMENT '是否已删除，1：已删除'
+    );
 ```
 -   spring-boot.application.yaml配置
 ```yaml
@@ -627,14 +627,14 @@ JDK 8+, Maven, Mysql/MariaDB
 -   schema.sql
 ```sql
     DROP TABLE IF EXISTS `entity3`;
-    
+        
     CREATE TABLE `entity3` (
       `id1` int(32) ,
       `id2` int(32) ,
       `value` varchar(30) DEFAULT NULL,
       `value2` varchar(30) DEFAULT NULL,
-      PRIMARY KEY (`id1` ,`id2`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+      CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2)
+    );
 ```
 -   实体类
 ```java

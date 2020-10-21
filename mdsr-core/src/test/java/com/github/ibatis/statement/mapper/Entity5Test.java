@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.core.Entity;
 import com.github.ibatis.statement.base.core.MappingStrategy;
@@ -93,19 +94,21 @@ public class Entity5Test {
             "  `value2` varchar(30) DEFAULT NULL,\n" +
             "  `value3` varchar(30) DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
-            "  PRIMARY KEY (`id` ,`id2`) USING BTREE\n" +
-            ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+            "  CONSTRAINT table_entity5_pk PRIMARY KEY (id, id2) \n" +
+            "); ";
 
     @Test
-    public void mysqlTest(){
+    public void test(){
         MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity5Mapper.class);
-        testMapper(environment.getSqlSession());
+        testMapper(environment);
     }
 
-    private void testMapper(SqlSession sqlSession)
+    private void testMapper(MybatisEnvironment environment)
     {
+        String environmentId = environment.getSqlSession().getConfiguration().getEnvironment().getId();
+        SqlSession sqlSession = environment.getSqlSession();
         Entity5Mapper mapper = sqlSession.getMapper(Entity5Mapper.class);
 
         Entity5 entity51 = new Entity5("1" ,"1");
@@ -125,7 +128,15 @@ public class Entity5Test {
         entity52.setValue2("2");
         mapper.updateByPrimaryKeySelective(entity52);
         List<Entity5> entity5s = Arrays.asList(entity51, entity52);
-        mapper.updateBatch(entity5s);
+
+        if (DataSourceEnvironment.MYSQL.name().equals(environmentId)) {
+            mapper.updateBatch(entity5s);
+        }else {
+            for (Entity5Test.Entity5 entity : entity5s) {
+                mapper.updateByPrimaryKey(entity);
+            }
+        }
+
         Assert.assertEquals(mapper.totalSelective(entity51) ,1);
         mapper.updateBatchSameValue(entity5s, entity51);
 

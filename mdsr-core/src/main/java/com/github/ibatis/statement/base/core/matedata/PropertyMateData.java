@@ -47,7 +47,7 @@ public class PropertyMateData implements Cloneable{
     }
 
     public PropertyMateData(String mappingColumnName, Field field) {
-        this.mappingColumnName = mappingColumnName;
+        this.mappingColumnName = mappingColumnName.toUpperCase();
         this.field = field;
     }
 
@@ -73,7 +73,7 @@ public class PropertyMateData implements Cloneable{
     }
 
     public void setMappingColumnName(String mappingColumnName) {
-        this.mappingColumnName = mappingColumnName;
+        this.mappingColumnName = mappingColumnName.toUpperCase();
     }
 
     public MappingStrategy getMappingStrategy() {

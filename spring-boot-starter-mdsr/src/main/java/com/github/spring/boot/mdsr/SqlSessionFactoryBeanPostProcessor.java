@@ -3,8 +3,6 @@ package com.github.spring.boot.mdsr;
 import com.github.ibatis.statement.register.StatementAutoRegister;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.mapper.MapperFactoryBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -19,8 +17,6 @@ import org.springframework.context.annotation.Import;
 @Import(DefaultStatementConfiguration.class)
 @Configuration
 public class SqlSessionFactoryBeanPostProcessor implements BeanPostProcessor,ApplicationContextAware {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SqlSessionFactoryBeanPostProcessor.class);
 
     private ApplicationContext applicationContext;
 

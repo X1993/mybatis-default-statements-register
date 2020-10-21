@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.condition.Condition;
 import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.dv.DefaultValue;
@@ -121,19 +122,21 @@ public class Entity2Test {
             "  `update_time` datetime DEFAULT NULL,\n" +
             "  `create_time` datetime DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
-            "  PRIMARY KEY (`id` ,`id2`) USING BTREE\n" +
+            "  CONSTRAINT table_entity2_pk PRIMARY KEY (id, id2)\n" +
             ");";
 
     @Test
-    public void mysqlTest(){
+    public void test(){
         MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity2Mapper.class);
-        testMapper(environment.getSqlSession());
+        testMapper(environment);
     }
 
-    private void testMapper(SqlSession sqlSession)
+    private void testMapper(MybatisEnvironment environment)
     {
+        String environmentId = environment.getSqlSession().getConfiguration().getEnvironment().getId();
+        SqlSession sqlSession = environment.getSqlSession();
         Entity2Mapper mapper = sqlSession.getMapper(Entity2Mapper.class);
         Entity2 entity20 = new Entity2("1" ,"1");
 
@@ -222,7 +225,14 @@ public class Entity2Test {
         entity23.setValue3("3");
 
         entity2s = Arrays.asList(entity21, entity22, entity23);
-        mapper.updateBatch(entity2s);
+        if (DataSourceEnvironment.MYSQL.name().equals(environmentId)) {
+            mapper.updateBatch(entity2s);
+        }else {
+            for (Entity2 entity2 : entity2s) {
+                mapper.updateByPrimaryKey(entity2);
+            }
+        }
+
         entity21 = mapper.selectByPrimaryKey(entity21);
         entity22 = mapper.selectByPrimaryKey(entity22);
         entity23 = mapper.selectByPrimaryKey(entity23);
@@ -237,8 +247,16 @@ public class Entity2Test {
         entity23.setUpdateTime(new Date());
         entity22.setUpdateTime(updateTime);
         entity22.setValue3("3");
+
         entity2s = Arrays.asList(entity21, entity22, entity23);
-        mapper.updateBatch(entity2s);
+        if (DataSourceEnvironment.MYSQL.name().equals(environmentId)) {
+            mapper.updateBatch(entity2s);
+        }else {
+            for (Entity2 entity2 : entity2s) {
+                mapper.updateByPrimaryKey(entity2);
+            }
+        }
+
         entity21 = mapper.selectByPrimaryKey(entity21);
         entity22 = mapper.selectByPrimaryKey(entity22);
         entity23 = mapper.selectByPrimaryKey(entity23);

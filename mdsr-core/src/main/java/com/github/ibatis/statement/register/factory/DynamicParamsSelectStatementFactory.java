@@ -64,15 +64,15 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
         boolean selectCount = SELECT_COUNT_METHOD_NAME.equals(methodName);
         List<SqlNode> sqlNodes = new ArrayList<>();
 
-        SqlNode baseSqlNode = new StaticTextSqlNode(new StringBuilder("select ")
-                .append(selectCount ? "count(0) " : entityMateData.getBaseColumnListSqlContent())
-                .append(" from `")
+        SqlNode baseSqlNode = new StaticTextSqlNode(new StringBuilder("SELECT ")
+                .append(selectCount ? "COUNT(0) " : entityMateData.getBaseColumnListSqlContent())
+                .append(" FROM `")
                 .append(entityMateData.getTableMateData().getTableName())
                 .append("` ")
                 .toString());
         sqlNodes.add(baseSqlNode);
 
-        sqlNodes.add(new StaticTextSqlNode(" where 1 = 1 "));
+        sqlNodes.add(new StaticTextSqlNode(" WHERE 1 = 1 "));
 
         //值固定的查询条件
         sqlNodes.add(entityMateData.noCustomConditionsSqlNode(
@@ -93,14 +93,14 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
         }
 
         //group by
-        sqlNodes.add(new IfSqlNode(new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(" group by ") ,
+        sqlNodes.add(new IfSqlNode(new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(" GROUP BY ") ,
                 new ForEachSqlNode(configuration, new TextSqlNode("${key}") ,
                 "groupColumns", null, "key",
                         null, null, ","))),
                 "groupColumns != null && groupColumns.size() > 0"));
 
         //having
-        sqlNodes.add(new IfSqlNode(new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(" having 1 = 1 ") ,
+        sqlNodes.add(new IfSqlNode(new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(" HAVING 1 = 1 ") ,
                 this.buildConditionSql(configuration ,"havingConditions"))) ,
                 "havingConditions != null"));
 
@@ -108,11 +108,11 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
             //order by
             sqlNodes.add(new IfSqlNode(new ForEachSqlNode(configuration ,
                     new TextSqlNode(" ${order.key} ${order.rule} ") ,"orderRules" ,null ,
-                    "order" ,"order by" ,null ,",") ,
+                    "order" ,"ORDER BY" ,null ,",") ,
                     "orderRules != null and orderRules.size > 0"));
 
             //limit
-            sqlNodes.add(new IfSqlNode(new StaticTextSqlNode(" limit #{limitParam.index}, " +
+            sqlNodes.add(new IfSqlNode(new StaticTextSqlNode(" LIMIT #{limitParam.index}, " +
                     "#{limitParam.size} ") ,"limitParam != null"));
         }
 
@@ -124,9 +124,9 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
         return new IfSqlNode(new MixedSqlNode(Arrays.asList(
                 new VarDeclSqlNode("proCondition" ,"null") ,
                 new ForEachSqlNode(configuration, new MixedSqlNode(Arrays.asList(
-                        new ChooseSqlNode(Arrays.asList(new IfSqlNode(new StaticTextSqlNode(" and ( "),
+                        new ChooseSqlNode(Arrays.asList(new IfSqlNode(new StaticTextSqlNode(" AND ( "),
                                 "(proCondition == null or (proCondition != null and proCondition.isOr() == false)) " +
-                                        "and condition.isOr() == true")), new IfSqlNode(new StaticTextSqlNode(" and "),
+                                        "and condition.isOr() == true")), new IfSqlNode(new StaticTextSqlNode(" AND "),
                                 "proCondition == null or (proCondition != null and proCondition.isOr() == false)")),
                         new TextSqlNode(" ${condition.key} ${condition.rule.expression} "),
                         new IfSqlNode(new ChooseSqlNode(Arrays.asList(
@@ -134,13 +134,13 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
                                         "condition.value", null, "data",
                                         "(", ")", ","),
                                 "condition.rule.name()=='IN' || condition.rule.name()=='NOT_IN'"),
-                                new IfSqlNode(new StaticTextSqlNode(" #{condition.value.minVal} and #{condition.value.maxVal}"),
+                                new IfSqlNode(new StaticTextSqlNode(" #{condition.value.minVal} AND #{condition.value.maxVal}"),
                                         "condition.rule.name()=='BETWEEN'"),
                                 new IfSqlNode(new StaticTextSqlNode(""), "condition.rule.name()=='NE'"),
                                 new IfSqlNode(new StaticTextSqlNode(""),
                                         "condition.rule.name()=='ISNULL' || condition.rule.name()=='NOT_NULL'")),
                                 new StaticTextSqlNode(" #{condition.value} ")), "condition.value != null"),
-                        new IfSqlNode(new StaticTextSqlNode(" or "), "condition.isOr() == true"),
+                        new IfSqlNode(new StaticTextSqlNode(" OR "), "condition.isOr() == true"),
                         new IfSqlNode(new StaticTextSqlNode(") "),
                                 "condition.isOr() == false and (proCondition != null and proCondition.isOr() ==true)"),
                         new VarDeclSqlNode("proCondition", "condition")

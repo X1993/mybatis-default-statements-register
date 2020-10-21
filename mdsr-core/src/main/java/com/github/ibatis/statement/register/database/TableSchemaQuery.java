@@ -16,6 +16,7 @@ public interface TableSchemaQuery {
 
     /**
      * 查询指定表包含的列信息
+     * @param sqlSession
      * @param tableName 表名
      * @return
      */
@@ -23,16 +24,19 @@ public interface TableSchemaQuery {
 
     /**
      * 查询指定表信息
+     * @param sqlSession
      * @param tableName
      * @return
      */
     Optional<TableMateData> queryTable(SqlSession sqlSession ,String tableName);
 
     /**
-     * 支持的数据库类型
+     * 是否支持查询table-schema
+     * @param sqlSession
+     * @param databaseProductName sqlSession.getConnection().getMetaData().getDatabaseProductName().toUpperCase()
      * @return
      */
-    String[] databaseType();
+    boolean match(SqlSession sqlSession ,String databaseProductName);
 
     /**
      * 获取不同数据库列类型对应的Jdbc类型
