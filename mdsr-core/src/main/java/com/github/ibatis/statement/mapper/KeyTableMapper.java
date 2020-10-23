@@ -58,7 +58,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * mysql数据库url添加allowMultiQueries=true，否则会报错
      * @param list
      * @return
-     * @deprecated 某些数据库（如H2）不支持
+     * @deprecated 某些数据库（如H2）不支持，适用性比较差
      */
     @Deprecated
     int updateBatch(Collection<T> list);
@@ -87,6 +87,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
 
     /**
      * 根据主键批量删除（根据有无逻辑列执行逻辑删除或物理删除）
+     * @param keys
      * @return
      */
     int deleteBatchByPrimaryKey(Collection<K> keys);

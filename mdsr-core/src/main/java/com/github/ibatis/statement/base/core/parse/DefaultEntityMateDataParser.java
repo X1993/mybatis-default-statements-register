@@ -56,7 +56,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
     /**
      * key : databaseId {@link Configuration#getDatabaseId()}
      * value :
-     *  key : entity class
+     * key : entity class
      */
     private final Map<DataSource, Map<Class<?> ,EntityMateData>> databaseEntityMateDataCache = new HashMap<>();
 
