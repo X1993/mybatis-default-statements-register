@@ -1,10 +1,12 @@
 package com.github.ibatis.statement.register;
 
+import com.github.ibatis.statement.base.core.matedata.TableMateData;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.core.matedata.RootMapperMethodMateData;
 import com.github.ibatis.statement.mapper.KeyParameterType;
+import com.github.ibatis.statement.mapper.TableMapper;
 import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
@@ -78,6 +80,16 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
                     "but mapper entity mapping table [{2}] no primary key" ,
                     mapperClass ,KeyParameterType.class ,entityMateData.getTableName()));
+        }
+
+        TableMateData tableMateData = entityMateData.getTableMateData();
+        if (TableMapper.class.isAssignableFrom(mapperClass)){
+            TableMateData.Type type = tableMateData.getType();
+            if ((TableMateData.Type.VIEW.equals(type) || TableMateData.Type.SYSTEM_VIEW.equals(type))){
+                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
+                                "but mapper entity mapping table [{2}] type is [{3}]" ,
+                        mapperClass ,TableMapper.class ,entityMateData.getTableName() ,tableMateData.getTableType()));
+            }
         }
 
         Configuration configuration = sqlSession.getConfiguration();
