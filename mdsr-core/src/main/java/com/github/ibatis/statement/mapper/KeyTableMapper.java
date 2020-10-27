@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * 支持带主键的表
- * @see K 主键类型或实体类型{@link T}
+ * @see K 主键类型或实体类型{@link KeyParameterType}
  * @see T 映射的实体类型
  * @author junjie
  * @date 2020/2/22

@@ -6,7 +6,7 @@ import org.apache.ibatis.exceptions.TooManyResultsException;
 import java.util.List;
 
 /**
- * 自定义规则查询接口
+ * 动态参数查询接口
  * @Author: junjie
  * @Date: 2020/8/31
  */

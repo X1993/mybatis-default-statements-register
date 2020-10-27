@@ -3,7 +3,7 @@ package com.github.ibatis.statement.mapper;
 import java.util.Collection;
 
 /**
- * 普通表操作mapper
+ * 表操作mapper
  * @Author: junjie
  * @Date: 2020/3/18
  */
