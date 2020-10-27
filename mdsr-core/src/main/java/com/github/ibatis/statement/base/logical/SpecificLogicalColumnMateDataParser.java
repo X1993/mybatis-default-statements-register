@@ -43,7 +43,8 @@ public class SpecificLogicalColumnMateDataParser implements LogicalColumnMateDat
         Objects.requireNonNull("construction parameters [logicalColumnName] is null");
         Objects.requireNonNull("construction parameters [existValue] is null");
         Objects.requireNonNull("construction parameters [notExistValue] is null");
-        predicate = columnMateData -> logicalColumnName.equals(columnMateData.getColumnName());
+        final String matchColumnName = logicalColumnName.toUpperCase();
+        predicate = columnMateData -> matchColumnName.equals(columnMateData.getColumnName());
         this.existValue = existValue;
         this.notExistValue = notExistValue;
     }
