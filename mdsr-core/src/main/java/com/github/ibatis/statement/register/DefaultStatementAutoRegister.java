@@ -11,12 +11,14 @@ import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
 import com.github.ibatis.statement.util.Sorter;
+import com.github.ibatis.statement.util.TypeUtils;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -76,21 +78,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
                         "unable parse EntityMateData from mapper [{0}] entity class [{1}]" ,
                         mapperClass ,mapperEntityClass)));
 
-        if (KeyParameterType.class.isAssignableFrom(mapperClass) && entityMateData.getPrimaryKeyCount() <= 0){
-            throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
-                    "but mapper entity mapping table [{2}] no primary key" ,
-                    mapperClass ,KeyParameterType.class ,entityMateData.getTableName()));
-        }
-
-        TableMateData tableMateData = entityMateData.getTableMateData();
-        if (TableMapper.class.isAssignableFrom(mapperClass)){
-            TableMateData.Type type = tableMateData.getType();
-            if ((TableMateData.Type.VIEW.equals(type) || TableMateData.Type.SYSTEM_VIEW.equals(type))){
-                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
-                                "but mapper entity mapping table [{2}] type is [{3}]" ,
-                        mapperClass ,TableMapper.class ,entityMateData.getTableName() ,tableMateData.getTableType()));
-            }
-        }
+        this.checkMatch(entityMateData ,mapperClass);
 
         Configuration configuration = sqlSession.getConfiguration();
         Collection<String> mappedStatementNames = new ArrayList<>(configuration.getMappedStatementNames());
@@ -128,6 +116,38 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
                 for (Listener listener : listeners) {
                     listener.cannotRegisterMappedStatement(mappedStatementMateData);
                 }
+            }
+        }
+    }
+
+    private void checkMatch(EntityMateData entityMateData ,Class mapperClass)
+    {
+        if (KeyParameterType.class.isAssignableFrom(mapperClass)){
+            int primaryKeyCount = entityMateData.getPrimaryKeyCount();
+            if (primaryKeyCount <= 0) {
+                //声明了主键参数但实际上没有主键
+                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
+                                "but mapper entity mapping table [{2}] no primary key",
+                        mapperClass, KeyParameterType.class, entityMateData.getTableName()));
+            }
+            Class<?> matchKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
+            Type defineKeyParameterClass = TypeUtils.parseSuperTypeVariable(mapperClass, KeyParameterType.class.getTypeParameters()[0]);
+            if (!TypeUtils.isAssignableFrom(matchKeyParameterClass ,defineKeyParameterClass)){
+                //声明的主键参数类型与实际类型不匹配
+                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] " +
+                                "declared primary key parameter type is [{1}] ,should implement [{2}]" ,
+                        mapperClass, defineKeyParameterClass ,matchKeyParameterClass));
+            }
+        }
+
+        TableMateData tableMateData = entityMateData.getTableMateData();
+        if (TableMapper.class.isAssignableFrom(mapperClass)){
+            TableMateData.Type type = tableMateData.getType();
+            if ((TableMateData.Type.VIEW.equals(type) || TableMateData.Type.SYSTEM_VIEW.equals(type))){
+                //如果是视图不应该继承表相关的mapper接口
+                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
+                                "but mapper entity mapping table [{2}] type is [{3}]" ,
+                        mapperClass ,TableMapper.class ,entityMateData.getTableName() ,tableMateData.getTableType()));
             }
         }
     }

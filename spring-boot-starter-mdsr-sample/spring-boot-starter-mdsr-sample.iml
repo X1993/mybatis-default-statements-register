@@ -26,6 +26,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.h2database:h2:1.4.197" level="project" />
     <orderEntry type="module" module-name="spring-boot-starter-mdsr" />
     <orderEntry type="module" module-name="mdsr-core" />
     <orderEntry type="library" name="Maven: org.mybatis:mybatis:3.5.2" level="project" />
