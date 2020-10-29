@@ -218,6 +218,11 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             return this;
         }
 
+        public Builder addDefaultListeners(){
+            this.addListeners(new KeyParameterMapperListener() ,new TableMapperListener());
+            return this;
+        }
+
         public Builder addMappedStatementFactory(MappedStatementFactory mappedStatementFactory)
         {
             mappedStatementFactories.add(mappedStatementFactory);
@@ -237,11 +242,6 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             mappedStatementFactories.add(new UpdateSameBatchMappedStatementFactory());
             mappedStatementFactories.add(new DeleteSelectiveMappedStatementFactory());
             mappedStatementFactories.add(new DynamicParamsSelectStatementFactory());
-            return this;
-        }
-
-        public Builder addDefaultListeners(){
-            this.addListeners(new KeyParameterMapperListener() ,new TableMapperListener());
             return this;
         }
 
