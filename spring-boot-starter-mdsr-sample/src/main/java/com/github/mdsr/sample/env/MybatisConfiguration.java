@@ -96,7 +96,7 @@ public class MybatisConfiguration {
 //    public DefaultStatementAutoRegister.Listener listener(){
 //        return new DefaultStatementAutoRegister.Listener() {
 //            @Override
-//            public void cannotRegisterMappedStatement(MappedStatementMateData mappedStatementMateData) {
+//            public void registerMappedStatementFail(MappedStatementMateData mappedStatementMateData) {
 //                throw new IllegalArgumentException();
 //            }
 //        };

@@ -39,6 +39,12 @@ public class MappedStatementProperties {
      */
     private boolean addDefaultMappedStatementFactories = true;
 
+    /**
+     * 注册默认监听
+     * @see DefaultStatementAutoRegister.Builder#addDefaultListeners()
+     */
+    private boolean addDefaultListeners = true;
+
     public boolean isEachPropertyMappingColumn() {
         return eachPropertyMappingColumn;
     }
@@ -69,5 +75,13 @@ public class MappedStatementProperties {
 
     public void setAddDefaultMappedStatementFactories(boolean addDefaultMappedStatementFactories) {
         this.addDefaultMappedStatementFactories = addDefaultMappedStatementFactories;
+    }
+
+    public boolean isAddDefaultListeners() {
+        return addDefaultListeners;
+    }
+
+    public void setAddDefaultListeners(boolean addDefaultListeners) {
+        this.addDefaultListeners = addDefaultListeners;
     }
 }

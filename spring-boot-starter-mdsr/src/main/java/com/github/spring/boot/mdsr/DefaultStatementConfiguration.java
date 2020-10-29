@@ -165,7 +165,9 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
 
     @Bean
     @ConditionalOnMissingBean(value = TableSchemaQueryRegister.class)
-    public DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister(@Autowired(required = false) List<TableSchemaQuery> tableSchemaQueries){
+    public DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister(
+            @Autowired(required = false) List<TableSchemaQuery> tableSchemaQueries)
+    {
         DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
         if (tableSchemaQueries != null && tableSchemaQueries.size() > 0){
             defaultTableSchemaQueryRegister.register(tableSchemaQueries.toArray(new TableSchemaQuery[tableSchemaQueries.size()]));
@@ -221,8 +223,12 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
             }
         }
 
+        if (properties.isAddDefaultListeners()) {
+            builder.addDefaultListeners();
+        }
+
         if (listeners != null) {
-            builder.setListeners(listeners);
+            builder.addListeners(listeners);
         }
 
         return builder.build();

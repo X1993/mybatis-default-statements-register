@@ -1,24 +1,19 @@
 package com.github.ibatis.statement.register;
 
-import com.github.ibatis.statement.base.core.matedata.TableMateData;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.core.matedata.RootMapperMethodMateData;
-import com.github.ibatis.statement.mapper.KeyParameterType;
-import com.github.ibatis.statement.mapper.TableMapper;
 import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
 import com.github.ibatis.statement.util.Sorter;
-import com.github.ibatis.statement.util.TypeUtils;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -78,7 +73,9 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
                         "unable parse EntityMateData from mapper [{0}] entity class [{1}]" ,
                         mapperClass ,mapperEntityClass)));
 
-        this.checkMatch(entityMateData ,mapperClass);
+        for (Listener listener : listeners) {
+            listener.verify(entityMateData ,mapperClass);
+        }
 
         Configuration configuration = sqlSession.getConfiguration();
         Collection<String> mappedStatementNames = new ArrayList<>(configuration.getMappedStatementNames());
@@ -114,40 +111,8 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             if (mappedStatement == null){
                 LOGGER.warn("can't build mappedStatement for [{}]" ,mappedStatementId);
                 for (Listener listener : listeners) {
-                    listener.cannotRegisterMappedStatement(mappedStatementMateData);
+                    listener.registerMappedStatementFail(mappedStatementMateData);
                 }
-            }
-        }
-    }
-
-    private void checkMatch(EntityMateData entityMateData ,Class mapperClass)
-    {
-        if (KeyParameterType.class.isAssignableFrom(mapperClass)){
-            int primaryKeyCount = entityMateData.getPrimaryKeyCount();
-            if (primaryKeyCount <= 0) {
-                //声明了主键参数但实际上没有主键
-                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
-                                "but mapper entity mapping table [{2}] no primary key",
-                        mapperClass, KeyParameterType.class, entityMateData.getTableName()));
-            }
-            Class<?> matchKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
-            Type defineKeyParameterClass = TypeUtils.parseSuperTypeVariable(mapperClass, KeyParameterType.class.getTypeParameters()[0]);
-            if (!TypeUtils.isAssignableFrom(matchKeyParameterClass ,defineKeyParameterClass)){
-                //声明的主键参数类型与实际类型不匹配
-                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] " +
-                                "declared primary key parameter type is [{1}] ,should implement [{2}]" ,
-                        mapperClass, defineKeyParameterClass ,matchKeyParameterClass));
-            }
-        }
-
-        TableMateData tableMateData = entityMateData.getTableMateData();
-        if (TableMapper.class.isAssignableFrom(mapperClass)){
-            TableMateData.Type type = tableMateData.getType();
-            if ((TableMateData.Type.VIEW.equals(type) || TableMateData.Type.SYSTEM_VIEW.equals(type))){
-                //如果是视图不应该继承表相关的mapper接口
-                throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] implement [{1}] ," +
-                                "but mapper entity mapping table [{2}] type is [{3}]" ,
-                        mapperClass ,TableMapper.class ,entityMateData.getTableName() ,tableMateData.getTableType()));
             }
         }
     }
@@ -158,16 +123,23 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
     public interface Listener extends Sorter{
 
         /**
+         * 校验mapper接口与定义的实体类是否兼容
+         * @param entityMateData
+         * @param mapperClass
+         */
+        default void verify(EntityMateData entityMateData ,Class mapperClass){}
+
+        /**
          * 成功注册{@link MappedStatement}
          * @param mappedStatement
          */
         default void mappedStatementRegister(MappedStatement mappedStatement){}
 
         /**
-         * 不能注册缺失{@link MappedStatement}
+         * 注册{@link MappedStatement}失败
          * @param mappedStatementMateData
          */
-        default void cannotRegisterMappedStatement(MappedStatementMateData mappedStatementMateData){}
+        default void registerMappedStatementFail(MappedStatementMateData mappedStatementMateData){}
 
     }
 
@@ -218,7 +190,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
 
         private MapperEntityParser mapperEntityParser;
 
-        private List<Listener> listeners;
+        private List<Listener> listeners = new ArrayList<>();
 
         private List<MappedStatementFactory> mappedStatementFactories = new ArrayList<>();
 
@@ -234,8 +206,15 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             return this;
         }
 
-        public Builder setListeners(List<Listener> listeners) {
-            this.listeners = listeners;
+        public Builder addListeners(Collection<Listener> listeners) {
+            this.listeners.addAll(listeners);
+            return this;
+        }
+
+        public Builder addListeners(Listener ... listeners){
+            for (Listener listener : listeners) {
+                this.listeners.add(listener);
+            }
             return this;
         }
 
@@ -258,6 +237,11 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             mappedStatementFactories.add(new UpdateSameBatchMappedStatementFactory());
             mappedStatementFactories.add(new DeleteSelectiveMappedStatementFactory());
             mappedStatementFactories.add(new DynamicParamsSelectStatementFactory());
+            return this;
+        }
+
+        public Builder addDefaultListeners(){
+            this.addListeners(new KeyParameterMapperListener() ,new TableMapperListener());
             return this;
         }
 

@@ -136,6 +136,7 @@ public class Demo {
                         .build())
                 .addDefaultMappedStatementFactories()
                 .addMappedStatementFactory(new SelectMaxIdMappedStatementFactory())
+                .addDefaultListeners()
                 .build();
 
         register.registerDefaultMappedStatement(sqlSession);

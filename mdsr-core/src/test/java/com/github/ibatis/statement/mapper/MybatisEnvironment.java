@@ -80,6 +80,7 @@ public class MybatisEnvironment {
                                 new DefaultPropertyMateDataParser(Arrays.asList(new TryMappingEveryPropertyMateDataParser()))
                         ).build())
                 .addDefaultMappedStatementFactories()
+                .addDefaultListeners()
                 .build();
 
         if (mapperClasses != null && mapperClasses.length > 0) {
