@@ -27,7 +27,8 @@ public class KeyParameterMapperListener implements DefaultStatementAutoRegister.
             if (!TypeUtils.isAssignableFrom(matchKeyParameterClass ,defineKeyParameterClass)){
                 //声明的主键参数类型与实际类型不匹配
                 throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] " +
-                                "declared primary key parameter type is [{1}] ,but should implement [{2}]" ,
+                                "declared primary key parameter type is [{1}] ,but should implement [{2}] ," +
+                                "because it is a composite primary key" ,
                         mapperClass, defineKeyParameterClass ,matchKeyParameterClass));
             }
         }
