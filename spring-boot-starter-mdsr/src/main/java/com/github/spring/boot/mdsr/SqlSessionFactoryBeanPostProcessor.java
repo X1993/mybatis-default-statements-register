@@ -39,11 +39,17 @@ public class SqlSessionFactoryBeanPostProcessor implements BeanPostProcessor,App
         if (bean instanceof MapperFactoryBean){
             MapperFactoryBean mapperFactoryBean = (MapperFactoryBean) bean;
             SqlSession sqlSession = mapperFactoryBean.getSqlSessionFactory().openSession();
-            if (!isInit){
-                //延迟初始化的原因是Bean处理器的创建时机太早了，提前获取相关依赖bean很可能出现问题
-                init();
+            try {
+                if (!isInit){
+                    //延迟初始化的原因是Bean处理器的创建时机太早了，提前获取相关依赖bean很可能出现问题
+                    init();
+                }
+                statementAutoRegister.registerDefaultMappedStatement(sqlSession);
+            }finally {
+                if (sqlSession != null) {
+                    sqlSession.close();
+                }
             }
-            statementAutoRegister.registerDefaultMappedStatement(sqlSession);
         }
         return bean;
     }
