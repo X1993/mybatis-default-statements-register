@@ -137,39 +137,36 @@ public class ConditionParams {
         return this;
     }
 
-    public ConditionParams notIn(String key ,Object ... values){
-        return this.notIn(key , Arrays.asList(values));
-    }
-
     public ConditionParams notIn(String key ,Iterable iterable)
     {
-        if (iterable != null) {
-            List list = new ArrayList<>();
-            for (Object value : iterable) {
-                if (value != null){
-                    list.add(value);
-                }
+        List list = new ArrayList<>();
+        for (Object value : iterable) {
+            if (value == null){
+                throw new IllegalArgumentException();
             }
-            if (list.size() > 0) {
-                this.params.add(new ConditionParam(key, ConditionRule.NOT_IN, list));
-            }
+            list.add(value);
         }
+        if (list.size() == 0){
+            throw new IllegalArgumentException();
+        }
+        this.params.add(new ConditionParam(key, ConditionRule.NOT_IN, list));
         return this;
+    }
+
+    public ConditionParams notIn(String key ,Object ... values){
+        return this.notIn(key ,Arrays.asList(values));
     }
 
     public ConditionParams in(String key ,Iterable iterable)
     {
-        if (iterable != null) {
-            List list = new ArrayList<>();
-            for (Object value : iterable) {
-                if (value != null){
-                    list.add(value);
-                }
-            }
-            if (list.size() > 0) {
-                this.params.add(new ConditionParam(key, ConditionRule.IN ,list));
-            }
+        List list = new ArrayList<>();
+        for (Object value : iterable) {
+            list.add(value);
         }
+        if (list.size() == 0){
+            list.add(null);
+        }
+        this.params.add(new ConditionParam(key, ConditionRule.IN ,list));
         return this;
     }
 

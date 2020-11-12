@@ -24,6 +24,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Test;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -294,6 +295,11 @@ public class Demo {
         user.setVersion(22);
         userMapper.insert(user);
         userMapper.updateByPrimaryKey(user);
+    }
+
+    @Test
+    public void selectIn(){
+        userMapper.selectByWhereConditions(new ConditionParams().in("id" ,new ArrayList()));
     }
 
     @Test
