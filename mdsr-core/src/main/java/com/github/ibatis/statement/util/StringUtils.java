@@ -35,4 +35,24 @@ public class StringUtils {
         return sb.toString();
     }
 
+    /**
+     * 下划线转驼峰
+     * @param str
+     * @return
+     */
+    public static String camelUnderscoreToCase(String str){
+        char[] chars = str.toCharArray();
+        StringBuilder result = new StringBuilder();
+        boolean beforeUnderscore = true;
+        for (char c : chars) {
+            if (c == '_'){
+                beforeUnderscore = true;
+            }else {
+                result.append(beforeUnderscore ? Character.toUpperCase(c) : c);
+                beforeUnderscore = false;
+            }
+        }
+        return result.toString();
+    }
+
 }
