@@ -52,7 +52,7 @@ public class TableMateData implements Cloneable{
     }
 
     public void setTableName(String tableName) {
-        this.tableName = tableName.toUpperCase();
+        this.tableName = tableName;
     }
 
     public String getTableType() {

@@ -37,7 +37,7 @@ public class DefaultLogicalColumnMateDataParser implements LogicalColumnMateData
 
         Logical logical = this.parseLogical(entityMateData.getEntityClass());
         if (logical != null) {
-            String logicalColumnName = logical.columnName().toUpperCase();
+            String logicalColumnName = logical.columnName();
             TableMateData tableMateData = entityMateData.getTableMateData();
 
             TableSchemaResolutionStrategy schemaResolutionStrategy = entityMateData.getSchemaResolutionStrategy();
