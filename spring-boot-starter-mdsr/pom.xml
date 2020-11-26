@@ -6,7 +6,7 @@
 
     <groupId>com.github.X1993</groupId>
     <artifactId>spring-boot-starter-mdsr</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <description>基于mybatis-spring-boot-starter组装可运行的mybatis-default-statement-register</description>
     <url>https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr</url>
 
@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.github.X1993</groupId>
             <artifactId>mdsr-core</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot -->

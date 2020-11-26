@@ -12,7 +12,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         <dependency>
             <groupId>com.github.X1993</groupId>
             <artifactId>spring-boot-starter-mdsr</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -886,11 +886,6 @@ JDK 8+, Maven, Mysql/MariaDB/H2
          */
         String value() default ColumnCondition.EMPTY_VALUE;
     
-        /**
-         * 过滤值选择策略
-         */
-        Strategy strategy() default Strategy.CUSTOM_MISS_DEFAULT;
-    
     }
 ```
 
@@ -1371,3 +1366,35 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     select `id` from `user` order by `id` desc limit 1; 
 ```
 
+### 13.特定规则方法缺省MappedStatement自动注册
+-   实现类
+```java
+    /** @see  com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory*/
+```
+
+-   方法命名规则 
+[规则](https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png)
+       
+
+    关键字            |        方法                         |          sql
+    ------           |      --------------                  |         ------
+    And              |      findByNameAndCode(?,?)          |     where name= ? and code = ?     
+    Or               |      findByNameOrCode(?,?)           |     where name= ? or code = ?       
+    Eq               |      findByEqName(?)                 |     where name= ?
+    NotEq            |      findByNotEqName(?)              |     where name != ?
+    Lt               |      findByLtTime(?)                 |     where time < ?
+    Gt               |      findByGtTime(?)                 |     where time > ?
+    Le               |      findByLeTime(?)                 |     where time <= ?
+    Ge               |      findByGeTime(?)                 |     where time >= ?
+    NotLike          |      findByNotLikeName(?)            |     where name not like '%?%'
+    Like             |      findByLikeName(?)               |     where name like '%?%'
+    LikeLeft         |      findByLikeLeftName(?)           |     where name like '%?'
+    LikeRight        |      findByLikeRightName(?)          |     where name like '?%'
+    NotIn            |      findByNotInId(Collection<?>)    |     where id not in (?)
+    In               |      findByInId(Collection<?>)       |     where id in (?)
+    IsNull           |      findByIsNullName()              |     where name is null
+    NotNull          |      findByNotNullName()             |     where name is not null
+    Between          |      findByBetweenTime(?,?)          |     where name between ? and ?
+    NotBetween       |      findByNotBetweenName(?,?)       |     where name not between ? and ?
+    Ne               |      findByNeName()                  |     where name <> ''
+   
