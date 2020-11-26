@@ -441,6 +441,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
     /**
      * 根据语法对表达式分词
+     * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/MethodNameParseMappedStatementFactory%E6%94%AF%E6%8C%81%E7%9A%84%E8%AF%AD%E6%B3%95.png">语法规则</a>
      * @param expression
      * @param columnNames
      * @return
