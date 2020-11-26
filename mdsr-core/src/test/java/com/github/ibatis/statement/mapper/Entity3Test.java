@@ -78,7 +78,7 @@ public class Entity3Test {
             "  `value` varchar(30) DEFAULT NULL,\n" +
             "  `value2` varchar(30) DEFAULT NULL,\n" +
             "  CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2) \n" +
-            ");";
+            ") DEFAULT CHARSET=utf8;;";
 
     @Test
     public void test(){

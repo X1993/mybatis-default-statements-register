@@ -1,10 +1,7 @@
 package com.github.mdsr.sample.model;
 
-import com.github.ibatis.statement.base.condition.Condition;
-import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.core.Entity;
-import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.base.logical.Logical;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -40,7 +37,6 @@ public class User
 
     //利用默认赋值和默认更新条件实现乐观锁
     @DefaultValue(commandTypes = {SqlCommandType.UPDATE} ,value = "&{column} + 1")
-    @Condition(commandTypes = {SqlCommandType.UPDATE} ,strategy = Strategy.CUSTOM)
     private int version;
 
     public Integer getId() {

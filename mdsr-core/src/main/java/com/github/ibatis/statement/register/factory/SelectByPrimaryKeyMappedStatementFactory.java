@@ -107,7 +107,8 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
         }
 
         //值固定的查询条件
-        sqlContext.append(entityMateData.noCustomConditionsContent(sqlCommandType(mappedStatementMateData) ,
+        sqlContext.append(entityMateData.defaultConditionsContent(
+                sqlCommandType(mappedStatementMateData) ,
                 content -> content.append(" AND ")));
 
         if (logicalConditional && logicalColumnMateData != null){

@@ -7,7 +7,6 @@ import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
 import com.github.ibatis.statement.base.core.ColumnExpressionParser;
 import com.github.ibatis.statement.base.core.ExpressionParser;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.type.JdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
@@ -58,7 +57,6 @@ public class DefaultColumnConditionParser implements ColumnConditionParser {
             {
                 String columnName = columnCondition.getColumnName();
                 SqlCommandType sqlCommandType = columnCondition.getSqlCommandType();
-                Strategy strategy = columnCondition.getStrategy();
 
                 if (!columnMateDataMap.containsKey(columnName)){
                     LOGGER.warn("table {} invalid column name {}" ,tableName ,columnName);
@@ -71,21 +69,6 @@ public class DefaultColumnConditionParser implements ColumnConditionParser {
                     LOGGER.warn("table {} column {} can't use default condition when sqlCommandType is {}",
                             tableName ,columnName ,sqlCommandType);
                     return;
-                }
-
-                if (!columnPropertyMappings.containsKey(columnName)){
-                    if (Strategy.CUSTOM.equals(strategy) || Strategy.CUSTOM_MISS_SKIP.equals(strategy)) {
-                        //不存在列映射的类属性也就不能定义自定义值
-                        LOGGER.warn("table {} column {} can't use custom value " +
-                                "because not exist mapping class-property", tableName, columnName);
-                        return;
-                    }else if (Strategy.CUSTOM_MISS_DEFAULT.equals(strategy)){
-                        strategy = Strategy.DEFAULT;
-                        LOGGER.warn("table {} column {} can't use custom value " +
-                                "because not exist mapping class-property ," +
-                                "set strategy as {}", tableName, columnName ,strategy);
-                        columnCondition.setStrategy(strategy);
-                    }
                 }
 
                 Map<String, ColumnCondition> columnConditionMap = conditionMap

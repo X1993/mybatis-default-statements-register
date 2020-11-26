@@ -34,12 +34,7 @@ public abstract class AbstractUpdateMappedStatementFactory extends AbstractMappe
      ...
      where
      primaryKey1 = #{keyPropertyName1,jdbcType=XXX}
-     col6 = #{propertyName6,jdbcType=XXX},
-     ...
-     <if test="propertyName4 != null">
-     col4 = #{propertyName4,jdbcType=XXX},
-     </if>
-     and col13 = value
+     and col13 = defaultValue13
      ...
      (and logicalCol = existValue)
      * @param mappedStatementMateData
@@ -70,8 +65,7 @@ public abstract class AbstractUpdateMappedStatementFactory extends AbstractMappe
                                     boolean isSelective)
     {
         Configuration configuration = mappedStatementMateData.getConfiguration();
-        return new DynamicSqlSource(configuration ,
-                createSqlNode(mappedStatementMateData ,propertyNameFunction ,isSelective));
+        return new DynamicSqlSource(configuration ,createSqlNode(mappedStatementMateData ,propertyNameFunction ,isSelective));
     }
 
     protected SqlNode getSetSqlNode(MappedStatementMateData mappedStatementMateData ,
@@ -162,12 +156,8 @@ public abstract class AbstractUpdateMappedStatementFactory extends AbstractMappe
                             .toString()));
         }
 
-        whereSqlNodes.addAll(entityMateData.filterColumnConditions(SqlCommandType.UPDATE)
-                .values()
-                .stream()
-                .map(columnCondition -> entityMateData.createConditionSqlNode(columnCondition ,
-                        propertyNameFunction ,content -> content.append(" AND ")))
-                .collect(Collectors.toList()));
+        whereSqlNodes.add(entityMateData.defaultConditionsSqlNode(SqlCommandType.UPDATE ,
+                content -> content.append(" AND ")));
 
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         if (logicalColumnMateData != null){

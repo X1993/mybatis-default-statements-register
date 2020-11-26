@@ -43,9 +43,4 @@ public @interface Condition {
      */
     String value() default "";
 
-    /**
-     * 过滤值选择策略
-     */
-    Strategy strategy() default Strategy.DEFAULT;
-
 }

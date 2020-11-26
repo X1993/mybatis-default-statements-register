@@ -86,7 +86,7 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
         }
 
         //值固定的查询条件
-        whereConditionContent.append(entityMateData.noCustomConditionsContent(
+        whereConditionContent.append(entityMateData.defaultConditionsContent(
                 sqlCommandType(mappedStatementMateData) ,content -> content.append(" AND ")));
 
         if (logicalDelete){

@@ -74,8 +74,8 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
 
         sqlNodes.add(new StaticTextSqlNode(" WHERE 1 = 1 "));
 
-        //值固定的查询条件
-        sqlNodes.add(entityMateData.noCustomConditionsSqlNode(
+        //默认查询条件
+        sqlNodes.add(entityMateData.defaultConditionsSqlNode(
                 sqlCommandType(mappedStatementMateData) ,
                 content -> content.insert(0 ," AND ")));
 

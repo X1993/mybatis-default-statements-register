@@ -1,10 +1,12 @@
 package com.github.ibatis.statement.register.factory;
 
 import com.github.ibatis.statement.base.core.MethodSignature;
+import com.github.ibatis.statement.base.core.matedata.ColumnPropertyMapping;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.SelectMapper;
+import com.github.ibatis.statement.mapper.param.ConditionRule;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -76,13 +78,26 @@ public class SelectSelectiveMappedStatementFactory extends AbstractSelectMappedS
                 .toString()));
 
         SqlCommandType sqlCommandType = sqlCommandType(mappedStatementMateData);
+
         Function<String ,String> propertyNameFunction = name -> "param1." + name;
         Function<StringBuilder ,StringBuilder> sqlContentFunction = content -> content.insert(0 ," AND ");
-        sqlNodes.add(new ChooseSqlNode(Arrays.asList(new IfSqlNode(new MixedSqlNode(
-                entityMateData.selectiveConditionSqlNodes(sqlCommandType, propertyNameFunction, sqlContentFunction)) ,
-                "param1 != null")),
-                //如果param1为null，使用默认值
-                entityMateData.noCustomConditionsSqlNode(sqlCommandType ,sqlContentFunction)));
+
+        List<SqlNode> conditionSqlNodes = new ArrayList<>();
+        for (ColumnPropertyMapping columnPropertyMapping : entityMateData.getColumnPropertyMappings().values())
+        {
+            StaticTextSqlNode customSqlNode = new StaticTextSqlNode(
+                    sqlContentFunction.apply(columnPropertyMapping.createConditionSqlContent(
+                            ConditionRule.EQ ,propertyNameFunction)).toString());
+
+            IfSqlNode equalIfSqlNode = new IfSqlNode(customSqlNode ,
+                    propertyNameFunction.apply(columnPropertyMapping.getPropertyName()) + " != null");
+
+            conditionSqlNodes.add(equalIfSqlNode);
+        }
+
+        sqlNodes.add(new IfSqlNode(new MixedSqlNode(conditionSqlNodes) , "param1 != null"));
+        //默认查询条件
+        sqlNodes.add(entityMateData.defaultConditionsSqlNode(sqlCommandType ,sqlContentFunction));
 
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         if (logicalColumnMateData != null){

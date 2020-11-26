@@ -80,7 +80,7 @@ public class Entity4Test {
             "  `id` varchar(255) PRIMARY KEY NOT NULL,\n" +
             "  `value` varchar(255) DEFAULT NULL,\n" +
             "  `removed` char(1) \n" +
-            ") ;";
+            ") DEFAULT CHARSET=utf8;;";
 
     @Test
     public void test(){

@@ -41,7 +41,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
       note varchar(100) DEFAULT NULL ,
       version int(255) DEFAULT NULL ,
       removed bit(1) DEFAULT 0 COMMENT '是否已删除，1：已删除'
-    );
+    ) DEFAULT CHARSET=utf8;
 ```
 -   Mybatis配置文件SqlMapConfig
 ```xml
@@ -551,7 +551,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         /*
          初始化SqlSessionFactory
          */
-        public SqlSessionFactory init() throws IOException 
+        public SqlSessionFactory init()
         {   
             // ...
             
@@ -924,7 +924,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
       `value` varchar(30) DEFAULT NULL,
       `value2` varchar(30) DEFAULT NULL,
       CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2)
-    );
+    ) DEFAULT CHARSET=utf8;;
 ```
 -   实体类
 ```java
@@ -1167,11 +1167,11 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         
         // ... columns    
     
-        //执行查询指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time > '2020-08-12 00:00:00'
+        //执行查询指令时，添加默认查询条件 create_time > '2020-08-12 00:00:00'
         @Condition(commandTypes = SqlCommandType.SELECT, rule = ConditionRule.GT , value = "2020-08-12 00:00:00")
-        //执行删除指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time < '2020-08-12 00:00:00'
+        //执行删除指令时，添加默认查询条件 create_time < '2020-08-12 00:00:00'
         @Condition(commandTypes = SqlCommandType.DELETE, rule = ConditionRule.LT , value = "2020-08-11 00:00:00")
-        //执行修改指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
+        //执行修改指令时，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
         @Condition(commandTypes = SqlCommandType.UPDATE, rule = ConditionRule.BETWEEN ,value = "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'")
         @Column("create_time")
         private Date createTime;
@@ -1228,11 +1228,6 @@ JDK 8+, Maven, Mysql/MariaDB/H2
          */
         String value() default ColumnCondition.EMPTY_VALUE;
     
-        /**
-         * 过滤值选择策略
-         */
-        Strategy strategy() default Strategy.DEFAULT;
-    
     }
 ```
 
@@ -1259,7 +1254,6 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import com.github.ibatis.statement.base.condition.ColumnConditionParser;
     import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
     import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
-    import com.github.ibatis.statement.base.condition.Strategy;
     import com.github.ibatis.statement.base.core.parse.*;
     import com.github.ibatis.statement.base.dv.ColumnValueParser;
     import com.github.ibatis.statement.base.dv.DefaultColumnValueParser;
@@ -1301,19 +1295,19 @@ JDK 8+, Maven, Mysql/MariaDB/H2
             ColumnConditionParser updateColumnConditionParser = new SpecificColumnConditionParser(
                     columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
                     new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN, 
-                    Strategy.CUSTOM_MISS_DEFAULT ,"'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
+                    "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
             
             //执行查询指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time > '2020-08-12 00:00:00'
             ColumnConditionParser selectColumnConditionParser = new SpecificColumnConditionParser(
                     columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
                     new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT, 
-                    Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-12 00:00:00");
+                    "2020-08-12 00:00:00");
             
             //执行删除指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time < '2020-08-12 00:00:00'
             ColumnConditionParser deleteColumnConditionParser = new SpecificColumnConditionParser(
                     columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
                     new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT, 
-                    Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-11 00:00:00");
+                    "2020-08-11 00:00:00");
             
              StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
                     .setEntityMateDataParser(
@@ -1580,61 +1574,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2
      LIMIT 0, 10;
 ```
 
-### 10.基于默认where条件和默认赋值配置可实现乐观锁
-```java
-    import com.github.ibatis.statement.base.condition.Condition;
-    import com.github.ibatis.statement.base.condition.Strategy;
-    import com.github.ibatis.statement.base.core.Column;
-    import com.github.ibatis.statement.base.core.Entity;
-    import com.github.ibatis.statement.base.logical.Logical;
-    import com.github.ibatis.statement.mapper.param.ConditionRule;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import java.util.Date;
-    
-    @Entity(tableName = "user")//申明实体映射的表
-    public class User {
-        
-        // ... columns    
-        
-        @DefaultValue(commandTypes = {SqlCommandType.UPDATE} ,value = "&{column} + 1")
-        @Condition(commandTypes = {SqlCommandType.UPDATE} ,strategy = Strategy.CUSTOM)
-        private int version;
-        
-        // ... (ellipsis get/set methods)
-    
-    }
-```
-#### 效果演示
-```java
-    import com.github.ibatis.statement.demo.User;
-    import com.github.ibatis.statement.demo.UserMapper;
-    import org.junit.Test;
-   
-    public class Demo{
-        
-        @Test
-        public void optimisticLock(){
-            User user = new User();
-            user.setId(11);
-            user.setName("张三");
-            user.setAddress("杭州");
-            user.setCreateTime(new Date());
-            user.setVersion(12);
-            userMapper.insert(user);
-            user.setNote("无");
-            userMapper.updateByPrimaryKey(user);
-        }
-    }
-    
-```
-    will execute the following SQL
-```sql
-    UPDATE `user` SET `note` = '无' , `update_time` = null , `address` = '杭州' , `name` = '张三' , 
-    `version` = `version` + 1
-     WHERE `id` = 11 AND `version` = 12 AND 1 = 1;
-```
 
-### 11.table schema解析策略
+### 10.table schema解析策略
 ```java
     package com.github.ibatis.statement.base.core;
 
@@ -1672,7 +1613,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-#### 11.1指定table schema解析策略
+#### 10.1指定table schema解析策略
 ```java
     /**
      * @author junjie
@@ -1720,7 +1661,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```
 >   java.sql.SQLException: Unknown column 'not_exist_column' in 'field list'
 
-#### 11.2全局配置
+#### 10.2全局配置
 ```java
     package com.github.ibatis.statement.demo;
     
@@ -1767,7 +1708,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-### 12.自定义mappedStatementFactory
+### 11.自定义mappedStatementFactory
 -   定义自定义方法
 ```java
     package com.github.ibatis.statement.demo;
@@ -1902,7 +1843,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     select `id` from `user` order by `id` desc limit 1; 
 ```
 
-### 13.特定规则方法缺省MappedStatement自动注册
+### 12.特定规则方法缺省MappedStatement自动注册
 -   实现类
 ```java
     /** @see  com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory*/

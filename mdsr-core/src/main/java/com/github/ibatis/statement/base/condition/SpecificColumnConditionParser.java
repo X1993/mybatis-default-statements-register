@@ -40,11 +40,6 @@ public class SpecificColumnConditionParser implements ColumnConditionParser {
      */
     private ConditionRule rule = ConditionRule.EQ;
 
-    /**
-     * 过滤值选择策略
-     */
-    private Strategy strategy = Strategy.CUSTOM_MISS_DEFAULT;
-
     public SpecificColumnConditionParser(Predicate<ColumnMateData> predicate) {
         Objects.requireNonNull(predicate);
         this.predicate = predicate;
@@ -53,14 +48,12 @@ public class SpecificColumnConditionParser implements ColumnConditionParser {
     public SpecificColumnConditionParser(Predicate<ColumnMateData> predicate,
                                          SqlCommandType[] sqlCommandTypes,
                                          ConditionRule rule,
-                                         Strategy strategy,
                                          String value)
     {
         Objects.requireNonNull(predicate);
         this.predicate = predicate;
         setSqlCommandTypes(sqlCommandTypes);
         setRule(rule);
-        setStrategy(strategy);
         setValue(value);
     }
 
@@ -78,7 +71,6 @@ public class SpecificColumnConditionParser implements ColumnConditionParser {
                         columnCondition.setSqlCommandType(sqlCommandType);
                         columnCondition.setValue(getValue());
                         columnCondition.setRule(getRule());
-                        columnCondition.setStrategy(getStrategy());
                         commandTypeColumnConditions
                                 .computeIfAbsent(sqlCommandType ,type -> new HashMap<>())
                                 .put(columnMateData.getColumnName() ,columnCondition);
@@ -100,10 +92,6 @@ public class SpecificColumnConditionParser implements ColumnConditionParser {
 
     public String getValue() {
         return value;
-    }
-
-    public Strategy getStrategy() {
-        return strategy;
     }
 
     public Predicate<ColumnMateData> getPredicate() {
@@ -131,8 +119,4 @@ public class SpecificColumnConditionParser implements ColumnConditionParser {
         this.rule = rule;
     }
 
-    public void setStrategy(Strategy strategy) {
-        Objects.requireNonNull(strategy);
-        this.strategy = strategy;
-    }
 }

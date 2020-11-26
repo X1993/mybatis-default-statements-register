@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.demo;
 
 import com.github.ibatis.statement.base.condition.Condition;
-import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.core.Entity;
 import com.github.ibatis.statement.base.dv.DefaultValue;
@@ -40,7 +39,6 @@ public class User
     private String address;
 
     @DefaultValue(commandTypes = {SqlCommandType.UPDATE} ,value = "&{column} + 1")
-    @Condition(commandTypes = {SqlCommandType.UPDATE} ,strategy = Strategy.CUSTOM)
     private int version;
 
     public Integer getId() {

@@ -95,7 +95,7 @@ public class Entity5Test {
             "  `value3` varchar(30) DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
             "  CONSTRAINT table_entity5_pk PRIMARY KEY (id, id2) \n" +
-            "); ";
+            ") DEFAULT CHARSET=utf8; ";
 
     @Test
     public void test(){

@@ -126,7 +126,9 @@ public abstract class AbstractInsertMappedStatementFactory extends AbstractMappe
     {
         List<SqlNode> columnSqlNodes = new LinkedList<>();
         List<SqlNode> propertySqlNodes = new LinkedList<>();
-        this.fillSqlNodes(mappedStatementMateData ,columnSqlNodes ,propertySqlNodes ,propertyNameFunction ,isSelective);
+
+        this.fillSqlNodes(mappedStatementMateData ,columnSqlNodes ,
+                propertySqlNodes ,propertyNameFunction ,isSelective);
 
         List<SqlNode> sqlNodes = new LinkedList<>();
         sqlNodes.add(new StaticTextSqlNode(new StringBuilder("INSERT INTO `")

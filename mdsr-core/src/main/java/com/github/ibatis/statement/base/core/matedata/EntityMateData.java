@@ -1,21 +1,17 @@
 package com.github.ibatis.statement.base.core.matedata;
 
 import com.github.ibatis.statement.base.condition.ColumnCondition;
-import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.scripting.xmltags.ChooseSqlNode;
-import org.apache.ibatis.scripting.xmltags.IfSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
 import org.apache.ibatis.session.Configuration;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 实体类元数据
@@ -251,16 +247,11 @@ public class EntityMateData implements Cloneable{
                 .orElse(Collections.EMPTY_MAP);
     }
 
-    public Map<String ,ColumnCondition> filterColumnConditions(SqlCommandType sqlCommandType ,Strategy ... strategies)
+    public Map<String ,ColumnCondition> filterColumnConditions(SqlCommandType sqlCommandType)
     {
-        if (strategies == null || strategies.length == 0){
-            return commandTypeConditionMap.getOrDefault(sqlCommandType ,Collections.EMPTY_MAP);
-        }
         return Optional.ofNullable(commandTypeConditionMap.get(sqlCommandType))
                 .map(map -> map.entrySet()
                     .stream()
-                    .filter(entry -> Stream.of(strategies)
-                            .anyMatch(strategy -> strategy.equals(entry.getValue().getStrategy())))
                     .collect(Collectors.toMap(entry -> entry.getKey() ,entry -> entry.getValue())))
                 .orElse(Collections.EMPTY_MAP);
     }
@@ -286,137 +277,31 @@ public class EntityMateData implements Cloneable{
     }
 
     /**
-     * 根据过滤条件构建SqlNode
-     *
-
-     -  GLOBAL:
-        `columnName` = defaultValue
-
-     -  CUSTOM:
-        `columnName` = #{propertyName,jdbcType=XXX}
-
-     -  CUSTOM_MISS_SKIP:
-         <if test="propertyName != null">
-            `columnName` = #{propertyName,jdbcType=XXX}
-         </if>
-
-     -  CUSTOM_MISS_DEFAULT:
-         <choose>
-             <if test="propertyName5 != null">
-                `col5` = #{propertyName5,jdbcType=XXX}
-             </if>
-             <otherwise>
-                `col5` = defaultValue5
-             </otherwise>
-         </choose>
-
-     * @param columnCondition
-     * @param propertyNameFunction
-     * @param sqlContentFunction
-     * @return
-     */
-    public SqlNode createConditionSqlNode(ColumnCondition columnCondition ,
-                                          Function<String ,String> propertyNameFunction,
-                                          Function<StringBuilder ,StringBuilder> sqlContentFunction)
-    {
-        Strategy strategy = columnCondition.getStrategy();
-        String columnName = columnCondition.getColumnName();
-        ColumnPropertyMapping columnPropertyMapping = columnPropertyMappings.get(columnName);
-
-        StaticTextSqlNode defaultCondition = new StaticTextSqlNode(
-                sqlContentFunction.apply(columnCondition.fixedValueSqlContent()).toString());
-
-        StaticTextSqlNode customSqlNode = new StaticTextSqlNode(
-                sqlContentFunction.apply(columnPropertyMapping.createConditionSqlContent(
-                        columnCondition.getRule() ,propertyNameFunction)).toString());
-
-        IfSqlNode equalIfSqlNode = new IfSqlNode(customSqlNode ,
-                propertyNameFunction.apply(columnPropertyMapping.getPropertyName()) + " != null");
-
-        switch (strategy){
-            case DEFAULT:
-                return defaultCondition;
-            case CUSTOM:
-                return customSqlNode;
-            case CUSTOM_MISS_DEFAULT:
-                return new ChooseSqlNode(Arrays.asList(equalIfSqlNode) ,defaultCondition);
-            case CUSTOM_MISS_SKIP:
-                return equalIfSqlNode;
-            default:
-                throw new IllegalArgumentException("Temporarily does not support [" + strategy + "] strategy");
-        }
-    }
-
-    /**
-     * 配置带默认值的条件过滤
+     * 使用默认值的条件过滤
      * @param sqlCommandType
      * @param sqlContentFunction
      * @return
      */
-    public StringBuilder noCustomConditionsContent(SqlCommandType sqlCommandType ,
-                                                    Function<StringBuilder ,StringBuilder> sqlContentFunction)
+    public StringBuilder defaultConditionsContent(SqlCommandType sqlCommandType ,
+                                                  Function<StringBuilder ,StringBuilder> sqlContentFunction)
     {
-        return this.filterColumnConditions(
-                sqlCommandType ,Strategy.CUSTOM_MISS_DEFAULT ,Strategy.DEFAULT)
+        return this.filterColumnConditions(sqlCommandType)
                 .values()
                 .stream()
-                .map(columnCondition -> {
-                    try {
-                        return columnCondition.clone();
-                    } catch (CloneNotSupportedException e) {
-                        throw new IllegalStateException(e);
-                    }
-                })
-                .peek(columnCondition -> columnCondition.setStrategy(Strategy.DEFAULT))
                 .map(columnCondition -> sqlContentFunction.apply(columnCondition.fixedValueSqlContent()))
                 .reduce(new StringBuilder() ,(content1 ,content2) -> content1.append(content2));
     }
 
     /**
-     * 配置带默认值的条件过滤
+     * 使用默认值的条件过滤
      * @param sqlCommandType
      * @param sqlContentFunction
      * @return
      */
-    public SqlNode noCustomConditionsSqlNode(SqlCommandType sqlCommandType ,
-                                             Function<StringBuilder ,StringBuilder> sqlContentFunction)
+    public SqlNode defaultConditionsSqlNode(SqlCommandType sqlCommandType ,
+                                            Function<StringBuilder ,StringBuilder> sqlContentFunction)
     {
-        return new StaticTextSqlNode(noCustomConditionsContent(sqlCommandType ,sqlContentFunction).toString());
-    }
-
-    /**
-     * 自定义非空匹配条件过滤
-     * @param sqlCommandType
-     * @param propertyNameFunction
-     * @param sqlContentFunction
-     * @return
-     */
-    public List<SqlNode> selectiveConditionSqlNodes(SqlCommandType sqlCommandType  ,
-                                                    Function<String ,String> propertyNameFunction,
-                                                    Function<StringBuilder ,StringBuilder> sqlContentFunction)
-    {
-        Map<String, ColumnCondition> defaultColumnConditions = this.filterColumnConditions(
-                sqlCommandType ,Strategy.CUSTOM_MISS_DEFAULT ,Strategy.DEFAULT);
-
-        List<ColumnPropertyMapping> missColumnConditions = this.getColumnPropertyMappings()
-                .values()
-                .stream()
-                .filter(mapping -> !defaultColumnConditions.containsKey(mapping.getColumnName()))
-                .collect(Collectors.toList());
-
-        List<ColumnCondition> list = new ArrayList<>();
-        list.addAll(defaultColumnConditions.values());
-        for (ColumnPropertyMapping missColumnCondition : missColumnConditions) {
-            ColumnCondition columnCondition = new ColumnCondition();
-            columnCondition.setColumnName(missColumnCondition.getColumnName());
-            columnCondition.setStrategy(Strategy.CUSTOM_MISS_SKIP);
-            list.add(columnCondition);
-        }
-
-        return list.stream()
-                .map(columnCondition -> this.createConditionSqlNode(
-                        columnCondition ,propertyNameFunction ,sqlContentFunction))
-                .collect(Collectors.toList());
+        return new StaticTextSqlNode(defaultConditionsContent(sqlCommandType ,sqlContentFunction).toString());
     }
 
 }

@@ -3,7 +3,6 @@ package com.github.ibatis.statement.demo;
 import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.condition.ColumnConditionParser;
 import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
-import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.base.dv.ColumnValueParser;
 import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
@@ -79,29 +78,26 @@ public class Demo {
                 "create_time".equals(columnMateData.getColumnName()) ,
                 new SqlCommandType[]{SqlCommandType.INSERT} ,"now()" ,false);
 
-        //执行修改指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
+        //执行修改指令时，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
         ColumnConditionParser updateColumnConditionParser = new SpecificColumnConditionParser(
                 columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN,
-                Strategy.CUSTOM_MISS_DEFAULT ,"'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
+                new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN, "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
 
-        //执行查询指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time > '2020-08-12 00:00:00'
+        //执行查询指令时，添加默认查询条件 create_time > '2020-08-12 00:00:00'
         ColumnConditionParser selectColumnConditionParser = new SpecificColumnConditionParser(
                 columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT,
-                Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-12 00:00:00");
+                new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT, "2020-08-12 00:00:00");
 
-        //执行删除指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time < '2020-08-12 00:00:00'
+        //执行删除指令时，添加默认查询条件 create_time < '2020-08-12 00:00:00'
         ColumnConditionParser deleteColumnConditionParser = new SpecificColumnConditionParser(
                 columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT,
-                Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-11 00:00:00");
+                new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT, "2020-08-11 00:00:00");
 
         StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
                 .setEntityMateDataParser(
                         new DefaultEntityMateDataParser.Builder()
 //                        .setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy.ENTITY)
-                        .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                                .setTableSchemaQueryRegister(tableSchemaQueryRegister)
 //                        .setTableSourceParser(new DefaultTableSourceParser(
 //                            Arrays.asList(
 //                                entityClass -> Optional.of(new TableSourceParser.Source(
@@ -109,11 +105,11 @@ public class Demo {
 //                                ))
 //                            )
 //                        ))
-                        .setPropertyMateDataParser(new DefaultPropertyMateDataParser(
-                            Arrays.asList(
-                                new TryMappingEveryPropertyMateDataParser()
-                            )
-                        ))
+                                .setPropertyMateDataParser(new DefaultPropertyMateDataParser(
+                                        Arrays.asList(
+                                                new TryMappingEveryPropertyMateDataParser()
+                                        )
+                                ))
 //                        .setLogicalColumnMateDataParser(new DefaultLogicalColumnMateDataParser(
 //                            //列名为removed的列,默认为逻辑列
 //                            Arrays.asList(
@@ -134,7 +130,7 @@ public class Demo {
 //                                    deleteColumnConditionParser
 //                            )
 //                        ))
-                        .build())
+                                .build())
                 .addDefaultMappedStatementFactories()
                 .addMappedStatementFactory(new SelectMaxIdMappedStatementFactory())
                 .addDefaultListeners()

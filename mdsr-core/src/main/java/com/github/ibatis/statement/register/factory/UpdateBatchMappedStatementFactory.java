@@ -37,21 +37,7 @@ public class UpdateBatchMappedStatementFactory extends AbstractUpdateMappedState
                     where
                     primaryKey1 = #{item.keyPropertyName1,jdbcType=XXX},
                     ...
-                    col6 = #{item.propertyName6,jdbcType=XXX},
-                    ...
-                    <if test="item.propertyName4 != null">
-                     col4 = #{item.propertyName4,jdbcType=XXX},
-                    </if>
-                    <choose>
-                         <if test="item.propertyName4 != null">
-                            col7 = #{item.propertyName7,jdbcType=XXX},
-                         </if>
-                         <otherwise>
-                            col7 = defaultValue7,
-                         </otherwise>
-                    </choose>
-                    ...
-                    and col13 = value
+                    and col7 = defaultValue7
                      ...
                     (and logicalCol = existValue)
         </foreach

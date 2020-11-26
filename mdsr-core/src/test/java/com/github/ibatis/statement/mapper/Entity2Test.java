@@ -1,8 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.DataSourceEnvironment;
-import com.github.ibatis.statement.base.condition.Condition;
-import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.base.logical.Logical;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
@@ -37,7 +35,6 @@ public class Entity2Test {
         private String value3;
 
         @DefaultValue(value = "now()")
-        @Condition(strategy = Strategy.CUSTOM_MISS_SKIP)
         private Date updateTime;
 
         @DefaultValue(value = "now()" ,commandTypes = SqlCommandType.INSERT)
@@ -123,7 +120,7 @@ public class Entity2Test {
             "  `create_time` datetime DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
             "  CONSTRAINT table_entity2_pk PRIMARY KEY (id, id2)\n" +
-            ");";
+            ") DEFAULT CHARSET=utf8;;";
 
     @Test
     public void test(){
@@ -166,7 +163,6 @@ public class Entity2Test {
         Assert.assertTrue(updateEntity2.getUpdateTime().compareTo(entity20.getUpdateTime()) > 0);
 
         entity20 = mapper.selectByPrimaryKey(entity20);
-        Date updateTime = entity20.getUpdateTime();
 
         try {
             Thread.sleep(500);
@@ -174,9 +170,6 @@ public class Entity2Test {
             e.printStackTrace();
         }
 
-        entity20.setUpdateTime(new Date());
-        Assert.assertEquals(0 ,mapper.updateByPrimaryKey(entity20));
-        entity20.setUpdateTime(updateTime);
         Assert.assertEquals(1 ,mapper.updateByPrimaryKey(entity20));
         Assert.assertTrue(mapper.selectByPrimaryKey(entity20).getValue2() == 4);
 
@@ -216,7 +209,7 @@ public class Entity2Test {
             e.printStackTrace();
         }
 
-        updateTime = entity22.getUpdateTime();
+        Date updateTime = entity22.getUpdateTime();
         entity21.setUpdateTime(null);
         entity22.setUpdateTime(new Date());
 
@@ -238,7 +231,7 @@ public class Entity2Test {
         entity23 = mapper.selectByPrimaryKey(entity23);
 
         Assert.assertEquals(entity21.getValue3() ,"3");
-        Assert.assertNull(entity22.getValue3());
+        Assert.assertEquals(entity22.getValue3() ,"3");
         Assert.assertEquals(entity23.getValue3() ,"3");
 
         entity21.setUpdateTime(null);
@@ -263,7 +256,7 @@ public class Entity2Test {
 
         Assert.assertEquals(entity21.getValue3() ,"2");
         Assert.assertEquals(entity22.getValue3() ,"3");
-        Assert.assertEquals(entity23.getValue3() ,"3");
+        Assert.assertEquals(entity23.getValue3() ,"4");
 
         Assert.assertEquals(3 ,mapper.deleteBatchByPrimaryKey(entity2s));
         Assert.assertEquals(3 ,mapper.deleteBatchByPrimaryKeyOnPhysical(entity2s));

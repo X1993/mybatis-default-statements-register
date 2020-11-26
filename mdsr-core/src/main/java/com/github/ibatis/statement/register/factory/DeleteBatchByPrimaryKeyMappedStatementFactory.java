@@ -121,7 +121,7 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
         }
 
         //值固定的查询条件
-        StringBuilder fixedValueConditions = entityMateData.noCustomConditionsContent(
+        StringBuilder fixedValueConditions = entityMateData.defaultConditionsContent(
                 sqlCommandType(mappedStatementMateData) ,content -> content.insert(0 ," AND "));
 
         if (logicalDelete){

@@ -64,8 +64,8 @@ public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStateme
         //where条件
         sqlNodes.add(new StaticTextSqlNode(" WHERE 1 = 1 "));
 
-        sqlNodes.addAll(entityMateData.selectiveConditionSqlNodes(sqlCommandType(mappedStatementMateData) ,
-                        name -> name ,content -> content.insert(0 ," AND ")));
+        sqlNodes.add(entityMateData.defaultConditionsSqlNode(sqlCommandType(mappedStatementMateData) ,
+                        content -> content.insert(0 ," AND ")));
 
         if (logicalDelete){
             //逻辑存在条件

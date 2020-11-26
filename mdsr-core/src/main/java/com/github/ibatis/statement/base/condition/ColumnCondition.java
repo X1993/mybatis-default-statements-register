@@ -36,11 +36,6 @@ public class ColumnCondition implements Cloneable{
      */
     private String value = "";
 
-    /**
-     * 过滤值选择策略
-     */
-    private Strategy strategy = Strategy.DEFAULT;
-
     @Override
     public ColumnCondition clone() throws CloneNotSupportedException {
         return (ColumnCondition) super.clone();
@@ -70,14 +65,6 @@ public class ColumnCondition implements Cloneable{
         this.rule = rule;
     }
 
-    public Strategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(Strategy strategy) {
-        this.strategy = strategy;
-    }
-
     public String getValue() {
         return value;
     }
@@ -93,7 +80,6 @@ public class ColumnCondition implements Cloneable{
                 ", columnName='" + columnName + '\'' +
                 ", rule=" + rule +
                 ", value='" + value + '\'' +
-                ", strategy=" + strategy +
                 '}';
     }
 
@@ -108,7 +94,6 @@ public class ColumnCondition implements Cloneable{
             columnCondition.setColumnName(columnName);
             columnCondition.setSqlCommandType(sqlCommandType);
             columnCondition.setRule(condition.rule());
-            columnCondition.setStrategy(condition.strategy());
             columnCondition.setValue(condition.value());
             columnConditions.add(columnCondition);
         }

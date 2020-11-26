@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @see KeyTableMapper#updateBatchSameValue(Collection, Object)
@@ -57,14 +56,13 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
 
         SqlNode setSqlNode = super.getSetSqlNode(mappedStatementMateData, propertyNameFunction, true);
 
-        SqlNode whereSqlNode = this.whereSqlNode(mappedStatementMateData, propertyNameFunction);
+        SqlNode whereSqlNode = this.whereSqlNode(mappedStatementMateData);
 
         return new DynamicSqlSource(configuration ,
                 new MixedSqlNode(Arrays.asList(updatePrefixSqlNode ,setSqlNode ,whereSqlNode)));
     }
 
-    private SqlNode whereSqlNode(MappedStatementMateData mappedStatementMateData ,
-                                 Function<String ,String> propertyNameFunction)
+    private SqlNode whereSqlNode(MappedStatementMateData mappedStatementMateData)
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         Configuration configuration = mappedStatementMateData.getConfiguration();
@@ -102,12 +100,9 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
                     "(", ")", ","));
         }
 
-        whereSqlNodes.addAll(entityMateData.filterColumnConditions(SqlCommandType.UPDATE)
-                .values()
-                .stream()
-                .map(columnCondition -> entityMateData.createConditionSqlNode(columnCondition ,
-                        propertyNameFunction ,content -> content.insert(0 ," AND ")))
-                .collect(Collectors.toList()));
+
+        whereSqlNodes.add(entityMateData.defaultConditionsSqlNode(SqlCommandType.UPDATE ,
+                content -> content.insert(0 ," AND ")));
 
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         if (logicalColumnMateData != null){
