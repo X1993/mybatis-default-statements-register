@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.demo;
 
 import com.github.ibatis.statement.mapper.KeyTableMapper;
-import com.github.ibatis.statement.mapper.param.BetweenParam;
 import java.util.Collection;
 import java.util.Date;
 
@@ -15,7 +14,7 @@ public interface UserMapper extends KeyTableMapper<Integer ,User> {
 
     User selectById(Integer id);
 
-    User selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(Integer id ,BetweenParam<Date> betweenParam);
+    User selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(Integer id ,Date startDate ,Date endDate);
 
     User selectByInNameAndGtCreateTime(Collection<String> names ,Date startTime);
 

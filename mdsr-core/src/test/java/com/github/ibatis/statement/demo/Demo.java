@@ -7,7 +7,6 @@ import com.github.ibatis.statement.base.condition.Strategy;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.base.dv.ColumnValueParser;
 import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
-import com.github.ibatis.statement.mapper.param.BetweenParam;
 import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.ConditionRule;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
@@ -323,7 +322,7 @@ public class Demo {
     @Test
     public void test(){
         userMapper.selectById(12);
-        userMapper.selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(12 ,new BetweenParam<>(new Date() ,new Date()));
+        userMapper.selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(12 ,new Date() ,new Date());
         userMapper.selectByInNameAndGtCreateTime(Arrays.asList("name1" ,"name2") ,new Date());
         userMapper.selectByInName(Arrays.asList("name1" ,"name2"));
         userMapper.selectByInId(1 ,3);

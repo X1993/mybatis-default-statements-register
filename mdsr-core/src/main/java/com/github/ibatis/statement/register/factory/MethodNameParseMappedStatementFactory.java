@@ -3,6 +3,7 @@ package com.github.ibatis.statement.register.factory;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.core.matedata.MapperMethodMateData;
+import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.mapper.param.*;
 import com.github.ibatis.statement.util.StringUtils;
@@ -17,10 +18,13 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * 特定规则的方法
+ * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png">方法名解析规则</a>
  * @Author: junjie
  * @Date: 2020/11/23
  */
@@ -288,12 +292,6 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                                         null, "item" ,"(" ,")" ,",");
                                 argIndex++;
                                 break;
-                            case BETWEEN:
-                            case NOT_BETWEEN:
-                                valueSqlNode = new StaticTextSqlNode(new StringBuilder("#{param").append(argIndex)
-                                        .append(".minVal} AND #{param").append(argIndex).append(".maxVal} ").toString());
-                                argIndex++;
-                                break;
                             case LIKE:
                             case NOT_LIKE:
                                 valueSqlNode = new StaticTextSqlNode(new StringBuilder("CONCAT('%',")
@@ -314,6 +312,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                             case IS_NULL:
                             case NOT_NULL:
                                 valueSqlNode = new StaticTextSqlNode("");
+                                break;
+                            case BETWEEN:
+                            case NOT_BETWEEN:
+                                valueSqlNode = new StaticTextSqlNode(value.append(" AND #{param")
+                                        .append(++argIndex).append("}").toString());
+                                argIndex++;
                                 break;
                             default:
                                 valueSqlNode = new StaticTextSqlNode(value.toString());
@@ -345,6 +349,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                 .append(entityMateData.getBaseColumnListSqlContent())
                 .append(" FROM `").append(entityMateData.getTableName())
                 .append("`").toString());
+
+        LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
+        if (logicalColumnMateData != null){
+            conditionSqlNodes.add(new StaticTextSqlNode(logicalColumnMateData.equalSqlContent(true)
+                    .insert(0 ," AND ").toString()));
+        }
 
         List<SqlNode> sqlNodes = new ArrayList<>();
         sqlNodes.add(selectSqlNode);
@@ -410,8 +420,15 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                         {
                             //没有值
                             break;
+                        }else if (ConditionRule.BETWEEN.equals(conditionRule)
+                                || ConditionRule.NOT_BETWEEN.equals(conditionRule))
+                        {
+                            //两个值
+                            conditionParams.add(new ConditionParam(card.value ,conditionRule ,"1"));
+                            conditionParams.add(new ConditionParam(card.value ,conditionRule ,"2"));
+                        }else {
+                            conditionParams.add(new ConditionParam(card.value, conditionRule, null));
                         }
-                        conditionParams.add(new ConditionParam(card.value ,conditionRule ,null));
                     }
             }
         }
@@ -425,11 +442,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             ConditionParam conditionParam = conditionParams.get(i);
             ConditionRule rule = conditionParam.getRule();
             Class<?> parameterType = parameterTypes[i];
-            if (ConditionRule.BETWEEN.equals(rule) || ConditionRule.NOT_BETWEEN.equals(rule)){
-                if (!BetweenParam.class.isAssignableFrom(parameterType)){
-                    return -1;
-                }
-            }else if (ConditionRule.IN.equals(rule) || ConditionRule.NOT_IN.equals(rule)){
+            if (ConditionRule.IN.equals(rule) || ConditionRule.NOT_IN.equals(rule)){
                 if (!Collection.class.isAssignableFrom(parameterType) && !parameterType.isArray()){
                     return -1;
                 }
@@ -441,7 +454,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
     /**
      * 根据语法对表达式分词
-     * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/MethodNameParseMappedStatementFactory%E6%94%AF%E6%8C%81%E7%9A%84%E8%AF%AD%E6%B3%95.png">语法规则</a>
+     * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png">方法名解析规则</a>
      * @param expression
      * @param columnNames
      * @return

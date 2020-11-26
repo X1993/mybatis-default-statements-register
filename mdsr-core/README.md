@@ -34,7 +34,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
     <dependency>
         <groupId>com.github.X1993</groupId>
         <artifactId>mdsr-core</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
     </dependency>
 ```
 
