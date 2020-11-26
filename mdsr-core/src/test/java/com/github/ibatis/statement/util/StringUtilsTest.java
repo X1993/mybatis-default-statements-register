@@ -13,8 +13,10 @@ public class StringUtilsTest {
 
     @Test
     public void camelUnderscoreToCase() {
-        Assert.assertEquals(StringUtils.camelUnderscoreToCase("task_service") ,"TaskService");
-        Assert.assertEquals(StringUtils.camelUnderscoreToCase("task_serviceImpl") ,"TaskServiceImpl");
+        Assert.assertEquals(StringUtils.camelUnderscoreToCase("task_service") ,"taskService");
+        Assert.assertEquals(StringUtils.camelUnderscoreToCase("task_service" ,true) ,"TaskService");
+        Assert.assertEquals(StringUtils.camelUnderscoreToCase("task_serviceImpl") ,"taskServiceImpl");
+        Assert.assertEquals(StringUtils.camelUnderscoreToCase("in_eq" ,true) ,"InEq");
     }
 
 }

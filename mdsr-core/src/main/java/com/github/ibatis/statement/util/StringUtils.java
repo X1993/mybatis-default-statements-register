@@ -38,12 +38,13 @@ public class StringUtils {
     /**
      * 下划线转驼峰
      * @param str
+     * @param firstCharUpperCase 首字母是否大写
      * @return
      */
-    public static String camelUnderscoreToCase(String str){
+    public static String camelUnderscoreToCase(String str ,boolean firstCharUpperCase){
         char[] chars = str.toCharArray();
         StringBuilder result = new StringBuilder();
-        boolean beforeUnderscore = true;
+        boolean beforeUnderscore = firstCharUpperCase;
         for (char c : chars) {
             if (c == '_'){
                 beforeUnderscore = true;
@@ -53,6 +54,10 @@ public class StringUtils {
             }
         }
         return result.toString();
+    }
+
+    public static String camelUnderscoreToCase(String str){
+        return camelUnderscoreToCase(str ,false);
     }
 
 }

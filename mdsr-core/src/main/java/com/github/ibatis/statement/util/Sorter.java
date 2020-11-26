@@ -8,7 +8,7 @@ package com.github.ibatis.statement.util;
 public interface Sorter extends Comparable<Sorter>{
 
     /**
-     * 排序值
+     * 排序值，值越小优先级越高
      * @return
      */
     default int order(){

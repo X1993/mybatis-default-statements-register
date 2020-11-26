@@ -19,7 +19,7 @@ public enum ConditionRule
     LIKE_RIGHT("LIKE"),
     NOT_IN("NOT IN"),
     IN("IN"),
-    ISNULL("IS NULL"),
+    IS_NULL("IS NULL"),
     NOT_NULL("IS NOT NULL"),
     BETWEEN("BETWEEN"),
     NOT_BETWEEN("NOT BETWEEN"),

@@ -242,6 +242,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             mappedStatementFactories.add(new UpdateSameBatchMappedStatementFactory());
             mappedStatementFactories.add(new DeleteSelectiveMappedStatementFactory());
             mappedStatementFactories.add(new DynamicParamsSelectStatementFactory());
+            mappedStatementFactories.add(new MethodNameParseMappedStatementFactory());
             return this;
         }
 

@@ -176,7 +176,7 @@ public class ConditionParams {
     }
 
     public ConditionParams isNull(String key){
-        this.addConditionParam(key ,ConditionRule.ISNULL ,null);
+        this.addConditionParam(key ,ConditionRule.IS_NULL,null);
         return this;
     }
 

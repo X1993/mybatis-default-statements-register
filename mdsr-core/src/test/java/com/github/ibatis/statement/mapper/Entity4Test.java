@@ -71,7 +71,9 @@ public class Entity4Test {
         }
     }
 
-    public interface Entity4Mapper extends KeyTableMapper<String ,Entity4> {}
+    public interface Entity4Mapper extends KeyTableMapper<String ,Entity4> {
+
+    }
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity4`;\n" +
             "CREATE TABLE `entity4` (\n" +
