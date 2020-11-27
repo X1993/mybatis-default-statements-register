@@ -18,7 +18,6 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,21 +95,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             this.value = value;
         }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Card card = (Card) o;
-            return Objects.equals(value, card.value);
+        public CardType getType() {
+            return type;
         }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(value);
+        public String getValue() {
+            return value;
         }
 
         @Override
@@ -379,6 +369,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         List<ConditionParam> conditionParams = new ArrayList<>(parameterTypes.length + 1);
         String operator = null;
         ConditionRule conditionRule = ConditionRule.EQ;
+
         for (int i = 0; i < size; i++) {
             Card card = sentence.get(i);
             switch (card.type){
@@ -424,8 +415,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                                 || ConditionRule.NOT_BETWEEN.equals(conditionRule))
                         {
                             //两个值
-                            conditionParams.add(new ConditionParam(card.value ,conditionRule ,"1"));
-                            conditionParams.add(new ConditionParam(card.value ,conditionRule ,"2"));
+                            conditionParams.add(new ConditionParam(card.value ,conditionRule ,null));
+                            conditionParams.add(new ConditionParam(card.value ,conditionRule ,null));
                         }else {
                             conditionParams.add(new ConditionParam(card.value, conditionRule, null));
                         }
@@ -442,6 +433,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             ConditionParam conditionParam = conditionParams.get(i);
             ConditionRule rule = conditionParam.getRule();
             Class<?> parameterType = parameterTypes[i];
+
             if (ConditionRule.IN.equals(rule) || ConditionRule.NOT_IN.equals(rule)){
                 if (!Collection.class.isAssignableFrom(parameterType) && !parameterType.isArray()){
                     return -1;
@@ -564,9 +556,6 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         startPossibleNextCards.add(new NextCard(find ,noOperator));
         syntaxTable.put(Card.START_CARD ,startPossibleNextCards);
 
-        List<NextCard> selectPossibleNextCards = new ArrayList<>();
-        // select / find -> by
-        selectPossibleNextCards.add(new NextCard(by ,noOperator));
         String order = "order";
         String operator = "operator";
         String where = "where";
@@ -593,19 +582,24 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         Function<Map<String ,String> ,Map<String ,String>> checkOperatorOrder = content ->
                 order.equals(content.get(operator)) ? content : Collections.EMPTY_MAP;
 
+        List<NextCard> selectPossibleNextCards = new ArrayList<>();
+        // select / find -> by
+        selectPossibleNextCards.add(new NextCard(by ,setOperatorWhere));
+        // select / find -> orderBy
         NextCard nextOrderByCard = new NextCard(orderBy, orderOperator);
         selectPossibleNextCards.add(nextOrderByCard);
 
         syntaxTable.put(select ,selectPossibleNextCards);
         syntaxTable.put(find ,selectPossibleNextCards);
 
-        List<NextCard>  byPossibleNextCards = new ArrayList<>();
+        List<NextCard> byPossibleNextCards = new ArrayList<>();
         for (Card conditionKeyWord : conditionKeyWords) {
-            // by -> conditions
+            // by -> condition
             byPossibleNextCards.add(new NextCard(conditionKeyWord ,noOperator));
         }
         for (Card columnCard : columnCards) {
-            byPossibleNextCards.add(new NextCard(columnCard ,true ,setOperatorWhere));
+            // by -> column
+            byPossibleNextCards.add(new NextCard(columnCard ,true ,noOperator));
         }
 
         syntaxTable.put(by ,byPossibleNextCards);

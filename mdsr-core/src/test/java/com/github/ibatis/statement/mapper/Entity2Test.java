@@ -120,7 +120,7 @@ public class Entity2Test {
             "  `create_time` datetime DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
             "  CONSTRAINT table_entity2_pk PRIMARY KEY (id, id2)\n" +
-            ") DEFAULT CHARSET=utf8;;";
+            ") DEFAULT CHARSET=utf8;";
 
     @Test
     public void test(){
@@ -209,36 +209,8 @@ public class Entity2Test {
             e.printStackTrace();
         }
 
-        Date updateTime = entity22.getUpdateTime();
-        entity21.setUpdateTime(null);
-        entity22.setUpdateTime(new Date());
-
-        entity21.setValue3("3");
-        entity22.setValue3("3");
-        entity23.setValue3("3");
-
-        entity2s = Arrays.asList(entity21, entity22, entity23);
-        if (DataSourceEnvironment.MYSQL.name().equals(environmentId)) {
-            mapper.updateBatch(entity2s);
-        }else {
-            for (Entity2 entity2 : entity2s) {
-                mapper.updateByPrimaryKey(entity2);
-            }
-        }
-
-        entity21 = mapper.selectByPrimaryKey(entity21);
-        entity22 = mapper.selectByPrimaryKey(entity22);
-        entity23 = mapper.selectByPrimaryKey(entity23);
-
-        Assert.assertEquals(entity21.getValue3() ,"3");
-        Assert.assertEquals(entity22.getValue3() ,"3");
-        Assert.assertEquals(entity23.getValue3() ,"3");
-
-        entity21.setUpdateTime(null);
         entity21.setValue3("2");
         entity23.setValue3("4");
-        entity23.setUpdateTime(new Date());
-        entity22.setUpdateTime(updateTime);
         entity22.setValue3("3");
 
         entity2s = Arrays.asList(entity21, entity22, entity23);

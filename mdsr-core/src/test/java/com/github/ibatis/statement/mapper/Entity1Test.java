@@ -241,7 +241,7 @@ public class Entity1Test {
             "  `id` varchar(255) PRIMARY KEY NOT NULL,\n" +
             "  `value` varchar(255) DEFAULT NULL,\n" +
             "  `value_one` varchar(255) DEFAULT NULL\n" +
-            ") DEFAULT CHARSET=utf8;;";
+            ") DEFAULT CHARSET=utf8;";
 
     @Test
     public void test(){

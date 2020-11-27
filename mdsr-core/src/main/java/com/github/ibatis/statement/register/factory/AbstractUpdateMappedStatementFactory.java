@@ -12,7 +12,6 @@ import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author junjie
