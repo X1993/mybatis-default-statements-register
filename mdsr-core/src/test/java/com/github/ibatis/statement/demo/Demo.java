@@ -282,18 +282,6 @@ public class Demo {
     }
 
     @Test
-    public void optimisticLock(){
-        User user = new User();
-        user.setId(21);
-        user.setName("张三");
-        user.setAddress("杭州");
-        user.setCreateTime(new Date());
-        user.setVersion(22);
-        userMapper.insert(user);
-        userMapper.updateByPrimaryKey(user);
-    }
-
-    @Test
     public void selectIn(){
         userMapper.selectByWhereConditions(new ConditionParams().in("id" ,new ArrayList()));
     }

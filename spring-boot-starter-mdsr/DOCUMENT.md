@@ -41,7 +41,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
       note varchar(100) DEFAULT NULL ,
       version int(255) DEFAULT NULL ,
       removed bit(1) DEFAULT 0 COMMENT '是否已删除，1：已删除'
-    );
+    ) DEFAULT CHARSET=utf8;
 ```
 -   spring-boot.application.yaml配置
 ```yaml
@@ -634,7 +634,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
       `value` varchar(30) DEFAULT NULL,
       `value2` varchar(30) DEFAULT NULL,
       CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2)
-    );
+    )  DEFAULT CHARSET=utf8;;
 ```
 -   实体类
 ```java
@@ -920,8 +920,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         public ColumnConditionParser selectColumnConditionParser(){
             return new SpecificColumnConditionParser(
                     columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT,
-                    Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-12 00:00:00");
+                    new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT, "2020-08-12 00:00:00");
         }
     
         /**
@@ -932,8 +931,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         public ColumnConditionParser updateColumnConditionParser(){
             return new SpecificColumnConditionParser(
                     columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN,
-                    Strategy.CUSTOM_MISS_DEFAULT ,"'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
+                    new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN, "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
         }
     
         /**
@@ -944,8 +942,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         public ColumnConditionParser deleteColumnConditionParser(){
             return new SpecificColumnConditionParser(
                     columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT,
-                    Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-11 00:00:00");
+                    new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT, "2020-08-11 00:00:00");
         }
     }
 ```
@@ -1164,54 +1161,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2
      LIMIT 0, 10;
 ```
 
-### 10.基于默认where条件和默认赋值配置可实现乐观锁
-```java
-    @Entity(tableName = "user")//申明实体映射的表
-    public class User {
-        
-        // ... columns    
-        
-        @DefaultValue(commandTypes = {SqlCommandType.UPDATE} ,value = "&{column} + 1")
-        @Condition(commandTypes = {SqlCommandType.UPDATE} ,strategy = Strategy.CUSTOM)
-        private int version;
-        
-        // ... (ellipsis get/set methods)
-    
-    }
-```
-#### 效果演示
-```java
-    @RunWith(SpringRunner.class)
-    @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-    public class UserMapperTest{
-    
-        @Autowired
-        private UserMapper userMapper;
-        
-        @Test
-        public void optimisticLock(){
-            User user = new User();
-            user.setId(11);
-            user.setName("张三");
-            user.setAddress("杭州");
-            user.setCreateTime(new Date());
-            user.setVersion(12);
-            userMapper.insert(user);
-            user.setNote("无");
-            userMapper.updateByPrimaryKey(user);
-        }
-    }
-    
-```
-    will execute the following SQL
-```sql
-    UPDATE `user` SET `note` = '无' , `update_time` = null , `address` = '杭州' , `name` = '张三' , 
-    `version` = `version` + 1
-     WHERE `id` = 11 AND `version` = 12 AND 1 = 1;
-```
-
-### 11.指定table schema解析策略
-#### 11.1.指定实体类配置
+### 10.指定table schema解析策略
+#### 10.1.指定实体类配置
 ```java
     /**
      * @author junjie
@@ -1255,7 +1206,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```
 >   java.sql.SQLException: Unknown column 'not_exist_column' in 'field list'
 
-#### 11.2全局默认配置
+#### 10.2全局默认配置
 ```yaml
   mybatis:
     mapped-statement:
@@ -1263,7 +1214,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         table-schema-resolution-strategy: entity    
 ```
 
-### 12.自定义MappedStatementFactory
+### 11.自定义MappedStatementFactory
 -   定义自定义方法
 ```java
     package com.github.mdsr.sample.mapper;
@@ -1366,15 +1317,20 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     select `id` from `user` order by `id` desc limit 1; 
 ```
 
-### 13.特定规则方法缺省MappedStatement自动注册
+### 12.特定规则方法缺省MappedStatement自动注册
 -   实现类
 ```java
     /** @see  com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory*/
 ```
 
 -   方法命名规则 
-[规则](https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png)
-       
+
+<p align="center">
+  <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/src/main/java/com/github/ibatis/statement/register/factory/MethodNameParseMappedStatementFactory.java">
+   <img alt="grammar" src="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png">
+  </a>
+</p>
+      
 
     关键字            |        方法                         |          sql
     ------           |      --------------                  |         ------

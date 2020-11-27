@@ -24,10 +24,10 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
 ```
 2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
 
-### 框架结构:
+### 流程框架:
 <p align="center">
   <a>
-   <img alt="Mybatis-Plus-Logo" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg">
+   <img alt="Framework" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/Framework.jpg">
   </a>
 </p>
 

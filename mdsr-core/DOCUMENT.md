@@ -1850,7 +1850,12 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```
 
 -   方法命名规则 
-[规则](https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png)
+
+<p align="center">
+  <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/src/main/java/com/github/ibatis/statement/register/factory/MethodNameParseMappedStatementFactory.java">
+   <img alt="grammar" src="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png">
+  </a>
+</p>
        
 
     关键字            |        方法                         |          sql

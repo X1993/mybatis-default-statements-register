@@ -94,19 +94,6 @@ public class UserMapperTest{
     }
 
     @Test
-    public void optimisticLock(){
-        User user = new User();
-        user.setId(userMapper.selectMaxKey() + 1);
-        user.setName("张三");
-        user.setAddress("杭州");
-        user.setCreateTime(new Date());
-        user.setVersion(12);
-        userMapper.insert(user);
-        user.setNote("无");
-        userMapper.updateByPrimaryKey(user);
-    }
-
-    @Test
     public void selectMaxKey(){
         userMapper.selectMaxKey();
     }

@@ -8,8 +8,7 @@
 -   4.扩展性：预留大量扩展点，允许开发人员根据需要配置或扩展。
     -   4.1. 允许根据需要实现MappedStatement工厂扩展自动注册的方法 
     -   4.2. 支持基于注解的细粒度配置，提供全局匹配实现默认配置，并支持自由实现自定义解析器扩展配置
--   5.功能：除自动注入特定方法外，支持逻辑列、复合主键、默认where条件、默认赋值、禁止特定列查询/修改/新增、
-        动态条件查询，另外基于默认where条件和默认赋值配置可实现乐观锁。
+-   5.功能：除自动注入特定方法外，支持逻辑列、复合主键、默认where条件、默认赋值、禁止特定列查询/修改/新增、动态条件查询、方法名称解析注册。
 
 ### 运行环境:
 JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
@@ -24,8 +23,12 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
 ```
 2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
 
-### 框架结构:
-[架构图](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/%E6%9E%B6%E6%9E%84%E5%9B%BE.jpg)
+### 流程框架:
+<p align="center">
+  <a>
+   <img alt="Framework" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/Framework.jpg">
+  </a>
+</p>
 
 ### 当前最新版本
 -   Maven

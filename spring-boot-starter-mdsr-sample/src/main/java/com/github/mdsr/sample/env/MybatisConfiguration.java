@@ -1,7 +1,11 @@
 package com.github.mdsr.sample.env;
 
+import com.github.ibatis.statement.base.condition.ColumnConditionParser;
+import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
+import com.github.ibatis.statement.mapper.param.ConditionRule;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +27,7 @@ public class MybatisConfiguration {
 //    public ColumnConditionParser selectColumnConditionParser(){
 //        return new SpecificColumnConditionParser(
 //                columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-//                new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT,
-//                Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-12 00:00:00");
+//                new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT, "2020-08-12 00:00:00");
 //    }
 
     /**
@@ -35,8 +38,7 @@ public class MybatisConfiguration {
 //    public ColumnConditionParser updateColumnConditionParser(){
 //        return new SpecificColumnConditionParser(
 //                columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-//                new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN,
-//                Strategy.CUSTOM_MISS_DEFAULT ,"'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
+//                new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN, "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
 //    }
 
     /**
@@ -47,8 +49,7 @@ public class MybatisConfiguration {
 //    public ColumnConditionParser deleteColumnConditionParser(){
 //        return new SpecificColumnConditionParser(
 //                columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-//                new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT,
-//                Strategy.CUSTOM_MISS_DEFAULT ,"2020-08-11 00:00:00");
+//                new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT, "2020-08-11 00:00:00");
 //    }
 
     /**
