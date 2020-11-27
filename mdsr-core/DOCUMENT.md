@@ -1853,7 +1853,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
        
 
     关键字           |        方法                          |          sql
-    ------           |      --------------                  |         ------
+    :------          |      :-------------                  |        :------
     And              |      findByNameAndCode(?,?)          |     where name= ? and code = ?     
     Or               |      findByNameOrCode(?,?)           |     where name= ? or code = ?       
     Eq               |      findByEqName(?)                 |     where name= ?
