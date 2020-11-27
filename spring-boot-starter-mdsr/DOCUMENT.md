@@ -1324,16 +1324,10 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```
 
 -   方法命名规则 
+       
 
-<p align="center">
-  <a href="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/src/main/java/com/github/ibatis/statement/register/factory/MethodNameParseMappedStatementFactory.java">
-   <img alt="grammar" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/method-name-parse-rule.png">
-  </a>
-</p>
-      
-
-    关键字            |        方法                         |          sql
-    ------           |      --------------                  |         ------
+    关键字           |        方法                          |          sql
+    :------          |      :-------------                  |        :------
     And              |      findByNameAndCode(?,?)          |     where name= ? and code = ?     
     Or               |      findByNameOrCode(?,?)           |     where name= ? or code = ?       
     Eq               |      findByEqName(?)                 |     where name= ?
@@ -1353,4 +1347,11 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Between          |      findByBetweenTime(?,?)          |     where name between ? and ?
     NotBetween       |      findByNotBetweenName(?,?)       |     where name not between ? and ?
     Ne               |      findByNeName()                  |     where name <> ''
-   
+    
+    
+    
+<p align="center">
+  <a href="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/src/main/java/com/github/ibatis/statement/register/factory/MethodNameParseMappedStatementFactory.java">
+   <img alt="grammar" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/method-name-parse-rule.png">
+  </a>
+</p>    
