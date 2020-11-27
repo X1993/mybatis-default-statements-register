@@ -304,7 +304,7 @@ public class Demo {
     }
 
     @Test
-    public void test(){
+    public void methodNameParseTest(){
         userMapper.selectById(12);
         userMapper.selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(12 ,new Date() ,new Date());
         userMapper.selectByInNameAndGtCreateTime(Arrays.asList("name1" ,"name2") ,new Date());
