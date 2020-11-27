@@ -1349,6 +1349,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Ne               |      findByNeName()                  |     where name <> ''
     
     
+-   语法规则
     
 <p align="center">
   <a href="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/src/main/java/com/github/ibatis/statement/register/factory/MethodNameParseMappedStatementFactory.java">
