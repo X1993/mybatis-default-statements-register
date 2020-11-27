@@ -1852,8 +1852,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 -   方法命名规则 
        
 
-
-    关键字           |        方法                           |          sql
+    关键字           |        方法                          |          sql
     ------           |      --------------                  |         ------
     And              |      findByNameAndCode(?,?)          |     where name= ? and code = ?     
     Or               |      findByNameOrCode(?,?)           |     where name= ? or code = ?       
