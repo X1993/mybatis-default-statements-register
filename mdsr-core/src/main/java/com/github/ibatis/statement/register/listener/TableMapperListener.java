@@ -1,8 +1,10 @@
-package com.github.ibatis.statement.register;
+package com.github.ibatis.statement.register.listener;
 
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.TableMateData;
 import com.github.ibatis.statement.mapper.TableMapper;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+
 import java.text.MessageFormat;
 
 /**

@@ -1,7 +1,8 @@
-package com.github.ibatis.statement.register;
+package com.github.ibatis.statement.register.listener;
 
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.mapper.KeyParameterType;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.util.TypeUtils;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
