@@ -26,7 +26,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
 ### 流程框架:
 <p align="center">
   <a>
-   <img alt="Framework" src="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/Framework.jpg">
+   <img alt="Framework" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/Framework.jpg">
   </a>
 </p>
 

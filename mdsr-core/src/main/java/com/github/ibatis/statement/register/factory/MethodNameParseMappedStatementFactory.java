@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 /**
  * 特定规则的方法
- * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png">方法名解析规则</a>
+ * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/method-name-parse-rule.png">方法名解析规则</a>
  * @Author: junjie
  * @Date: 2020/11/23
  */
@@ -446,7 +446,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
     /**
      * 根据语法对表达式分词
-     * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/3.1.0-SNAPSHOT/mdsr-core/method-name-parse-rule.png">方法名解析规则</a>
+     * @see <a href="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/method-name-parse-rule.png">方法名解析规则</a>
      * @param expression
      * @param columnNames
      * @return
