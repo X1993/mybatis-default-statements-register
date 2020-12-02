@@ -58,7 +58,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
      * value :
      * key : entity class
      */
-    private final Map<DataSource, Map<Class<?> ,EntityMateData>> databaseEntityMateDataCache = new HashMap<>();
+    private final Map<DataSource, Map<Class<?> ,EntityMateData>> databaseEntityMateDataCache = new WeakHashMap<>();
 
     public DefaultEntityMateDataParser() {
         this(new DefaultTableSourceParser() ,
