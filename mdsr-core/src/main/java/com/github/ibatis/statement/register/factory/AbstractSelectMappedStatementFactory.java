@@ -25,7 +25,7 @@ public abstract class AbstractSelectMappedStatementFactory extends AbstractMappe
 
     protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData)
     {
-        return mappedStatementMateData.getEntityMateData().getAutoMappingResultMap();
+        return mappedStatementMateData.getDefaultMappingResultMap();
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.github.ibatis.statement.base.condition.ColumnCondition;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
-import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
@@ -53,11 +52,6 @@ public class EntityMateData implements Cloneable{
      * 执行不同类型sql命令时列默认条件过滤项
      */
     private Map<SqlCommandType ,Map<String ,ColumnDefaultValue>> commandTypeDefaultValueMap =  Collections.EMPTY_MAP;
-
-    /**
-     * 默认ResultMap
-     */
-    private ResultMap autoMappingResultMap;
 
     private Configuration configuration;
 
@@ -133,10 +127,6 @@ public class EntityMateData implements Cloneable{
         return getKeyPrimaryColumnPropertyMappings().size();
     }
 
-    public ResultMap getAutoMappingResultMap() {
-        return autoMappingResultMap;
-    }
-
     public Map<SqlCommandType, Map<String, ColumnCondition>> getCommandTypeConditionMap() {
         return commandTypeConditionMap;
     }
@@ -165,10 +155,6 @@ public class EntityMateData implements Cloneable{
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.getKey() ,
                         entry -> Collections.unmodifiableMap(entry.getValue()))));
-    }
-
-    public void setAutoMappingResultMap(ResultMap autoMappingResultMap) {
-        this.autoMappingResultMap = autoMappingResultMap;
     }
 
     public boolean isPrimaryKeyParameterIsEntity(){

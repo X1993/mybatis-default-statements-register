@@ -1347,6 +1347,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Between          |      findByBetweenTime(?,?)          |     where name between ? and ?
     NotBetween       |      findByNotBetweenName(?,?)       |     where name not between ? and ?
     Ne               |      findByNeName()                  |     where name <> ''
+    OrderBy          |      findOrderByNameTimeDesc         |     order by name time desc
     
     
 -   语法规则
