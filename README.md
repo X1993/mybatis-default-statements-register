@@ -15,7 +15,7 @@
 -   1.核心模块：[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core) 
     演示：[参考单元测试](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
 
--   2.基于spring-boot组装：[spring-boot-starter-mdsr](https://github.com/X1993/spring-boot-starter-mdsr.git) 
+-   2.基于spring-boot组装：[spring-boot-starter-mdsr](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr) 
     演示：[sample](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
 
 
