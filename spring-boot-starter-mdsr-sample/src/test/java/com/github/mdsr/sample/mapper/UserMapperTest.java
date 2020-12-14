@@ -5,6 +5,7 @@ import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
 import com.github.mdsr.sample.model.User;
 import org.apache.ibatis.session.SqlSession;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,8 @@ public class UserMapperTest{
     private EntityMateDataParser entityMateDataParser;
 
     @Test
-    public void entityMateDataParser(){
-        entityMateDataParser.parse(User.class, sqlSession).get();
+    public void entityMateDataParser0() {
+        Assert.assertNotNull(entityMateDataParser.parse(User.class, sqlSession).get());
     }
 
     @Test
