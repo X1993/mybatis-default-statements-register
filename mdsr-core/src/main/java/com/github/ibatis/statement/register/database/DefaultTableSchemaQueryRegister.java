@@ -27,10 +27,13 @@ public class DefaultTableSchemaQueryRegister implements TableSchemaQueryRegister
     @Override
     public Optional<TableSchemaQuery> getTableSchemaQuery(SqlSession sqlSession)
     {
-        Connection connection = sqlSession.getConnection();
-        String databaseProductName = null;
-        try {
-            databaseProductName = connection.getMetaData().getDatabaseProductName().toUpperCase();
+        String databaseProductName = "UNKNOWN";
+        try (Connection connection = sqlSession.getConfiguration().getEnvironment().getDataSource().getConnection()){
+            if (!connection.isClosed()) {
+                databaseProductName = connection.getMetaData().getDatabaseProductName().toUpperCase();
+            }else {
+                LOGGER.warn("sqlSession connection is closed");
+            }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }

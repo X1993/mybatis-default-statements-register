@@ -49,7 +49,7 @@ public class MysqlTableSchemaQuery extends AbstractTableSchemaQuery
 
     @Override
     public boolean match(SqlSession sqlSession ,String databaseProductName) {
-        return "MYSQL".equals(databaseProductName) || "MariaDB".equals(databaseProductName);
+        return "MYSQL".equalsIgnoreCase(databaseProductName) || "MariaDB".equalsIgnoreCase(databaseProductName);
     }
 
     @Override
