@@ -606,10 +606,10 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
         List<NextCard>  andOrPossibleNextCards = new ArrayList<>();
         for (Card conditionKeyWord : conditionKeyWords) {
-            andOrPossibleNextCards.add(new NextCard(conditionKeyWord ,noOperator));
+            andOrPossibleNextCards.add(new NextCard(conditionKeyWord ,true ,noOperator));
         }
         for (Card columnCard : columnCards) {
-            andOrPossibleNextCards.add(new NextCard(columnCard ,checkOperatorWhere));
+            andOrPossibleNextCards.add(new NextCard(columnCard ,true ,checkOperatorWhere));
         }
         // and -> conditions
         syntaxTable.put(and ,andOrPossibleNextCards);

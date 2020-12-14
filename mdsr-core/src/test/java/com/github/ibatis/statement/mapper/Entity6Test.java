@@ -27,6 +27,8 @@ public class Entity6Test {
 
         private String byAndLike;
 
+        private String index;
+
         public Entity6(String id, String id2) {
             this.id = id;
             this.id2 = id2;
@@ -90,6 +92,14 @@ public class Entity6Test {
         public void setByAndLike(String byAndLike) {
             this.byAndLike = byAndLike;
         }
+
+        public String getIndex() {
+            return index;
+        }
+
+        public void setIndex(String index) {
+            this.index = index;
+        }
     }
 
     interface Entity6Mapper extends KeyTableMapper<Entity6Test.Entity6, Entity6Test.Entity6> {
@@ -99,6 +109,10 @@ public class Entity6Test {
         Entity6Test.Entity6 selectByByAndLikeOrderByOrAsc(String by ,String like);
 
         Entity6Test.Entity6 selectByByAndLikeAndLikeOrderByOrByLikeAsc(String by ,String like);
+
+        Entity6Test.Entity6 selectByIndexAndLike(String index ,String like);
+
+        Entity6Test.Entity6 selectByIndex(String index);
 
     }
 
@@ -111,6 +125,7 @@ public class Entity6Test {
             "  `like` varchar(30) DEFAULT NULL,\n" +
             "  `by` varchar(30) DEFAULT NULL,\n" +
             "  `by_and_like` varchar(30) DEFAULT NULL,\n" +
+            "  `index` varchar(30) DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
             "  CONSTRAINT table_entity6_pk PRIMARY KEY (id, id2) \n" +
             ") DEFAULT CHARSET=utf8; ";
@@ -130,6 +145,8 @@ public class Entity6Test {
         mapper.selectByByAndLikeAndLikeOrderByOrByLikeAsc("12" ,"13");
         mapper.selectByByAndLikeOrderByOrDesc("11");
         mapper.selectByByAndLikeOrderByOrAsc("12" ,"14");
+        mapper.selectByIndexAndLike("12" ,"12");
+        mapper.selectByIndex("12");
     }
 
 }
