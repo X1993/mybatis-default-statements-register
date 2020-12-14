@@ -57,7 +57,7 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
 
     @Override
     public boolean match(SqlSession sqlSession ,String databaseProductName) {
-        return "H2".equals(databaseProductName);
+        return "H2".equalsIgnoreCase(databaseProductName);
     }
 
     @Override
