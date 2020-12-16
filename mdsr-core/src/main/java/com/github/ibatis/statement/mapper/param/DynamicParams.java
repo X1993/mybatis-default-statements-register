@@ -92,6 +92,13 @@ public class DynamicParams {
         return this;
     }
 
+    public DynamicParams addOrderRule(OrderRule.Rule rule ,String ... keys){
+        for (String key : keys) {
+            this.orderRules.add(new OrderRule(key ,rule));
+        }
+        return this;
+    }
+
     public DynamicParams addOrderRules(Iterable<OrderRule> orderRules){
         if (orderRules != null){
             for (OrderRule orderRule : orderRules) {

@@ -26,7 +26,14 @@ public class ConditionParams {
     public ConditionParams or(){
         this.or = !or;
         if (!this.or && params.size() > 0){
-            params.get(params.size() - 1).setOr(false);
+            setOr(params.size() - 1 ,false);
+        }
+        return this;
+    }
+
+    public ConditionParams setOr(int index ,boolean isOr){
+        if (index < params.size()) {
+            params.get(index).setOr(isOr);
         }
         return this;
     }
@@ -185,14 +192,14 @@ public class ConditionParams {
         return this;
     }
 
-    private ConditionParams addConditionParam(ConditionParam conditionParam)
+    public ConditionParams addConditionParam(ConditionParam conditionParam)
     {
         conditionParam.setOr(or);
         this.params.add(conditionParam);
         return this;
     }
 
-    private ConditionParams addConditionParam(String key ,ConditionRule rule ,Object value)
+    public ConditionParams addConditionParam(String key ,ConditionRule rule ,Object value)
     {
         addConditionParam(new ConditionParam(key,rule,value));
         return this;
@@ -215,6 +222,10 @@ public class ConditionParams {
         DynamicParams dynamicParams = new DynamicParams();
         dynamicParams.where(this);
         return dynamicParams;
+    }
+
+    public int size() {
+        return params.size();
     }
 
 }
