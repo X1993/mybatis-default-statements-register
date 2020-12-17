@@ -96,7 +96,6 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             for (MappedStatementFactory mappedStatementFactory : getMappedStatementFactories())
             {
                 //尝试自动注册
-                LOGGER.debug("{} try build {}" ,mappedStatementFactory ,mappedStatementId);
                 mappedStatement = mappedStatementFactory.tryBuild(mappedStatementMateData).orElse(null);
 
                 if (mappedStatement != null) {
