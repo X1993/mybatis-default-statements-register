@@ -1,10 +1,13 @@
 package com.github.ibatis.statement.base.core.parse;
 
 import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
+import com.github.ibatis.statement.util.ClassUtils;
 import com.github.ibatis.statement.util.StringUtils;
 import java.lang.annotation.*;
-import java.lang.reflect.Field;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 默认为每一个属性需要尝试映射列
@@ -25,10 +28,13 @@ public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataPa
     }
 
     @Override
-    public Optional<PropertyMateData> parse(Field field, Class<?> entityClass)
+    public Set<PropertyMateData> parse(Class<?> entityClass)
     {
-        return entityClass.getAnnotation(Prohibit.class) != null ? Optional.empty() :
-                Optional.of(new PropertyMateData(defaultNameFunction.apply(field.getName()) ,field));
+        return entityClass.getAnnotation(Prohibit.class) == null ?
+                ClassUtils.getFields(entityClass ,false)
+                .stream()
+                .map(field -> new PropertyMateData(defaultNameFunction.apply(field.getName()) ,field))
+                .collect(Collectors.toSet()) : Collections.EMPTY_SET;
     }
 
     public PropertyToColumnNameFunction getDefaultNameFunction() {
@@ -36,6 +42,7 @@ public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataPa
     }
 
     public void setDefaultNameFunction(PropertyToColumnNameFunction defaultNameFunction) {
+        Objects.requireNonNull(defaultNameFunction);
         this.defaultNameFunction = defaultNameFunction;
     }
 

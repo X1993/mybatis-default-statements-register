@@ -16,12 +16,12 @@ import java.util.Collection;
  */
 public class UpdateBatchMappedStatementFactory extends AbstractUpdateMappedStatementFactory {
 
-    public static final String MATCH_METHOD_NAME = "updateBatch";
+    public static final String UPDATE_BATCH = "updateBatch";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData) {
         return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class , MATCH_METHOD_NAME, ParameterizedTypeImpl.make(Collection.class ,
+                new MethodSignature(int.class , UPDATE_BATCH, ParameterizedTypeImpl.make(Collection.class ,
                         new Type[]{mappedStatementMateData.getEntityMateData().getEntityClass()} ,null)));
     }
 

@@ -244,6 +244,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             mappedStatementFactories.add(new DeleteSelectiveMappedStatementFactory());
             mappedStatementFactories.add(new DynamicParamsSelectStatementFactory());
             mappedStatementFactories.add(new MethodNameParseMappedStatementFactory());
+            mappedStatementFactories.add(new SelectMaxKeyStatementFactory());
             return this;
         }
 

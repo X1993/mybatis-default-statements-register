@@ -2,6 +2,7 @@ package com.github.ibatis.statement.mapper;
 
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import java.util.List;
+import com.github.ibatis.statement.register.factory.SelectSelectiveMappedStatementFactory;
 
 /**
  * 支持表或视图查询
@@ -17,6 +18,7 @@ public interface SelectMapper<T> extends EntityType<T> ,DynamicSelectMapper<T> {
      * @param condition
      * @param logicalExist 是否只查询逻辑存在
      * @return
+     * @see SelectSelectiveMappedStatementFactory#TOTAL_SELECTIVE
      */
     int totalSelective(T condition ,boolean logicalExist);
 
@@ -44,6 +46,7 @@ public interface SelectMapper<T> extends EntityType<T> ,DynamicSelectMapper<T> {
      * @param condition
      * @param logicalExist 是否只查询逻辑存在
      * @return
+     * @see SelectSelectiveMappedStatementFactory#SELECT_SELECTIVE
      */
     List<T> selectSelective(T condition ,boolean logicalExist);
 

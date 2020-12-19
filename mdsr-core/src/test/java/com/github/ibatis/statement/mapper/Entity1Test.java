@@ -4,6 +4,7 @@ import com.github.ibatis.statement.base.core.Column;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -117,7 +118,7 @@ public class Entity1Test {
          * @param logicalExist 是否只查询逻辑存在
          * @return
          */
-        int totalSelective(T condition ,boolean logicalExist);
+        int totalSelective(T condition, boolean logicalExist);
 
         default int totalSelective(T condition){
             return totalSelective(condition ,true);
@@ -144,7 +145,7 @@ public class Entity1Test {
          * @param logicalExist 是否只查询逻辑存在
          * @return
          */
-        Collection<T> selectSelective(T condition , boolean logicalExist);
+        Collection<T> selectSelective(T condition, boolean logicalExist);
 
         default Collection<T> selectSelective(T condition){
             return selectSelective(condition ,true);
@@ -159,6 +160,13 @@ public class Entity1Test {
                     .findFirst()
                     .orElse(null);
         }
+
+        /**
+         * 查询最大的主键
+         * @return
+         */
+        K selectMaxKey();
+
     }
 
     interface Entity1Mapper extends CustomMapper<String, Entity1>, EntityType<Entity1> {
@@ -218,7 +226,7 @@ public class Entity1Test {
          * @param update
          * @return
          */
-        int updateBatchSameValue(Collection<String> list , Entity1 update);
+        int updateBatchSameValue(Collection<String> list, Entity1 update);
 
         /**
          * 批量删除（根据有无逻辑列执行逻辑删除或物理删除）
@@ -264,6 +272,8 @@ public class Entity1Test {
 
         Assert.assertNotNull(mapper.selectByPrimaryKey(entity1.getId()));
         Assert.assertEquals(mapper.total() ,2);
+
+        Assert.assertEquals(mapper.selectMaxKey() ,"2");
 
         entity1.setValue1("12");
         mapper.updateByPrimaryKey(entity1);

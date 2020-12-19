@@ -3,7 +3,11 @@ package com.github.ibatis.statement.base.core.parse;
 import com.github.ibatis.statement.base.core.Entity;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.util.StringUtils;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author junjie

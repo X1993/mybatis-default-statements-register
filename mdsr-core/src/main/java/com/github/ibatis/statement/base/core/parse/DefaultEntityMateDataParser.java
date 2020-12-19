@@ -1,10 +1,10 @@
 package com.github.ibatis.statement.base.core.parse;
 
+import com.github.ibatis.statement.base.condition.ColumnConditionParser;
+import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
 import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.core.matedata.*;
-import com.github.ibatis.statement.base.condition.ColumnConditionParser;
-import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
 import com.github.ibatis.statement.base.dv.ColumnValueParser;
 import com.github.ibatis.statement.base.dv.DefaultColumnValueParser;
 import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataParser;
@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @Author: junjie
@@ -47,11 +46,11 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
     public DefaultEntityMateDataParser() {
         this(new DefaultTableSourceParser() ,
-            new DefaultPropertyMateDataParser() ,
-            new DefaultLogicalColumnMateDataParser(),
-            new DefaultColumnConditionParser() ,
-            new DefaultColumnValueParser() ,
-            new DefaultTableSchemaQueryRegister());
+                new DefaultPropertyMateDataParser() ,
+                new DefaultLogicalColumnMateDataParser(),
+                new DefaultColumnConditionParser() ,
+                new DefaultColumnValueParser() ,
+                new DefaultTableSchemaQueryRegister());
     }
 
     public DefaultEntityMateDataParser(TableSourceParser tableSourceParser,
@@ -70,17 +69,17 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
     }
 
     @Override
-    public Optional<EntityMateData> parse(Class<?> entityClazz, SqlSession sqlSession)
+    public Optional<EntityMateData> parse(Class<?> entityClass, SqlSession sqlSession)
     {
-        return Optional.ofNullable(parse0(entityClazz ,sqlSession));
+        return Optional.ofNullable(parse0(entityClass ,sqlSession));
     }
 
-    private EntityMateData parse0(Class<?> entityClazz ,SqlSession sqlSession)
+    private EntityMateData parse0(Class<?> entityClass ,SqlSession sqlSession)
     {
-        EntityMateData entityMateData = null;
-        TableSourceParser.Source tableSource = tableSourceParser.parse(entityClazz).orElse(null);
+        TableSourceParser.Source tableSource = tableSourceParser.parse(entityClass).orElse(null);
         if (tableSource == null){
-            LOGGER.warn("can't parse table source for entity class [{}]" ,entityClazz);
+            LOGGER.warn("can't parse table source for entity class [{}]" ,entityClass);
+            return null;
         }else {
             TableSchemaResolutionStrategy strategy = tableSource.getTableSchemaResolutionStrategy();
             strategy = strategy == null || TableSchemaResolutionStrategy.GLOBAL.equals(strategy)
@@ -88,130 +87,105 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
             String tableName = tableSource.getTableName();
             if (tableName == null || "".equals(tableName)) {
-                LOGGER.warn("can' parse table name from entity class {}", entityClazz);
-            } else if (TableSchemaResolutionStrategy.DATA_BASE.equals(strategy)) {
-                entityMateData = parseEntityMateDataByDatabase(entityClazz ,tableName ,strategy ,sqlSession);
-            } else if (TableSchemaResolutionStrategy.DATA_BASE_PRIORITY.equals(strategy)) {
-                strategy = TableSchemaResolutionStrategy.DATA_BASE;
-                entityMateData = parseEntityMateDataByDatabase(entityClazz ,tableName ,strategy ,sqlSession);
-                if (entityMateData == null){
-                    strategy = TableSchemaResolutionStrategy.ENTITY;
-                    entityMateData = parseEntityMateDataByEntity(entityClazz ,tableName ,strategy ,sqlSession);
-                }
-                if (entityMateData != null){
-                    entityMateData.getTableMateData().setSchemaResolutionStrategy(strategy);
-                }
-            } else if (TableSchemaResolutionStrategy.ENTITY.equals(strategy)) {
-                entityMateData = parseEntityMateDataByEntity(entityClazz ,tableName ,strategy ,sqlSession);
+                LOGGER.warn("can' parse table name from entity class {}", entityClass);
+                return null;
             }
-        }
-        return entityMateData;
-    }
 
-    private EntityMateData parseEntityMateDataByDatabase(Class entityClazz ,
-                                                         String tableName ,
-                                                         TableSchemaResolutionStrategy strategy ,
-                                                         SqlSession sqlSession)
-    {
-        LOGGER.debug("parse EntityMateData for [{}] from database table [{}]" ,entityClazz ,tableName);
-        TableSchemaQuery tableSchemaQuery = tableSchemaQueryRegister.getTableSchemaQuery(sqlSession).orElse(null);
-        if (tableSchemaQuery != null){
-            TableMateData tableMateData = tableSchemaQuery.queryTable(sqlSession, tableName).orElse(null);
-            if (tableMateData != null){
-                tableMateData.setSchemaResolutionStrategy(strategy);
-                return buildEntityMateData(
-                        entityClazz ,
-                        tableMateData ,
-                        sqlSession ,
-                        parseColumnPropertyMappings(entityClazz ,tableMateData));
+            Set<PropertyMateData> propertyMateDataSet = propertyMateDataParser.parse(entityClass);
+
+            if (TableSchemaResolutionStrategy.DATA_BASE.equals(strategy)) {
+                return parseEntityMateDataByDatabase(entityClass ,tableName ,
+                        sqlSession ,propertyMateDataSet);
+            }
+            if (TableSchemaResolutionStrategy.DATA_BASE_PRIORITY.equals(strategy)) {
+                EntityMateData entityMateData = parseEntityMateDataByDatabase(entityClass ,tableName ,
+                        sqlSession ,propertyMateDataSet);
+                if (entityMateData == null){
+                    entityMateData = parseEntityMateDataByEntity(entityClass ,tableName ,
+                            sqlSession ,propertyMateDataSet);
+                }
+                return entityMateData;
+            }
+            if (TableSchemaResolutionStrategy.ENTITY.equals(strategy)) {
+                return parseEntityMateDataByEntity(entityClass ,tableName ,
+                        sqlSession ,propertyMateDataSet);
             }
         }
         return null;
     }
 
-    private EntityMateData parseEntityMateDataByEntity(Class entityClazz ,
-                                                       String tableName ,
-                                                       TableSchemaResolutionStrategy strategy ,
-                                                       SqlSession sqlSession)
+    private EntityMateData parseEntityMateDataByDatabase(Class entityClass ,
+                                                         String tableName ,
+                                                         SqlSession sqlSession,
+                                                         Set<PropertyMateData> propertyMateDataSet)
     {
-        LOGGER.debug("parse EntityMateData for [{}] from entity class" ,entityClazz);
-        Map<String, ColumnPropertyMapping> columnPropertyMappings = parseColumnPropertyMappings(entityClazz);
+        LOGGER.debug("parse EntityMateData for [{}] from database table [{}]" ,entityClass ,tableName);
+        TableSchemaQuery tableSchemaQuery = tableSchemaQueryRegister.getTableSchemaQuery(sqlSession).orElse(null);
+        if (tableSchemaQuery != null){
+            TableMateData tableMateData = tableSchemaQuery.queryTable(sqlSession, tableName).orElse(null);
+            if (tableMateData != null){
+                Map<String, ColumnMateData> columnMateDataMap = tableMateData.getColumnMateDataMap();
+                final Map<String ,ColumnPropertyMapping> columnPropertyMappings = new HashMap<>();
 
-        TableMateData tableMateData = new TableMateData();
-        tableMateData.setTableName(tableName);
-        tableMateData.setType(TableMateData.Type.UNDEFINED);
-        tableMateData.setSchemaResolutionStrategy(strategy);
-        tableMateData.setColumnMateDataList(columnPropertyMappings
-                .values()
-                .stream()
-                .map(columnPropertyMapping -> columnPropertyMapping.getColumnMateData())
-                .collect(Collectors.toList()));
-
-        return buildEntityMateData(
-                entityClazz ,
-                tableMateData ,
-                sqlSession ,
-                columnPropertyMappings);
-    }
-
-    private Map<String ,ColumnPropertyMapping> parseColumnPropertyMappings(Class<?> entityClass ,TableMateData tableMateData)
-    {
-        Map<String, ColumnMateData> columnMateDataMap = tableMateData.getColumnMateDataMap();
-        final Map<String ,ColumnPropertyMapping> columnPropertyMappings = new HashMap<>();
-
-        for (Field field : ClassUtils.getBaseNonStaticFields(entityClass))
-        {
-            PropertyMateData propertyMateData = propertyMateDataParser.parse(field, entityClass).orElse(null);
-            if (propertyMateData != null){
-                String mappingColumnName = propertyMateData.getMappingColumnName();
-                ColumnMateData columnMateData = columnMateDataMap.get(mappingColumnName);
-                if (columnMateData != null)
-                {
-                    if (columnMateData.isPrimaryKey()){
-                        MappingStrategy mappingStrategy = propertyMateData.getMappingStrategy();
-                        if (MappingStrategy.IGNORE.equals(mappingStrategy)){
-                            throw new IllegalArgumentException("primary key column can't ignore");
-                        }
-                        propertyMateData.setMappingStrategy(MappingStrategy.PRIMARY_KEY);
-                    }else if (propertyMateData.isPrimaryKey()){
-                        throw new IllegalArgumentException("property [" + propertyMateData.getField() + "] mapping column is't primary key");
-                    }
-
-                    ColumnPropertyMapping repeat = columnPropertyMappings.put(mappingColumnName,
-                            new ColumnPropertyMapping(propertyMateData, columnMateDataMap.get(mappingColumnName)));
-                    if (repeat != null)
+                for (PropertyMateData propertyMateData : propertyMateDataSet) {
+                    String mappingColumnName = propertyMateData.getMappingColumnName();
+                    ColumnMateData columnMateData = columnMateDataMap.get(mappingColumnName);
+                    if (columnMateData != null)
                     {
-                        throw new IllegalArgumentException("entity [" + entityClass + "] multiple property mapping to "
-                                + "the same column "  + mappingColumnName);
+                        if (columnMateData.isPrimaryKey()){
+                            if (propertyMateData.isIgnore()){
+                                throw new IllegalArgumentException("primary key column can't ignore");
+                            }
+                            propertyMateData.setMappingStrategy(MappingStrategy.PRIMARY_KEY);
+                        }else if (propertyMateData.isPrimaryKey()){
+                            throw new IllegalArgumentException("property [" + propertyMateData.getField()
+                                    + "] mapping column is't primary key");
+                        }
+
+                        ColumnPropertyMapping repeat = columnPropertyMappings.put(mappingColumnName,
+                                new ColumnPropertyMapping(propertyMateData, columnMateDataMap.get(mappingColumnName)));
+                        if (repeat != null)
+                        {
+                            throw new IllegalArgumentException("entity [" + entityClass + "] multiple property mapping to "
+                                    + "the same column "  + mappingColumnName);
+                        }
+                    }else if (propertyMateData.isRequiredMappingColumn()){
+                        throw new IllegalArgumentException("property [" + propertyMateData.getField().toGenericString()
+                                + "] mapping column " + mappingColumnName + " is " + propertyMateData.getMappingStrategy()
+                                + " ,but don't exist match column on table " + tableMateData.getTableName());
                     }
-                }else if (propertyMateData.isRequiredMappingColumn()){
-                    throw new IllegalArgumentException("property [" + propertyMateData.getField().toGenericString()
-                            + "] mapping column " + mappingColumnName + " is " + propertyMateData.getMappingStrategy()
-                            + " ,but don't exist match column on table " + tableMateData.getTableName());
                 }
+
+                for (String keyColumnName : tableMateData.getKeyColumnMateDataMap().keySet()) {
+                    if (!columnPropertyMappings.containsKey(keyColumnName)){
+                        throw new IllegalArgumentException(MessageFormat.format("unable to map entity " +
+                                "attributes for primary key column [{0}]" , keyColumnName));
+                    }
+                }
+
+                tableMateData.setSchemaResolutionStrategy(TableSchemaResolutionStrategy.DATA_BASE);
+                return buildEntityMateData(
+                        entityClass ,
+                        tableMateData ,
+                        sqlSession ,
+                        columnPropertyMappings);
             }
         }
-
-        for (String keyColumnName : tableMateData.getKeyColumnMateDataMap().keySet()) {
-            if (!columnPropertyMappings.containsKey(keyColumnName)){
-                throw new IllegalArgumentException(MessageFormat.format("unable to map entity " +
-                        "attributes for primary key column [{0}]" , keyColumnName));
-            }
-        }
-
-        return columnPropertyMappings;
+        return null;
     }
 
-    private Map<String ,ColumnPropertyMapping> parseColumnPropertyMappings(Class<?> entityClass)
+    private EntityMateData parseEntityMateDataByEntity(Class entityClass ,
+                                                       String tableName ,
+                                                       SqlSession sqlSession,
+                                                       Set<PropertyMateData> propertyMateDataSet)
     {
+        LOGGER.debug("parse EntityMateData for [{}] from entity class" ,entityClass);
+
         final Map<String ,ColumnPropertyMapping> columnPropertyMappings = new HashMap<>();
+        Map<String ,String> keyPropertyMappingColumnMap = new HashMap<>();
+        List<ColumnMateData> columnMateDataList = new ArrayList<>();
 
-        for (Field field : ClassUtils.getBaseNonStaticFields(entityClass)) {
-            PropertyMateData propertyMateData = propertyMateDataParser.parse(field, entityClass).orElse(null);
-            if (propertyMateData == null || propertyMateData.isIgnore()){
-                continue;
-            }
-
+        for (PropertyMateData propertyMateData : propertyMateDataSet) {
             String mappingColumnName = propertyMateData.getMappingColumnName();
             if (columnPropertyMappings.containsKey(mappingColumnName))
             {
@@ -225,15 +199,42 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
             columnMateData.setPrimaryKey(propertyMateData.isPrimaryKey());
 
             columnPropertyMappings.put(mappingColumnName, new ColumnPropertyMapping(propertyMateData, columnMateData));
+            if (columnMateData.isPrimaryKey()) {
+                keyPropertyMappingColumnMap.put(propertyMateData.getPropertyName() ,mappingColumnName);
+            }
+            columnMateDataList.add(columnMateData);
         }
 
-        return columnPropertyMappings;
+        TableMateData tableMateData = new TableMateData();
+        tableMateData.setTableName(tableName);
+        tableMateData.setType(TableMateData.Type.UNDEFINED);
+        tableMateData.setSchemaResolutionStrategy(TableSchemaResolutionStrategy.ENTITY);
+        tableMateData.setColumnMateDataList(columnMateDataList);
+
+        List<KeyColumnUsage> keyColumnUsages = new ArrayList<>();
+        int i = 1;
+        for (Field field : ClassUtils.getFields(entityClass ,false)) {
+            String keyColumnName = keyPropertyMappingColumnMap.remove(field.getName());
+            if (keyColumnName != null){
+                keyColumnUsages.add(new KeyColumnUsage(i++ ,keyColumnName));
+            }
+            if (keyPropertyMappingColumnMap.isEmpty()){
+                break;
+            }
+        }
+        tableMateData.setKeyColumnUsages(keyColumnUsages);
+
+        return buildEntityMateData(
+                entityClass ,
+                tableMateData ,
+                sqlSession ,
+                columnPropertyMappings);
     }
 
     private EntityMateData buildEntityMateData(Class<?> entityClass ,
-                                              TableMateData tableMateData ,
-                                              SqlSession sqlSession ,
-                                              Map<String ,ColumnPropertyMapping> columnPropertyMappings)
+                                               TableMateData tableMateData ,
+                                               SqlSession sqlSession ,
+                                               Map<String ,ColumnPropertyMapping> columnPropertyMappings)
     {
         Configuration configuration = sqlSession.getConfiguration();
 
@@ -371,6 +372,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
         }
 
         public Builder setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy strategy){
+            Objects.requireNonNull(strategy);
             this.tableSchemaResolutionStrategy = strategy;
             return this;
         }
@@ -394,3 +396,4 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
     }
 
 }
+

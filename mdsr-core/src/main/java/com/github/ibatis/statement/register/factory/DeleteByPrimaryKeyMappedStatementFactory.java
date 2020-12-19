@@ -27,9 +27,9 @@ import java.util.Map;
  */
 public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory
 {
-    public final static String DELETE_BY_PRIMARY_KEY_METHOD_NAME = "deleteByPrimaryKey";
+    public final static String DELETE_BY_PRIMARY_KEY = "deleteByPrimaryKey";
 
-    public final static String PHYSICAL_DELETE_BY_PRIMARY_KEY_METHOD_NAME = "deleteByPrimaryKeyOnPhysical";
+    public final static String DELETE_BY_PRIMARY_KEY_ON_PHYSICAL = "deleteByPrimaryKeyOnPhysical";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -43,9 +43,9 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
         return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                DELETE_BY_PRIMARY_KEY_METHOD_NAME ,reasonableKeyParameterClass))
+                DELETE_BY_PRIMARY_KEY,reasonableKeyParameterClass))
                 || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                PHYSICAL_DELETE_BY_PRIMARY_KEY_METHOD_NAME ,reasonableKeyParameterClass))
+                DELETE_BY_PRIMARY_KEY_ON_PHYSICAL,reasonableKeyParameterClass))
                 && entityMateData.getPrimaryKeyCount() > 0;
     }
 
@@ -144,7 +144,7 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
 
     @Override
     protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
-        if (DELETE_BY_PRIMARY_KEY_METHOD_NAME.equals(mappedStatementMateData.getMapperMethodMateData().getMappedMethod()
+        if (DELETE_BY_PRIMARY_KEY.equals(mappedStatementMateData.getMapperMethodMateData().getMappedMethod()
                 .getName()) && mappedStatementMateData.getEntityMateData().getLogicalColumnMateData() != null)
         {//逻辑删除
             return SqlCommandType.UPDATE;

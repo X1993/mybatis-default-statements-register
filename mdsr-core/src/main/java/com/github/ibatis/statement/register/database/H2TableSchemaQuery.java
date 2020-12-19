@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.register.database;
 
 import com.github.ibatis.statement.base.core.matedata.ColumnMateData;
+import com.github.ibatis.statement.base.core.matedata.KeyColumnUsage;
 import com.github.ibatis.statement.base.core.matedata.TableMateData;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.binding.MapperRegistry;
@@ -20,11 +21,13 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
 {
     private final static Logger LOGGER = LoggerFactory.getLogger(H2TableSchemaQuery.class);
 
-    @Override
-    public List<ColumnMateData> queryTableColumns(SqlSession sqlSession ,String tableName)
+    private List<ColumnMateData> queryTableColumns(SqlSession sqlSession ,String tableName)
     {
-        Set<String> primaryKeySet = this.getTableSchemaMapper(sqlSession)
-                .map(mapper -> mapper.primaryKeys(tableName))
+        Set<String> keyColumnNames = this.getTableSchemaMapper(sqlSession)
+                .map(mapper -> mapper.keyColumnUsage(tableName)
+                        .stream()
+                        .map(keyColumnUsage -> keyColumnUsage.getColumnName())
+                        .collect(Collectors.toSet()))
                 .orElse(Collections.EMPTY_SET);
 
         return this.getTableSchemaMapper(sqlSession)
@@ -33,7 +36,7 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
                         .peek(columnMateData -> columnMateData.setJdbcType(
                                 mappingJdbcType(columnMateData.getDataType())))
                         .peek(columnMateData -> columnMateData.setPrimaryKey(
-                                primaryKeySet.contains(columnMateData.getColumnName().toUpperCase()))
+                                keyColumnNames.contains(columnMateData.getColumnName().toUpperCase()))
                         ).collect(Collectors.toList()))
                 .orElseGet(() -> new ArrayList());
     }
@@ -41,18 +44,17 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
     @Override
     public Optional<TableMateData> queryTable(SqlSession sqlSession ,String tableName)
     {
-        Optional<TableMateData> optional = this.getTableSchemaMapper(sqlSession)
-                .map(mapper -> mapper.tableMateData(tableName))
-                .map(tableMateData -> {
-                    tableMateData.setType(mappingTableType(tableMateData.getTableType()));
-                    tableMateData.setColumnMateDataList(queryTableColumns(sqlSession, tableName));
-                    return tableMateData;
-                });
-
-        if (!optional.isPresent()){
+        H2TableSchemaMapper tableSchemaMapper = this.getTableSchemaMapper(sqlSession).orElse(null);
+        if (tableSchemaMapper != null){
+            TableMateData tableMateData = tableSchemaMapper.tableMateData(tableName);
+            tableMateData.setType(mappingTableType(tableMateData.getTableType()));
+            tableMateData.setColumnMateDataList(queryTableColumns(sqlSession, tableName));
+            tableMateData.setKeyColumnUsages(tableSchemaMapper.keyColumnUsage(tableName));
+            return Optional.of(tableMateData);
+        }else {
             LOGGER.warn("not exist table [{}]" ,tableName);
+            return Optional.empty();
         }
-        return optional;
     }
 
     @Override
@@ -122,11 +124,11 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
          * @param tableName
          * @return
          */
-        @Select("SELECT column_name as columnName FROM information_schema.KEY_COLUMN_USAGE " +
-                "WHERE table_name = #{0} AND TABLE_CATALOG = (SELECT DATABASE())")
-        Set<String> primaryKeys(String tableName);
+        @Select("SELECT column_name as columnName, ordinal_position as ordinalPosition " +
+                "FROM information_schema.KEY_COLUMN_USAGE WHERE table_name = #{0} AND " +
+                "TABLE_CATALOG = (SELECT DATABASE()) ORDER BY ordinal_position ASC")
+        List<KeyColumnUsage> keyColumnUsage(String tableName);
 
     }
-
 
 }

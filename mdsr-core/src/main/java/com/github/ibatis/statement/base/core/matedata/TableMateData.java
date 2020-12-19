@@ -1,9 +1,8 @@
 package com.github.ibatis.statement.base.core.matedata;
 
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +31,11 @@ public class TableMateData implements Cloneable{
      * 列信息
      */
     private List<ColumnMateData> columnMateDataList = Collections.EMPTY_LIST;
+
+    /**
+     * 主键信息
+     */
+    private List<KeyColumnUsage> keyColumnUsages = Collections.EMPTY_LIST;
 
     /**
      * 元数据解析策略
@@ -68,12 +72,24 @@ public class TableMateData implements Cloneable{
     }
 
     public void setColumnMateDataList(List<ColumnMateData> columnMateDataList) {
-        this.columnMateDataList = columnMateDataList;
+        this.columnMateDataList = Collections.unmodifiableList(columnMateDataList);
     }
 
-    public void addColumnMateData(ColumnMateData columnMateData)
+    public List<KeyColumnUsage> getKeyColumnUsages() {
+        return keyColumnUsages;
+    }
+
+    public void setKeyColumnUsages(List<KeyColumnUsage> keyColumnUsages) {
+        this.keyColumnUsages = Collections.unmodifiableList(keyColumnUsages);
+    }
+
+    public void addColumnMateData(ColumnMateData ... columnMateDataList)
     {
-        this.columnMateDataList.add(columnMateData);
+        List<ColumnMateData> columnMateDataList1 = new ArrayList<>(this.columnMateDataList);
+        for (ColumnMateData columnMateData : columnMateDataList) {
+            columnMateDataList1.add(columnMateData);
+        }
+        setColumnMateDataList(columnMateDataList1);
     }
 
     public Map<String ,ColumnMateData> getColumnMateDataMap(){

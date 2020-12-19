@@ -4,6 +4,7 @@ import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
 import org.apache.ibatis.exceptions.TooManyResultsException;
 import java.util.List;
+import com.github.ibatis.statement.register.factory.DynamicParamsSelectStatementFactory;
 
 /**
  * 动态参数查询接口
@@ -16,6 +17,7 @@ public interface DynamicSelectMapper<T> extends EntityType<T> {
      * 通过自定义规则查询符合条件的数据
      * @param dynamicParams
      * @return
+     * @see DynamicParamsSelectStatementFactory#SELECT_ALL_METHOD_NAME
      */
     List<T> selectByDynamicParams(DynamicParams dynamicParams);
 
@@ -57,6 +59,7 @@ public interface DynamicSelectMapper<T> extends EntityType<T> {
      * 通过自定义规则查询符合条件的数据条数
      * @param dynamicParams
      * @return
+     * @see DynamicParamsSelectStatementFactory#SELECT_COUNT_METHOD_NAME
      */
     int countByDynamicParams(DynamicParams dynamicParams);
 

@@ -101,10 +101,6 @@ public class EntityMateData implements Cloneable{
     }
 
     public void setColumnPropertyMappings(Map<String, ColumnPropertyMapping> columnPropertyMappings) {
-        if (columnPropertyMappings == null || columnPropertyMappings.size() == 0){
-            this.commandTypeConditionMap = Collections.EMPTY_MAP;
-            return;
-        }
         this.columnPropertyMappings = Collections.unmodifiableMap(columnPropertyMappings);
     }
 
@@ -132,10 +128,6 @@ public class EntityMateData implements Cloneable{
     }
 
     public void setCommandTypeConditionMap(Map<SqlCommandType, Map<String, ColumnCondition>> commandTypeConditionMap) {
-        if (commandTypeConditionMap == null || commandTypeConditionMap.size() == 0){
-            this.commandTypeConditionMap = Collections.EMPTY_MAP;
-            return;
-        }
         this.commandTypeConditionMap = Collections.unmodifiableMap(commandTypeConditionMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.getKey() ,
@@ -147,10 +139,6 @@ public class EntityMateData implements Cloneable{
     }
 
     public void setCommandTypeDefaultValueMap(Map<SqlCommandType, Map<String, ColumnDefaultValue>> commandTypeDefaultValueMap) {
-        if (commandTypeDefaultValueMap == null || commandTypeDefaultValueMap.size() == 0){
-            this.commandTypeDefaultValueMap = Collections.EMPTY_MAP;
-            return;
-        }
         this.commandTypeDefaultValueMap = Collections.unmodifiableMap(commandTypeDefaultValueMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.getKey() ,

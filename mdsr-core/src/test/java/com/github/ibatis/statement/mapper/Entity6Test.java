@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -127,27 +128,27 @@ public class Entity6Test{
 
         Entity6 selectByByAndLikeOrderByOrDesc(String byAndLike);
 
-        List<Entity6> selectByByAndLikeOrderByOrAsc(String by , String like);
+        List<Entity6> selectByByAndLikeOrderByOrAsc(String by, String like);
 
-        Entity6 selectByByAndLikeAndLikeOrderByOrByLikeAsc(String byAndLike ,String like);
+        Entity6 selectByByAndLikeAndLikeOrderByOrByLikeAsc(String byAndLike, String like);
 
-        Entity6 selectByIndexAndLike(String index ,String like);
+        Entity6 selectByIndexAndLike(String index, String like);
 
         List<Entity6> selectByIndex(String index);
 
         Collection<Entity6> selectByInIndex(Collection<String> index);
 
-        Set<Entity6> selectByInOr(String ... or);
+        Set<Entity6> selectByInOr(String... or);
 
-        List<Entity6> selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(String locationCode , String startOr , String endOr);
+        List<Entity6> selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(String locationCode, String startOr, String endOr);
 
-        List<Entity6> selectByLikeOrIndexOrGtLikeAndNotNullBy(String like , String index , String gtLike);
-
-        @Deprecated
-        List<Entity6> selectByLikeOrIndexOrGtLikeAndIsNullBy(String like , String index , String gtLike , String by);
+        List<Entity6> selectByLikeOrIndexOrGtLikeAndNotNullBy(String like, String index, String gtLike);
 
         @Deprecated
-        Entity6 selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(String locationCode ,String startOr);
+        List<Entity6> selectByLikeOrIndexOrGtLikeAndIsNullBy(String like, String index, String gtLike, String by);
+
+        @Deprecated
+        Entity6 selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(String locationCode, String startOr);
 
     }
 

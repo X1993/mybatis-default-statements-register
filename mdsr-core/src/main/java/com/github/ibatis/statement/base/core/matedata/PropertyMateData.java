@@ -68,6 +68,10 @@ public class PropertyMateData implements Cloneable{
         this.field = field;
     }
 
+    public String getPropertyName(){
+        return getField().getName();
+    }
+
     public String getMappingColumnName() {
         return mappingColumnName;
     }

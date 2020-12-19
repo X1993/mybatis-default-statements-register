@@ -25,7 +25,7 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateSameBatchMappedStatementFactory.class);
 
-    public static final String MATCH_METHOD_NAME = "updateBatchSameValue";
+    public static final String UPDATE_BATCH_SAME_VALUE = "updateBatchSameValue";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -39,7 +39,7 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
         return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class ,MATCH_METHOD_NAME, ParameterizedTypeImpl.make(Collection.class ,
+                new MethodSignature(int.class , UPDATE_BATCH_SAME_VALUE, ParameterizedTypeImpl.make(Collection.class ,
                         new Type[]{reasonableKeyParameterClass} ,null) ,entityClass))
                 && entityMateData.getPrimaryKeyCount() > 0;
     }

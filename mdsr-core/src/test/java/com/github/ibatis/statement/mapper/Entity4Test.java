@@ -5,6 +5,7 @@ import com.github.ibatis.statement.base.logical.Logical;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,9 +72,7 @@ public class Entity4Test {
         }
     }
 
-    public interface Entity4Mapper extends KeyTableMapper<String ,Entity4> {
-
-    }
+    public interface Entity4Mapper extends KeyTableMapper<String ,Entity4> {}
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity4`;\n" +
             "CREATE TABLE `entity4` (\n" +

@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.logical.Logical;
+
 import java.lang.annotation.*;
 
 /**

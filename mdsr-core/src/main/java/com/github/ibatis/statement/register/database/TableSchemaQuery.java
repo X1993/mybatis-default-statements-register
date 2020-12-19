@@ -1,10 +1,8 @@
 package com.github.ibatis.statement.register.database;
 
-import com.github.ibatis.statement.base.core.matedata.ColumnMateData;
 import com.github.ibatis.statement.base.core.matedata.TableMateData;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.type.JdbcType;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,14 +11,6 @@ import java.util.Optional;
  * @Date: 2020/2/21
  */
 public interface TableSchemaQuery {
-
-    /**
-     * 查询指定表包含的列信息
-     * @param sqlSession
-     * @param tableName 表名
-     * @return
-     */
-    List<ColumnMateData> queryTableColumns(SqlSession sqlSession ,String tableName);
 
     /**
      * 查询指定表信息
