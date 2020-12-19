@@ -40,7 +40,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 条件：1.非空属性，2.有对应的列
      * 注意：基本类型是一定会满足1.非空 条件的
      * @return
-     * @see DeleteByPrimaryKeyMappedStatementFactory#DELETE_BY_PRIMARY_KEY
+     * @see DeleteSelectiveMappedStatementFactory#DELETE_SELECTIVE_METHOD_NAME
      */
     int deleteSelective(T condition);
 
@@ -50,7 +50,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 条件：1.非空属性，2.有对应的列
      * 注意：基本类型是一定会满足1.非空 条件的
      * @return
-     * @see DeleteByPrimaryKeyMappedStatementFactory#DELETE_BY_PRIMARY_KEY_ON_PHYSICAL
+     * @see DeleteSelectiveMappedStatementFactory#PHYSICAL_DELETE_SELECTIVE_METHOD_NAME
      */
     int deleteSelectiveOnPhysical(T condition);
 
