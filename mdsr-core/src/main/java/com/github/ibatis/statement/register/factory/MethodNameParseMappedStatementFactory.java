@@ -14,7 +14,6 @@ import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.*;
@@ -99,7 +98,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
         List<SqlNode> sqlNodes = new ArrayList<>();
         SqlNode baseSqlNode = new StaticTextSqlNode(new StringBuilder("SELECT ")
-                .append(entityMateData.getBaseColumnListSqlContent())
+                .append(dynamicParamsContext.selectContext)
                 .append(" FROM `")
                 .append(entityMateData.getTableMateData().getTableName())
                 .append("` WHERE ")
@@ -116,10 +115,11 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         }
         sqlNodes.add(new StaticTextSqlNode(" 1 = 1 "));
 
-        OrderRule[] orderRules = dynamicParams.getOrderRules().toArray(new OrderRule[dynamicParams.getOrderRules().size()]);
+        OrderRule[] orderRules = dynamicParams.getOrderRules()
+                .toArray(new OrderRule[dynamicParams.getOrderRules().size()]);
         int length = orderRules.length;
         if (length > 0) {
-            sqlNodes.add(new StaticTextSqlNode(" order by "));
+            sqlNodes.add(new StaticTextSqlNode(" ORDER BY "));
             for (int i = 0; i < length - 1; i++) {
                 OrderRule orderRule = orderRules[i];
                 sqlNodes.add(new StaticTextSqlNode(new StringBuilder(" `")
@@ -233,27 +233,51 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         return StringUtils.camelUnderscoreToCase(str ,true);
     }
 
-    final String conditionRuleKey = "conditionRule";
+    private final String conditionRuleKey = "conditionRule";
 
-    final String conditionValueKey = "conditionValue";
+    private final String conditionValueKey = "conditionValue";
 
-    final String operatorKey = "operator";
+    private final String operatorKey = "operator";
 
-    final String ordering = "ordering";
+    private final String ordering = "ordering";
 
-    final String filtering = "filtering";
+    private final String filtering = "filtering";
 
-    final String orderColumnsKey = "orderColumns";
+    private final String orderColumnsKey = "orderColumns";
 
-    final Predicate<Context> orderPredicate = context -> context.match(operatorKey ,ordering);
+    private final Predicate<Context> orderPredicate = context -> context.match(operatorKey ,ordering);
 
-    final Function<Context ,Context> orderOperator = context -> context.cloneAndPut(operatorKey ,ordering);
+    private final Function<Context ,Context> orderOperator = context -> context.cloneAndPut(operatorKey ,ordering);
 
-    final Predicate<Context> wherePredicate = context -> context.match(operatorKey ,filtering);
+    private final Predicate<Context> wherePredicate = context -> context.match(operatorKey ,filtering);
 
-    final Function<Context ,Context> whereOperator = context -> context.cloneAndPut(operatorKey ,filtering);
+    private final Function<Context ,Context> whereOperator = context -> context.cloneAndPut(operatorKey ,filtering);
 
-    final Predicate<Context> truePredicate = context -> true;
+    private final Predicate<Context> truePredicate = context -> true;
+
+    private final Map<CacheKey ,Map<Card ,List<Edge>>> edgeMapCache = new WeakHashMap<>();
+
+    class CacheKey{
+
+        private Class<?> entityClass;
+
+        public CacheKey(Class<?> entityClass) {
+            this.entityClass = entityClass;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CacheKey cacheKey = (CacheKey) o;
+            return Objects.equals(entityClass, cacheKey.entityClass);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(entityClass);
+        }
+    }
 
     /**
      * 语法规则
@@ -263,6 +287,13 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
      */
     private Map<Card ,List<Edge>> syntaxMap(EntityMateData entityMateData)
     {
+        CacheKey cacheKey = new CacheKey(entityMateData.getEntityClass());
+        Map<Card, List<Edge>> syntaxTable = edgeMapCache.get(cacheKey);
+        if (syntaxTable != null){
+            return syntaxTable;
+        }
+        syntaxTable = new HashMap<>();
+
         Set<ColumnCard> columnCards = entityMateData
                 .getTableMateData().getColumnMateDataList()
                 .stream()
@@ -275,6 +306,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         }
 
         Card select = new Card("select");
+        Card count = new Card("Count");
         Card find = new Card("find");
         Card by = new Card("By");
         Card and = new Card("And");
@@ -287,22 +319,33 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                 .map(conditionRule -> new Card(standard(conditionRule.name().toLowerCase())))
                 .toArray(length -> new Card[length]);
 
-        Map<Card ,List<Edge>> syntaxTable = new HashMap<>();
-
         List<Edge> startPossibleEdges = new ArrayList<>();
         startPossibleEdges.add(new Edge().nextCard(select));
         startPossibleEdges.add(new Edge().nextCard(find));
         syntaxTable.put(Card.START_CARD ,startPossibleEdges);
 
+        Consumer<DynamicParamsContext> selectColumnsConsumer = context ->
+                context.selectContext = entityMateData.getBaseColumnListSqlContent().toString();
+
         List<Edge> selectPossibleEdges = new ArrayList<>();
         // select / find -> by
-        selectPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator));
-        Edge nextOrderByEdge = new Edge().nextCard(orderBy).updateContext(orderOperator);
+        selectPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator)
+                .dynamicParamsFunction(selectColumnsConsumer));
+        // select / find -> count
+        selectPossibleEdges.add(new Edge().nextCard(count)
+                .dynamicParamsFunction(context -> context.selectContext = "COUNT(0)"));
         // select / find -> orderBy
+        Edge nextOrderByEdge = new Edge().nextCard(orderBy).updateContext(orderOperator)
+                .dynamicParamsFunction(selectColumnsConsumer);
         selectPossibleEdges.add(nextOrderByEdge);
 
         syntaxTable.put(select ,selectPossibleEdges);
         syntaxTable.put(find ,selectPossibleEdges);
+
+        List<Edge> countPossibleEdges = new ArrayList<>();
+        // count -> by
+        countPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator));
+        syntaxTable.put(count ,countPossibleEdges);
 
         List<Edge> byPossibleEdges = new ArrayList<>();
         // by -> condition
@@ -380,6 +423,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         syntaxTable.put(asc ,orderRulePossibleEdges);
         syntaxTable.put(orderBy ,orderPossibleEdges);
 
+        edgeMapCache.put(cacheKey ,syntaxTable);
         return syntaxTable;
     }
 
@@ -778,6 +822,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     class DynamicParamsContext extends Context{
 
         private DynamicParams dynamicParams;
+
+        private String selectContext;
 
         public DynamicParamsContext(MappedStatementMateData mappedStatementMateData) {
             super(mappedStatementMateData);

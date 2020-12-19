@@ -150,6 +150,13 @@ public class Entity6Test{
         @Deprecated
         Entity6 selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(String locationCode, String startOr);
 
+        int selectCountByIndex(String index);
+
+        @Deprecated
+        Integer selectCountOrderByIndexDesc();
+
+        int selectCountByLikeOrIndexOrGtLikeAndNotNullBy(String like, String index, String gtLike);
+
     }
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity6`;\n" +
@@ -272,6 +279,22 @@ public class Entity6Test{
     @Test(expected = BindingException.class)
     public void selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(){
         mapper.selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc("1" ,"2");
+    }
+
+    @Test
+    public void selectCountByIndex(){
+        Assert.assertEquals(mapper.selectCountByIndex("6") ,2);
+    }
+
+    @Test(expected = BindingException.class)
+    public void selectCountOrderByIndexDesc(){
+        Assert.assertTrue(mapper.selectCountOrderByIndexDesc() == 2);
+    }
+
+    @Test
+    public void selectCountByLikeOrIndexOrGtLikeAndNotNullBy(){
+        Assert.assertEquals(mapper.selectCountByLikeOrIndexOrGtLikeAndNotNullBy(
+                "27" ,"6" ,"6") ,3);
     }
 
 }
