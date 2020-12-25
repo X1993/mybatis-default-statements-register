@@ -14,7 +14,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 新增
      * @param t
      * @return
-     * @see InsertMappedStatementFactory#INSERT_METHOD_NAME
+     * @see InsertMappedStatementFactory#INSERT
      */
     int insert(T t);
 
@@ -22,7 +22,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 条件插入不为空的数据
      * @param t
      * @return
-     * @see InsertMappedStatementFactory#INSERT_SELECTIVE_METHOD_NAME
+     * @see InsertMappedStatementFactory#INSERT_SELECTIVE
      */
     int insertSelective(T t);
 
@@ -30,7 +30,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 批量新增
      * @param list
      * @return
-     * @see InsertBatchMappedStatementFactory#INSERT_BATCH_METHOD_NAME
+     * @see InsertBatchMappedStatementFactory#INSERT_BATCH
      */
     int insertBatch(Collection<? extends T> list);
 
@@ -40,7 +40,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 条件：1.非空属性，2.有对应的列
      * 注意：基本类型是一定会满足1.非空 条件的
      * @return
-     * @see DeleteSelectiveMappedStatementFactory#DELETE_SELECTIVE_METHOD_NAME
+     * @see DeleteSelectiveMappedStatementFactory#DELETE_SELECTIVE
      */
     int deleteSelective(T condition);
 
@@ -50,7 +50,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * 条件：1.非空属性，2.有对应的列
      * 注意：基本类型是一定会满足1.非空 条件的
      * @return
-     * @see DeleteSelectiveMappedStatementFactory#PHYSICAL_DELETE_SELECTIVE_METHOD_NAME
+     * @see DeleteSelectiveMappedStatementFactory#DELETE_SELECTIVE_ON_PHYSICAL
      */
     int deleteSelectiveOnPhysical(T condition);
 

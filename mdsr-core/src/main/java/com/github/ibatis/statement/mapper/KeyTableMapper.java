@@ -92,7 +92,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * 根据主键批量删除（根据有无逻辑列执行逻辑删除或物理删除）
      * @param keys
      * @return
-     * @see DeleteByPrimaryKeyMappedStatementFactory#DELETE_BY_PRIMARY_KEY
+     * @see DeleteBatchByPrimaryKeyMappedStatementFactory#DELETE_BATCH_ON_PHYSICAL
      */
     int deleteBatchByPrimaryKey(Collection<? extends K> keys);
 
@@ -108,7 +108,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * 根据主键批量删除 （物理删除）
      * @param keys
      * @return
-     * @see DeleteBatchByPrimaryKeyMappedStatementFactory#DELETE_BATCH_METHOD_NAME
+     * @see DeleteBatchByPrimaryKeyMappedStatementFactory#DELETE_BATCH_ON_PHYSICAL
      */
     int deleteBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
 
