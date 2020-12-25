@@ -17,13 +17,13 @@ import java.util.*;
  */
 public class InsertBatchMappedStatementFactory extends AbstractInsertMappedStatementFactory {
 
-    public final static String INSERT_BATCH_METHOD_NAME = "insertBatch";
+    public final static String INSERT_BATCH = "insertBatch";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
     {
         return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class ,INSERT_BATCH_METHOD_NAME , ParameterizedTypeImpl.make(Collection.class ,
+                new MethodSignature(int.class , INSERT_BATCH, ParameterizedTypeImpl.make(Collection.class ,
                 new Type[]{mappedStatementMateData.getEntityMateData().getEntityClass()} ,null)));
     }
 

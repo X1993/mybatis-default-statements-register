@@ -13,9 +13,9 @@ import org.apache.ibatis.mapping.SqlSource;
  */
 public class InsertMappedStatementFactory extends AbstractInsertMappedStatementFactory {
 
-    public static final String INSERT_METHOD_NAME = "insert";
+    public static final String INSERT = "insert";
 
-    public static final String INSERT_SELECTIVE_METHOD_NAME = "insertSelective";
+    public static final String INSERT_SELECTIVE = "insertSelective";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -23,14 +23,14 @@ public class InsertMappedStatementFactory extends AbstractInsertMappedStatementF
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
         Class<?> entityClass = mappedStatementMateData.getEntityMateData().getEntityClass();
         return super.isMatchMethodSignature(methodSignature ,new MethodSignature(
-                int.class ,INSERT_METHOD_NAME ,entityClass))
+                int.class , INSERT,entityClass))
                 || super.isMatchMethodSignature(methodSignature ,new MethodSignature(
-                        int.class ,INSERT_SELECTIVE_METHOD_NAME, entityClass));
+                        int.class , INSERT_SELECTIVE, entityClass));
     }
 
     @Override
     protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData) {
         String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        return super.createSqlSource(mappedStatementMateData ,name -> name ,INSERT_SELECTIVE_METHOD_NAME.equals(methodName));
+        return super.createSqlSource(mappedStatementMateData ,name -> name , INSERT_SELECTIVE.equals(methodName));
     }
 }

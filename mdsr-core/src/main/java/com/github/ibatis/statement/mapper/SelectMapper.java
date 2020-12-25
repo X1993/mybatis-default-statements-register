@@ -54,6 +54,10 @@ public interface SelectMapper<T> extends EntityType<T> ,DynamicSelectMapper<T> {
         return selectSelective(condition ,defaultLogicalValue());
     }
 
+    /**
+     * 查询所有数据，谨慎使用
+     * @return
+     */
     default List<T> selectAll(){
         return selectSelective(null);
     }

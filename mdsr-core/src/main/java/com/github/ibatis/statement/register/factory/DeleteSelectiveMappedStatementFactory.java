@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStatementFactory {
 
-    public static final String DELETE_SELECTIVE_METHOD_NAME = "deleteSelective";
+    public static final String DELETE_SELECTIVE = "deleteSelective";
 
-    public static final String PHYSICAL_DELETE_SELECTIVE_METHOD_NAME = "deleteSelectiveOnPhysical";
+    public static final String DELETE_SELECTIVE_ON_PHYSICAL = "deleteSelectiveOnPhysical";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -31,9 +31,9 @@ public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStateme
         Class<?> entityClass = entityMateData.getEntityClass();
 
         return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class ,DELETE_SELECTIVE_METHOD_NAME, entityClass))
+                new MethodSignature(int.class , DELETE_SELECTIVE, entityClass))
                 || super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class ,PHYSICAL_DELETE_SELECTIVE_METHOD_NAME, entityClass));
+                new MethodSignature(int.class , DELETE_SELECTIVE_ON_PHYSICAL, entityClass));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStateme
 
     @Override
     protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
-        if (DELETE_SELECTIVE_METHOD_NAME.equals(mappedStatementMateData.getMapperMethodMateData().getMappedMethod()
+        if (DELETE_SELECTIVE.equals(mappedStatementMateData.getMapperMethodMateData().getMappedMethod()
                 .getName()) && mappedStatementMateData.getEntityMateData().getLogicalColumnMateData() != null)
         {//逻辑删除
             return SqlCommandType.UPDATE;

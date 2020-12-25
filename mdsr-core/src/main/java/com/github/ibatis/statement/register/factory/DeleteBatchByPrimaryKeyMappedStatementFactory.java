@@ -25,7 +25,7 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
     /**
      * 批量删除方法
      */
-    public final static String DELETE_BATCH_METHOD_NAME = "deleteBatchByPrimaryKey";
+    public final static String DELETE_BATCH_ON_PHYSICAL = "deleteBatchByPrimaryKey";
 
     /**
      * 批量物理删除方法
@@ -45,7 +45,7 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
             new Type[]{entityMateData.getReasonableKeyParameterClass()}, null);
 
         return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                DELETE_BATCH_METHOD_NAME , parameterizedType))
+                DELETE_BATCH_ON_PHYSICAL, parameterizedType))
                 || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
                 PHYSICAL_DELETE_BATCH_METHOD_NAME , parameterizedType))
                 && entityMateData.getPrimaryKeyCount() > 0;
@@ -136,7 +136,7 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
 
     @Override
     protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
-        if (DELETE_BATCH_METHOD_NAME.equals(mappedStatementMateData.getMapperMethodMateData().getMappedMethod()
+        if (DELETE_BATCH_ON_PHYSICAL.equals(mappedStatementMateData.getMapperMethodMateData().getMappedMethod()
                 .getName()) && mappedStatementMateData.getEntityMateData().getLogicalColumnMateData() != null)
         {//逻辑删除
             return SqlCommandType.UPDATE;
