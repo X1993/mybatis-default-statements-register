@@ -69,7 +69,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @deprecated 某些数据库（如H2）不支持，适用性比较差
      */
     @Deprecated
-    int updateBatch(Collection<T> list);
+    int updateBatch(Collection<? extends T> list);
 
     /**
      * 对多个主键匹配的数据使用相同的值做修改
@@ -78,7 +78,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @see UpdateSameBatchMappedStatementFactory#UPDATE_BATCH_SAME_VALUE
      * @return
      */
-    int updateBatchSameValue(Collection<K> list ,T updateValue);
+    int updateBatchSameValue(Collection<? extends K> list ,T updateValue);
 
     /**
      * 根据主键删除（如果定义了逻辑列则为逻辑删除，否则物理删除）
@@ -94,7 +94,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @return
      * @see DeleteByPrimaryKeyMappedStatementFactory#DELETE_BY_PRIMARY_KEY
      */
-    int deleteBatchByPrimaryKey(Collection<K> keys);
+    int deleteBatchByPrimaryKey(Collection<? extends K> keys);
 
     /**
      * 根据主键物理删除
@@ -110,7 +110,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @return
      * @see DeleteBatchByPrimaryKeyMappedStatementFactory#DELETE_BATCH_METHOD_NAME
      */
-    int deleteBatchByPrimaryKeyOnPhysical(Collection<K> keys);
+    int deleteBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
 
     /**
      * 查询最大的主键

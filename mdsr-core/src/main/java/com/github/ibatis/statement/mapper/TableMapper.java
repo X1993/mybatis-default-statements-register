@@ -32,7 +32,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * @return
      * @see InsertBatchMappedStatementFactory#INSERT_BATCH_METHOD_NAME
      */
-    int insertBatch(Collection<T> list);
+    int insertBatch(Collection<? extends T> list);
 
     /**
      * 批量删除（根据有无逻辑列执行逻辑删除或物理删除）
