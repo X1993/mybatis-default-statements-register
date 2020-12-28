@@ -48,7 +48,7 @@ public class UpdateBatchMappedStatementFactory extends AbstractUpdateMappedState
         return new DynamicSqlSource(mappedStatementMateData.getConfiguration() ,new ForEachSqlNode(
                 mappedStatementMateData.getConfiguration() ,
                 super.createSqlNode(mappedStatementMateData ,name -> "item." + name ,false) ,
-                "list" ,"index" ,"item" ,
+                "collection" ,"index" ,"item" ,
                 null ,null ,";"));
     }
 

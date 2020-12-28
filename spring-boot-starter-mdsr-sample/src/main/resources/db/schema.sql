@@ -9,4 +9,4 @@ CREATE TABLE user (
   note varchar(100) DEFAULT NULL COMMENT '备注',
   version int(255) DEFAULT NULL COMMENT '版本号',
   removed bit(1) DEFAULT 0 COMMENT '是否已删除，1：已删除'
-) DEFAULT CHARSET=utf8;;
+) DEFAULT CHARSET=utf8;

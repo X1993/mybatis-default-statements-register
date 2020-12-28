@@ -138,6 +138,8 @@ public class Entity6Test{
 
         Collection<Entity6> selectByInIndex(Collection<String> index);
 
+        Collection<Entity6> selectByIdAndInIndex(String id, List<String> strings);
+
         Set<Entity6> selectByInOr(String... or);
 
         List<Entity6> selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(String locationCode, String startOr, String endOr);
@@ -156,7 +158,6 @@ public class Entity6Test{
         Integer selectCountOrderByIndexDesc();
 
         int selectCountByLikeOrIndexOrGtLikeAndNotNullBy(String like, String index, String gtLike);
-
     }
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity6`;\n" +
@@ -245,6 +246,11 @@ public class Entity6Test{
     @Test
     public void selectByIndex(){
         Assert.assertEquals(mapper.selectByIndex("6").size() ,2);
+    }
+
+    @Test
+    public void selectByIdAndInIndex(){
+        Assert.assertEquals(mapper.selectByIdAndInIndex("1" ,Arrays.asList("6", "26")).size() ,1);
     }
 
     @Test

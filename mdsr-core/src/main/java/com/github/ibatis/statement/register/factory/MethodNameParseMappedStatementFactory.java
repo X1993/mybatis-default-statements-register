@@ -629,11 +629,10 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     private ForEachSqlNode conditionInSqlNode(DynamicParamsContext context){
         Method mappedMethod = context.mappedStatementMateData.getMapperMethodMateData().getMappedMethod();
         Class<?> paramType = mappedMethod.getParameterTypes()[(int) context.get(context.paramIndexKey ,0)];
-        String collectionExpression = mappedMethod.getParameterCount() > 1 ? context.getParamPlaceholder().toString() :
+        String collectionExpression = mappedMethod.getParameterCount() > 1 ? context.getParamName().toString() :
                 paramType.isArray() ? "array" : "collection";
         Configuration configuration = context.mappedStatementMateData.getConfiguration();
-        return new ForEachSqlNode(configuration ,new TrimSqlNode(configuration , new StaticTextSqlNode("#{item}") ,
-                null , null ,null ,",") ,collectionExpression  ,
+        return new ForEachSqlNode(configuration ,new StaticTextSqlNode("#{item}"), collectionExpression,
                 null , "item" ,"(" ,")" ,",");
     }
 
@@ -831,8 +830,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             this.dynamicParams.where(new ConditionParams());
         }
 
+        public StringBuilder getParamName(){
+            return new StringBuilder("param").append(getParamIndexAndAdd(1) + 1);
+        }
+
         public StringBuilder getParamPlaceholder(){
-            return new StringBuilder("#{param").append(getParamIndexAndAdd(1) + 1).append("}");
+            return new StringBuilder("#{").append(getParamName()).append("}");
         }
 
         /**
