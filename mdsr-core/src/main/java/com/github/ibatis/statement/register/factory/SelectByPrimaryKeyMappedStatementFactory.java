@@ -80,14 +80,12 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
         String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
 
         boolean logicalConditional = SELECT_BY_PRIMARY_KEY.equals(methodName) || EXIST_BY_PRIMARY_KEY.equals(methodName);
-
-        String selectContent = selectEntity(mappedStatementMateData)
-                ? entityMateData.getBaseColumnListSqlContent().toString() : "COUNT(0) > 0";
+        boolean selectEntity = selectEntity(mappedStatementMateData);
 
         Configuration configuration = mappedStatementMateData.getConfiguration();
 
         StringBuilder sqlContext = new StringBuilder("SELECT ")
-                .append(selectContent)
+                .append(selectEntity ? entityMateData.getBaseColumnListSqlContent().toString() : "COUNT(0) > 0")
                 .append(" FROM `")
                 .append(entityMateData.getTableName())
                 .append("` WHERE ");
@@ -116,6 +114,8 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
         }else {
             sqlContext.delete(sqlContext.length() - 4,sqlContext.length());
         }
+
+        sqlContext.append(" LIMIT 1");
 
         return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,sqlContext.toString() ,parameterMappings);
     }
