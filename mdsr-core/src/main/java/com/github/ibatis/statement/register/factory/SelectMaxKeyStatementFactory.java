@@ -21,10 +21,9 @@ public class SelectMaxKeyStatementFactory extends AbstractSelectMappedStatementF
     {
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
-        Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
         return entityMateData.getPrimaryKeyCount() > 0 && super.isMatchMethodSignature(methodSignature ,
-                new MethodSignature(reasonableKeyParameterClass ,SELECT_MAX_KEY));
+                new MethodSignature(entityMateData.getReasonableKeyParameterClass() ,SELECT_MAX_KEY));
     }
 
     @Override
