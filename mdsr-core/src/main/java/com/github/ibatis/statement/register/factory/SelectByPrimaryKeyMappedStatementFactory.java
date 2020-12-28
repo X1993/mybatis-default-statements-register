@@ -115,7 +115,9 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
             sqlContext.delete(sqlContext.length() - 4,sqlContext.length());
         }
 
-        sqlContext.append(" LIMIT 1");
+        if (!selectEntity) {
+            sqlContext.append(" LIMIT 1");
+        }
 
         return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,sqlContext.toString() ,parameterMappings);
     }
