@@ -70,6 +70,12 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             return;
         }
 
+        if (mapperEntityClass.isInterface() || mapperEntityClass.isArray()
+                || mapperEntityClass.isPrimitive() || mapperEntityClass.isEnum()){
+            throw new IllegalArgumentException(MessageFormat.format("mapper [{0}] entity class [{1}] illegal" ,
+                    mapperClass ,mapperEntityClass));
+        }
+
         EntityMateData entityMateData = entityMateDataParser.parse(mapperEntityClass, sqlSession)
                 .orElseThrow(() -> new IllegalArgumentException(MessageFormat.format(
                         "unable parse EntityMateData from mapper [{0}] entity class [{1}]" ,
