@@ -16,13 +16,13 @@ public class ClassUtils {
      * @param containStatic 是否包含静态字段
      * @return
      */
-    public static List<Field> getFields(Class<?> clazz , boolean containStatic)
+    public static List<Field> getFields(Class<?> clazz ,boolean containStatic)
     {
-        if (clazz.getPackage().getName().startsWith("java")){
+        if (clazz == null || clazz.isInterface() || clazz.getPackage().getName().startsWith("java")){
             return Collections.EMPTY_LIST;
         }
         List<Field> fields = new ArrayList<>();
-        fields.addAll(getFields(clazz.getSuperclass() ,containStatic));
+        fields.addAll(getFields(clazz.getSuperclass(), containStatic));
         for (Field field : clazz.getDeclaredFields()) {
             if (containStatic || !Modifier.isStatic(field.getModifiers())) {
                 fields.add(field);
