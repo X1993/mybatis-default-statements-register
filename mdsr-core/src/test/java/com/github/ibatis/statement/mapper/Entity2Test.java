@@ -246,16 +246,7 @@ public class Entity2Test {
         Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,3);
         Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,3);
 
-        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity2s).size() ,0);
-        Assert.assertEquals(mapper.countByPrimaryKeys(entity2s) ,0);
-
-        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,3);
-        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,3);
-
         Assert.assertEquals(3 ,mapper.deleteBatchByPrimaryKeyOnPhysical(entity2s));
-
-        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,0);
-        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,0);
 
         Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,0);
         Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,0);
