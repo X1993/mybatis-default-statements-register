@@ -102,6 +102,12 @@ public class Entity3Test {
         mapper.insertSelective(entity32);
         Assert.assertTrue(mapper.existByPrimaryKey(entity31));
 
+        List<Entity3> entities = Arrays.asList(entity31, entity32);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entities).size() ,2);
+        Assert.assertEquals(mapper.countByPrimaryKeys(entities) ,2);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entities).size() ,2);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entities) ,2);
+
         Assert.assertEquals(mapper.total() ,2);
         Assert.assertEquals(mapper.total(false) ,2);
 
@@ -149,6 +155,11 @@ public class Entity3Test {
 
         mapper.deleteSelective(entity31);
         mapper.deleteSelective(entity32);
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entities).size() ,0);
+        Assert.assertEquals(mapper.countByPrimaryKeys(entities) ,0);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entities).size() ,0);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entities) ,0);
     }
 
 }

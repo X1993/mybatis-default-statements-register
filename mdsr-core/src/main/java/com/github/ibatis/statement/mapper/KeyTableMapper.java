@@ -1,6 +1,8 @@
 package com.github.ibatis.statement.mapper;
 
 import java.util.Collection;
+import java.util.List;
+
 import com.github.ibatis.statement.register.factory.*;
 
 /**
@@ -43,6 +45,34 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @see SelectByPrimaryKeyMappedStatementFactory#SELECT_BY_PRIMARY_KEY_ON_PHYSICAL
      */
     T selectByPrimaryKeyOnPhysical(K key);
+
+    /**
+     * 根据主键集查询匹配的行数(如果有逻辑列，只统计逻辑存在的)
+     * @param keys
+     * @return
+     */
+    int countByPrimaryKeys(Collection<? extends K> keys);
+
+    /**
+     * 根据主键集查询匹配的行数（包含逻辑删除的行）
+     * @param keys
+     * @return
+     */
+    int countByPrimaryKeysOnPhysical(Collection<? extends K> keys);
+
+    /**
+     * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
+     * @param keys
+     * @return
+     */
+    List<T> selectBatchByPrimaryKey(Collection<? extends K> keys);
+
+    /**
+     * 根据主键集批量物理查询
+     * @param keys
+     * @return
+     */
+    List<T> selectBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
 
     /**
      * 修改属性不为空的数据

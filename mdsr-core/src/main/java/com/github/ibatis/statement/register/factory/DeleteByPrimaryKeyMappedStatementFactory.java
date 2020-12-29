@@ -53,11 +53,11 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
     protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData)
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
+
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
+        boolean logicalDelete = sqlCommandType(mappedStatementMateData) == SqlCommandType.UPDATE;
 
         StringBuilder sqlBuilder = new StringBuilder();
-
-        boolean logicalDelete = sqlCommandType(mappedStatementMateData) == SqlCommandType.UPDATE;
         sqlBuilder.append(deleteSqlContentNoWhere(logicalDelete ,entityMateData));
 
         Map<String ,ColumnPropertyMapping> keyPrimaryColumnPropertyMappings = entityMateData
@@ -108,7 +108,7 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
     {
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         StringBuilder sqlContent = new StringBuilder();
-        if (logicalDelete)
+        if (logicalDelete && logicalColumnMateData != null)
         {
             /*
               update table

@@ -181,9 +181,18 @@ public class Entity2Test {
         Entity2 entity23 = new Entity2("1" ,"4");
         List<Entity2> entity2s = Arrays.asList(entity21, entity22, entity23);
         mapper.insertBatch(entity2s);
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity2s).size() ,3);
+        Assert.assertEquals(mapper.countByPrimaryKeys(entity2s) ,3);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,3);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,3);
+
         entity21 = mapper.selectByPrimaryKey(entity21);
         entity22 = mapper.selectByPrimaryKey(entity22);
         entity23 = mapper.selectByPrimaryKey(entity23);
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity2s).size() ,3);
+        Assert.assertEquals(mapper.countByPrimaryKeys(entity2s) ,3);
 
         Date now = new Date();
         Assert.assertNotNull(mapper.selectUniqueByDynamicParams(new DynamicParams()
@@ -231,7 +240,25 @@ public class Entity2Test {
         Assert.assertEquals(entity23.getValue3() ,"4");
 
         Assert.assertEquals(3 ,mapper.deleteBatchByPrimaryKey(entity2s));
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity2s).size() ,0);
+        Assert.assertEquals(mapper.countByPrimaryKeys(entity2s) ,0);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,3);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,3);
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity2s).size() ,0);
+        Assert.assertEquals(mapper.countByPrimaryKeys(entity2s) ,0);
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,3);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,3);
+
         Assert.assertEquals(3 ,mapper.deleteBatchByPrimaryKeyOnPhysical(entity2s));
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,0);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,0);
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,0);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(entity2s) ,0);
     }
 
 }

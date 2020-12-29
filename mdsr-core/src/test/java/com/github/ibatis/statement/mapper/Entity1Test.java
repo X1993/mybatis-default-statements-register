@@ -214,6 +214,34 @@ public class Entity1Test {
         boolean existByPrimaryKeyOnPhysical(String key);
 
         /**
+         * 根据主键集查询匹配的行数(如果有逻辑列，只统计逻辑存在的)
+         * @param keys
+         * @return
+         */
+        int countByPrimaryKeys(Collection<String> keys);
+
+        /**
+         * 根据主键集查询匹配的行数（包含逻辑删除的行）
+         * @param keys
+         * @return
+         */
+        int countByPrimaryKeysOnPhysical(Collection<String> keys);
+
+        /**
+         * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
+         * @param keys
+         * @return
+         */
+        List<Entity1> selectBatchByPrimaryKey(Collection<String> keys);
+
+        /**
+         * 根据主键集批量物理查询
+         * @param keys
+         * @return
+         */
+        List<Entity1> selectBatchByPrimaryKeyOnPhysical(Collection<String> keys);
+
+        /**
          * 批量修改，set值为每个元素不为空的值
          * @param list
          * @return
@@ -269,6 +297,11 @@ public class Entity1Test {
         mapper.insert(entity1);
         mapper.insert(entity12);
         Assert.assertTrue(mapper.existByPrimaryKey(entity1.getId()));
+
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(Arrays.asList("1" ,"2")).size() ,2);
+        Assert.assertEquals(mapper.countByPrimaryKeys(Arrays.asList("1" ,"2")) ,2);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(Arrays.asList("1" ,"4")).size() ,1);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(Arrays.asList("3" ,"2")) ,1);
 
         Assert.assertNotNull(mapper.selectByPrimaryKey(entity1.getId()));
         Assert.assertEquals(mapper.total() ,2);

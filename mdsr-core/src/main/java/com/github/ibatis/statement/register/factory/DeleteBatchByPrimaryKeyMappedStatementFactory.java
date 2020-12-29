@@ -2,7 +2,6 @@ package com.github.ibatis.statement.register.factory;
 
 import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.base.core.MethodSignature;
-import com.github.ibatis.statement.base.core.matedata.ColumnPropertyMapping;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
@@ -10,7 +9,6 @@ import com.github.ibatis.statement.mapper.KeyTableMapper;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
-import org.apache.ibatis.session.Configuration;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -55,70 +53,16 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
     protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData)
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
-        LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
 
         List<SqlNode> sqlNodes = new LinkedList<>();
+
+        LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         boolean logicalDelete = sqlCommandType(mappedStatementMateData) == SqlCommandType.UPDATE;
 
         sqlNodes.add(DeleteByPrimaryKeyMappedStatementFactory.deleteSqlNodeNoWhere(logicalDelete ,entityMateData));
 
-        Configuration configuration = mappedStatementMateData.getConfiguration();
-        Map<String ,ColumnPropertyMapping> keyPrimaryColumnPropertyMappings = entityMateData
-                .getKeyPrimaryColumnPropertyMappings();
-
-        boolean primaryKeyParameterIsEntity = entityMateData.isPrimaryKeyParameterIsEntity();
-
         sqlNodes.add(new StaticTextSqlNode(" WHERE "));
-        if (primaryKeyParameterIsEntity)
-        {
-            /*
-            <foreach collection="collectionExpression" item="item" index="index" open="(" close=")" separator="or">
-               1 = 1
-               and key1 = #{item.keyPropertyName1,jdbcType=XXX}
-               and key2 = #{item.keyPropertyName2,jdbcType=XXX}
-            </foreach>
-             */
-
-            StringBuilder whereConditions = new StringBuilder("(");
-
-            //主键的查询条件
-            for (ColumnPropertyMapping columnPropertyMapping : keyPrimaryColumnPropertyMappings.values()) {
-                whereConditions.append(columnPropertyMapping.createEqSqlContent(name -> "item." + name))
-                        .append(" AND ");
-            }
-
-            whereConditions.append(" 1 = 1 )");
-
-            sqlNodes.add(new ForEachSqlNode(configuration ,new StaticTextSqlNode(whereConditions.toString()) ,
-                    "collection" ,"index" , "item" ,
-                    "(" ,")" ," OR "));
-
-        }else {
-            /*
-                参数类型一定是唯一主键
-
-                primaryKeyColName in (
-             <foreach collection="collectionExpression" item="item" separator=",">
-                #{item}
-             </foreach>
-             )
-             */
-
-            //主键多值查询
-            ColumnPropertyMapping keyColumnPropertyMapping = keyPrimaryColumnPropertyMappings.values()
-                    .stream()
-                    .findFirst()
-                    .get();
-
-            sqlNodes.add(new StaticTextSqlNode(new StringBuilder(
-                    keyColumnPropertyMapping.getColumnMateData().getEscapeColumnName())
-                    .append(" in ")
-                    .toString()));
-
-            sqlNodes.add(new ForEachSqlNode(configuration ,new StaticTextSqlNode("#{item}") ,
-                    "collection" ,null, "item" ,
-                    "(" ,")" ,","));
-        }
+        sqlNodes.add(entityMateData.multivaluedKeyConditionSqlNode());
 
         //值固定的查询条件
         StringBuilder fixedValueConditions = entityMateData.defaultConditionsContent(
