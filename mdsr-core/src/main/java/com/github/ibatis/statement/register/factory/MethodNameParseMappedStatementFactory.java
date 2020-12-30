@@ -147,7 +147,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         Context context = new Context(new HashMap<>() ,mappedStatementMateData);
         long startTimeMillis = System.currentTimeMillis();
         String expression = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        List<List<Edge>> sentences = parseParticiple(expression, Edge.START_EDGE, context, syntaxMap);
+        List<List<Edge>> sentences = parseParticiple(expression.toUpperCase(), Edge.START_EDGE, context, syntaxMap);
 
         for (List<Edge> sentence : sentences) {
             //removed Card.START_CARD
@@ -680,7 +680,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
         public Card(CardType type, String value) {
             this.type = type;
-            this.value = value;
+            this.value = value.toUpperCase();
         }
 
         @Override
