@@ -13,6 +13,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD ,ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
+@Documented
 @Repeatable(Conditions.class)
 public @interface Condition {
 

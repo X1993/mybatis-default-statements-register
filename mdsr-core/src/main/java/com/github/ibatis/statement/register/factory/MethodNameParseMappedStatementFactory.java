@@ -21,6 +21,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static com.github.ibatis.statement.mapper.param.ConditionRule.*;
+import static com.github.ibatis.statement.register.factory.If.PARAM_PLACEHOLDER;
 import static com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory.Card.START_CARD;
 
 /**
@@ -91,32 +92,28 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         }
 
         DynamicParamsContext dynamicParamsContext = new DynamicParamsContext(mappedStatementMateData);
+        String expression = getExpression(mappedStatementMateData);
+        dynamicParamsContext.putExpression(expression);
         for (Edge edge : sentence) {
             edge.dynamicParamsFunction.accept(dynamicParamsContext);
+            expression = expression.substring(edge.card.value.length());
+            dynamicParamsContext.putExpression(expression);
         }
-        DynamicParams dynamicParams = dynamicParamsContext.dynamicParams;
 
         List<SqlNode> sqlNodes = new ArrayList<>();
         SqlNode baseSqlNode = new StaticTextSqlNode(new StringBuilder("SELECT ")
                 .append(dynamicParamsContext.selectContext)
                 .append(" FROM `")
                 .append(entityMateData.getTableMateData().getTableName())
-                .append("` WHERE ")
+                .append("` WHERE 1 = 1 ")
                 .toString());
         sqlNodes.add(baseSqlNode);
+        sqlNodes.addAll(dynamicParamsContext.conditionSqlNodes);
 
-        List<ConditionParam> params = dynamicParams.getWhereConditions().getParams();
-        for (ConditionParam param : params) {
-            sqlNodes.add(new StaticTextSqlNode(new StringBuilder(" `")
-                    .append(param.getKey()).append("` ")
-                    .append(param.getRule().expression).toString()));
-            sqlNodes.add((SqlNode) param.getValue());
-            sqlNodes.add(new StaticTextSqlNode(param.isOr() ? " OR " : " AND "));
-        }
-        sqlNodes.add(new StaticTextSqlNode(" 1 = 1 "));
+        OrderRule[] orderRules = dynamicParamsContext.orderRules
+                .stream()
+                .toArray(size -> new OrderRule[size]);
 
-        OrderRule[] orderRules = dynamicParams.getOrderRules()
-                .toArray(new OrderRule[dynamicParams.getOrderRules().size()]);
         int length = orderRules.length;
         if (length > 0) {
             sqlNodes.add(new StaticTextSqlNode(" ORDER BY "));
@@ -136,6 +133,10 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         return Optional.of(new DynamicSqlSource(configuration ,new MixedSqlNode(sqlNodes)));
     }
 
+    private String getExpression(MappedStatementMateData mappedStatementMateData){
+        return mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName().toUpperCase();
+    }
+
     /**
      * 根据语法对表达式分词
      * @param mappedStatementMateData
@@ -146,8 +147,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     {
         Context context = new Context(new HashMap<>() ,mappedStatementMateData);
         long startTimeMillis = System.currentTimeMillis();
-        String expression = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        List<List<Edge>> sentences = parseParticiple(expression.toUpperCase(), Edge.START_EDGE, context, syntaxMap);
+        String expression = getExpression(mappedStatementMateData);
+        List<List<Edge>> sentences = parseParticiple(expression, Edge.START_EDGE, context, syntaxMap);
 
         for (List<Edge> sentence : sentences) {
             //removed Card.START_CARD
@@ -203,7 +204,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         Card currentCard = currentEdge.card;
         String cardValue = currentCard.value;
         if (expression.startsWith(cardValue) && currentEdge.isConform.test(content)){
-            String subExpression = expression.substring(cardValue.length());
+            content.putExpression(expression);
             Context newContext = currentEdge.updateContext.apply(content);
             if (expression.length() == cardValue.length()){
                 if (currentEdge.isTermination.test(content) && !newContext.hasEnoughParams(1)) {
@@ -217,6 +218,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             List<Edge> edges = syntaxMap.get(currentCard);
             if (edges != null && edges.size() > 0) {
                 //TODO 可以使用前缀树提高匹配效率
+                String subExpression = expression.substring(cardValue.length());
                 for (Edge edge : edges) {
                     List<List<Edge>> afterSentences = parseParticiple(subExpression, edge, newContext, syntaxMap);
                     for (List<Edge> afterSentence : afterSentences) {
@@ -233,9 +235,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         return StringUtils.camelUnderscoreToCase(str ,true);
     }
 
-    private final String conditionRuleKey = "conditionRule";
-
-    private final String conditionValueKey = "conditionValue";
+    private final String columnNameKey = "columnName";
 
     private final String operatorKey = "operator";
 
@@ -319,15 +319,34 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                 .map(conditionRule -> new Card(standard(conditionRule.name().toLowerCase())))
                 .toArray(length -> new Card[length]);
 
-        List<Edge> startPossibleEdges = new ArrayList<>();
-        startPossibleEdges.add(new Edge().nextCard(select));
-        startPossibleEdges.add(new Edge().nextCard(find));
-        syntaxTable.put(Card.START_CARD ,startPossibleEdges);
-
         Consumer<DynamicParamsContext> selectColumnsConsumer = context ->
                 context.selectContext = entityMateData.getBaseColumnListSqlContent().toString();
 
+        List<Edge> startPossibleEdges = new ArrayList<>();
         List<Edge> selectPossibleEdges = new ArrayList<>();
+        List<Edge> countPossibleEdges = new ArrayList<>();
+        List<Edge> conditionPossibleEdges = new ArrayList<>();
+        List<Edge> columnPossibleEdges = new ArrayList<>();
+        List<Edge> orderRulePossibleEdges = new ArrayList<>();
+        List<Edge> orderPossibleEdges = new ArrayList<>();
+        List<Edge> andPossibleEdges = new ArrayList<>();
+        List<Edge> orPossibleEdges = new ArrayList<>();
+        List<Edge> byPossibleEdges = new ArrayList<>();
+
+        syntaxTable.put(Card.START_CARD ,startPossibleEdges);
+        syntaxTable.put(find ,selectPossibleEdges);
+        syntaxTable.put(count ,countPossibleEdges);
+        syntaxTable.put(and ,andPossibleEdges);
+        syntaxTable.put(or ,orPossibleEdges);
+        syntaxTable.put(by ,byPossibleEdges);
+        syntaxTable.put(desc ,orderRulePossibleEdges);
+        syntaxTable.put(asc ,orderRulePossibleEdges);
+        syntaxTable.put(orderBy ,orderPossibleEdges);
+        syntaxTable.put(select ,selectPossibleEdges);
+
+        startPossibleEdges.add(new Edge().nextCard(select));
+        startPossibleEdges.add(new Edge().nextCard(find));
+
         // select / find -> by
         selectPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator)
                 .dynamicParamsFunction(selectColumnsConsumer));
@@ -335,82 +354,46 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         selectPossibleEdges.add(new Edge().nextCard(count)
                 .dynamicParamsFunction(context -> context.selectContext = "COUNT(0)"));
         // select / find -> orderBy
-        Edge nextOrderByEdge = new Edge().nextCard(orderBy).updateContext(orderOperator)
-                .dynamicParamsFunction(selectColumnsConsumer);
-        selectPossibleEdges.add(nextOrderByEdge);
+        selectPossibleEdges.add(new Edge().nextCard(orderBy).updateContext(orderOperator)
+                .dynamicParamsFunction(selectColumnsConsumer));
 
-        syntaxTable.put(select ,selectPossibleEdges);
-        syntaxTable.put(find ,selectPossibleEdges);
-
-        List<Edge> countPossibleEdges = new ArrayList<>();
         // count -> by
         countPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator));
-        syntaxTable.put(count ,countPossibleEdges);
 
-        List<Edge> byPossibleEdges = new ArrayList<>();
-        // by -> condition
-        List<Edge> toConditionEdges = toConditionEdges();
-        byPossibleEdges.addAll(toConditionEdges);
-        for (ColumnCard columnCard : columnCards) {
-            // by -> column
-            byPossibleEdges.add(andToColumn(columnCard));
-        }
+        // column -> and
+        columnPossibleEdges.add(columnToAndEdge(and));
+        // column -> or
+        columnPossibleEdges.add(columnToOrEdge(or));
+        // column -> condition
+        columnPossibleEdges.addAll(toConditionEdges());
+        // column -> orderBy
+        columnPossibleEdges.add(columnToOrderEdge(orderBy));
+        // column -> desc
+        columnPossibleEdges.add(toOrderRuleEdge(desc ,OrderRule.Rule.DESC));
+        // column -> asc
+        columnPossibleEdges.add(toOrderRuleEdge(asc ,OrderRule.Rule.ASC));
 
-        syntaxTable.put(by ,byPossibleEdges);
-
-        List<Edge> andPossibleEdges = new ArrayList<>();
-        List<Edge> orPossibleEdges = new ArrayList<>();
-        syntaxTable.put(and ,andPossibleEdges);
-        syntaxTable.put(or ,orPossibleEdges);
-
-        // and -> condition
-        andPossibleEdges.addAll(toConditionEdges);
-        // or -> condition
-        orPossibleEdges.addAll(toConditionEdges()
-                .stream()
-                .map(edge -> edge.dynamicParamsFunction(edge.dynamicParamsFunction.andThen(dynamicParamsContext ->
-                        Optional.ofNullable(dynamicParamsContext.dynamicParams.getWhereConditions().getParams())
-                                .ifPresent(params -> params.get(params.size() - 1).setOr(true)))))
-                .collect(Collectors.toList()));
+        // condition -> or
+        conditionPossibleEdges.add(new Edge().nextCard(or).isConform(wherePredicate));
+        // condition -> and
+        conditionPossibleEdges.add(new Edge().nextCard(and).isConform(wherePredicate));
+        // condition -> orderBy
+        conditionPossibleEdges.add(new Edge().nextCard(orderBy)
+                .isConform(wherePredicate).updateContext(orderOperator));
 
         for (ColumnCard columnCard : columnCards) {
             // and -> column
             andPossibleEdges.add(andToColumn(columnCard));
             // or -> column
             orPossibleEdges.add(orToColumn(columnCard));
-        }
-
-        List<Edge> columnPossibleEdges = new ArrayList<>();
-        // column -> condition
-        columnPossibleEdges.addAll(toConditionEdges);
-
-        // column -> and
-        columnPossibleEdges.add(columnToAndEdge());
-        // column -> or
-        columnPossibleEdges.add(columnToOrEdge());
-
-        // column -> desc
-        columnPossibleEdges.add(toOrderRuleEdge(desc ,OrderRule.Rule.DESC));
-        // column -> asc
-        columnPossibleEdges.add(toOrderRuleEdge(asc ,OrderRule.Rule.ASC));
-        // column -> orderBy
-        columnPossibleEdges.add(nextOrderByEdge);
-        for (ColumnCard columnCard : columnCards) {
+            // by -> column
+            byPossibleEdges.add(andToColumn(columnCard));
             // column -> column
             columnPossibleEdges.add(columnToColumnEdge(columnCard));
-        }
-
-        List<Edge> conditionPossibleEdges = new ArrayList<>();
-        List<Edge> orderRulePossibleEdges = new ArrayList<>();
-        List<Edge> orderPossibleEdges = new ArrayList<>();
-
-        for (ColumnCard columnCard : columnCards) {
             // orderBy -> column
             orderPossibleEdges.add(orderToColumnsEdge(columnCard));
             // desc / asc -> column
             orderRulePossibleEdges.add(orderRuleToColumnEdge(columnCard));
-            // condition -> column
-            conditionPossibleEdges.add(conditionToColumnEdge(columnCard));
             // column -> ?
             syntaxTable.put(columnCard ,columnPossibleEdges);
         }
@@ -418,10 +401,6 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         for (Card conditionCard : conditionCards) {
             syntaxTable.put(conditionCard ,conditionPossibleEdges);
         }
-
-        syntaxTable.put(desc ,orderRulePossibleEdges);
-        syntaxTable.put(asc ,orderRulePossibleEdges);
-        syntaxTable.put(orderBy ,orderPossibleEdges);
 
         edgeMapCache.put(cacheKey ,syntaxTable);
         return syntaxTable;
@@ -433,14 +412,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
      * @return
      */
     private Edge orToColumn(ColumnCard columnCard){
-        return new Edge().nextCard(columnCard)
-                .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
-                .updateContext(context -> context.addEnoughParams(1))
-                .dynamicParamsFunction(dynamicParamsContext ->
-                        Optional.ofNullable(nextColumnDynamicParamsFunction(columnCard ,dynamicParamsContext)
-                                .dynamicParams.getWhereConditions().getParams())
-                                .ifPresent(params -> params.get(params.size() - 1).setOr(true)))
-                .isTermination(truePredicate);
+        return toColumnEdge(columnCard ,true);
     }
 
     /**
@@ -449,32 +421,76 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
      * @return
      */
     private Edge andToColumn(ColumnCard columnCard){
+        return toColumnEdge(columnCard ,false);
+    }
+
+    private Edge toColumnEdge(ColumnCard columnCard ,boolean isOr){
         return new Edge().nextCard(columnCard)
+                .isConform(wherePredicate)
+                .updateContext(context -> {
+                    if (columnCard.value.equals(context.getExpression())){
+                        return context.addEnoughParams(1);
+                    }
+                    return context;
+                })
+                .isTermination(wherePredicate)
+                .dynamicParamsFunction(context -> {
+                    context.setOr(isOr).put(columnNameKey ,columnCard.columnName);
+                    if (columnCard.value.equals(context.getExpression())){
+                        singleParameterCondition(EQ ,i ->
+                                new StaticTextSqlNode(new StringBuilder(
+                                context.getParamPlaceholder(i)).toString()) ,context);
+                    }
+                });
+    }
+
+    /**
+     * column -> And，default condition = EQ
+     * @return
+     */
+    private Edge columnToAndEdge(Card card){
+        return new Edge().nextCard(card)
                 .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
                 .updateContext(context -> context.addEnoughParams(1))
-                .dynamicParamsFunction(context -> nextColumnDynamicParamsFunction(columnCard ,context))
-                .isTermination(truePredicate);
+                .dynamicParamsFunction(context -> singleParameterCondition(
+                        EQ ,i -> new StaticTextSqlNode(new StringBuilder(
+                                context.getParamPlaceholder(i))
+                                .toString()) ,context)
+                        .setOr(false)
+                );
     }
 
     /**
-     * column -> And
+     * column -> Or，default condition = EQ
      * @return
      */
-    private Edge columnToAndEdge(){
-        return new Edge().nextCard(new Card(standard("And")))
-                .isConform(wherePredicate);
+    private Edge columnToOrEdge(Card card){
+        return new Edge().nextCard(card)
+                .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
+                .updateContext(context -> context.addEnoughParams(1))
+                .dynamicParamsFunction(context -> singleParameterCondition(
+                        EQ ,i -> new StaticTextSqlNode(new StringBuilder(
+                                context.getParamPlaceholder(i))
+                                .toString()) ,context)
+                        .setOr(true)
+                );
     }
 
     /**
-     * column -> Or
+     * column -> OrderBy，default condition = EQ
      * @return
      */
-    private Edge columnToOrEdge(){
-        return new Edge().nextCard(new Card(standard("Or")))
-                .dynamicParamsFunction(dynamicParamsContext ->
-                        Optional.ofNullable(dynamicParamsContext.dynamicParams.getWhereConditions().getParams())
-                                .ifPresent(params -> params.get(params.size() - 1).setOr(true)))
-                .isConform(wherePredicate);
+    private Edge columnToOrderEdge(Card card)
+    {
+        return new Edge().nextCard(card)
+                .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
+                .updateContext(orderOperator.andThen(context -> context.addEnoughParams(1)))
+                .dynamicParamsFunction(context -> singleParameterCondition(
+                        EQ ,i -> new StaticTextSqlNode(new StringBuilder(
+                                context.getParamPlaceholder(i))
+                                .toString()) ,context)
+                        .setOr(false)
+                );
     }
 
     /**
@@ -485,12 +501,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
      */
     private Edge toOrderRuleEdge(Card card ,OrderRule.Rule rule){
         return new Edge().nextCard(card)
+                .isConform(orderPredicate)
                 .dynamicParamsFunction(dynamicParamsContext ->
                         Optional.ofNullable(dynamicParamsContext.remove(orderColumnsKey))
-                                .ifPresent(columnNames -> dynamicParamsContext.dynamicParams.addOrderRule(rule ,
+                                .ifPresent(columnNames -> dynamicParamsContext.addOrderRule(rule ,
                                         ((String) columnNames).split(","))))
-                .isTermination(truePredicate)
-                .isConform(orderPredicate);
+                .isTermination(orderPredicate.and(truePredicate));
     }
 
     /**
@@ -506,24 +522,13 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     }
 
     /**
-     * condition -> column
-     * @param columnCard
-     * @return
-     */
-    private Edge conditionToColumnEdge(ColumnCard columnCard){
-        return new Edge().nextCard(columnCard)
-                .isConform(wherePredicate)
-                .dynamicParamsFunction(context -> nextColumnDynamicParamsFunction(columnCard ,context))
-                .isTermination(truePredicate);
-    }
-
-    /**
      * desc / asc -> column
      * @param columnCard
      * @return
      */
     private Edge orderRuleToColumnEdge(ColumnCard columnCard){
         return new Edge().nextCard(columnCard)
+                .isConform(orderPredicate)
                 .dynamicParamsFunction(dynamicParamsContext ->
                         orderColumnSpliceConsumer(columnCard.columnName ,dynamicParamsContext));
     }
@@ -540,97 +545,134 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     }
 
     /**
-     * ? -> condition
+     * ? -> condition ,构建SqlNode
      * @return
      */
     private List<Edge> toConditionEdges()
     {
-        List<Edge> byPossibleEdges = new ArrayList<>();
+        List<Edge> toConditionPossibleEdges = new ArrayList<>();
         ConditionRule[] conditionRules = new ConditionRule[]{EQ ,NOT_EQ ,LT ,GT ,LE ,GE};
         for (ConditionRule conditionRule : conditionRules) {
-            byPossibleEdges.add(new Edge()
+            toConditionPossibleEdges.add(new Edge()
                     .nextCard(new Card(standard(conditionRule.name().toLowerCase())))
                     .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
                     .updateContext(context -> context.addEnoughParams(1))
-                    .dynamicParamsFunction(context -> context.put(conditionRuleKey, conditionRule)
-                            .put(conditionValueKey ,new StaticTextSqlNode(
-                                    new StringBuilder(context.getParamPlaceholder())
-                                    .toString()))));
+                    .isTermination(truePredicate)
+                    .dynamicParamsFunction(context -> singleParameterCondition(
+                            conditionRule ,
+                            i -> new StaticTextSqlNode(new StringBuilder(
+                                    context.getParamPlaceholder(i))
+                                    .toString()) ,
+                            context)
+                    )
+            );
         }
 
         conditionRules = new ConditionRule[]{LIKE ,NOT_LIKE};
         for (ConditionRule conditionRule : conditionRules) {
-            byPossibleEdges.add(new Edge()
+            toConditionPossibleEdges.add(new Edge()
                     .nextCard(new Card(standard(conditionRule.name().toLowerCase())))
                     .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
                     .updateContext(context -> context.addEnoughParams(1))
-                    .dynamicParamsFunction(context -> context.put(conditionRuleKey, conditionRule)
-                            .put(conditionValueKey ,new StaticTextSqlNode(
-                                    new StringBuilder("CONCAT('%',")
-                                    .append(context.getParamPlaceholder())
-                                    .append(",'%')").toString()))));
+                    .isTermination(truePredicate)
+                    .dynamicParamsFunction(context -> singleParameterCondition(
+                            conditionRule ,
+                            i -> new StaticTextSqlNode(new StringBuilder("CONCAT('%',")
+                                    .append(context.getParamPlaceholder(i))
+                                    .append(",'%')").toString()) ,
+                            context)
+                    )
+            );
         }
 
-        byPossibleEdges.add(new Edge()
+        toConditionPossibleEdges.add(new Edge()
                 .nextCard(new Card(standard(LIKE_LEFT.name().toLowerCase())))
                 .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
                 .updateContext(context -> context.addEnoughParams(1))
-                .dynamicParamsFunction(context -> context.put(conditionRuleKey, LIKE_LEFT)
-                        .put(conditionValueKey ,new StaticTextSqlNode(
-                                new StringBuilder("CONCAT('%',")
-                                .append(context.getParamPlaceholder())
-                                .append(")").toString()))));
+                .isTermination(truePredicate)
+                .dynamicParamsFunction(context -> singleParameterCondition(
+                        LIKE_LEFT ,
+                        i -> new StaticTextSqlNode(new StringBuilder("CONCAT('%',")
+                                .append(context.getParamPlaceholder(i))
+                                .append(")").toString()) ,
+                        context)
+                )
+        );
 
-        byPossibleEdges.add(new Edge()
+        toConditionPossibleEdges.add(new Edge()
                 .nextCard(new Card(standard(LIKE_RIGHT.name().toLowerCase())))
                 .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
                 .updateContext(context -> context.addEnoughParams(1))
-                .dynamicParamsFunction(context -> context.put(conditionRuleKey, LIKE_RIGHT)
-                        .put(conditionValueKey ,new StaticTextSqlNode(
-                                new StringBuilder("CONCAT(")
-                                .append(context.getParamPlaceholder())
-                                .append(",'%')").toString()))));
+                .isTermination(truePredicate)
+                .dynamicParamsFunction(context -> singleParameterCondition(
+                        LIKE_LEFT ,
+                        i -> new StaticTextSqlNode(new StringBuilder("CONCAT(")
+                                .append(context.getParamPlaceholder(i))
+                                .append(",'%')").toString()) ,
+                        context)
+                )
+        );
 
         conditionRules = new ConditionRule[]{NE ,IS_NULL ,NOT_NULL};
         for (ConditionRule conditionRule : conditionRules) {
-            byPossibleEdges.add(new Edge()
+            toConditionPossibleEdges.add(new Edge()
                     .nextCard(new Card(standard(conditionRule.name().toLowerCase())))
-                    .dynamicParamsFunction(context -> context.put(conditionRuleKey, conditionRule)
-                            .put(conditionValueKey ,new StaticTextSqlNode(""))));
+                    .isTermination(truePredicate)
+                    .dynamicParamsFunction(context -> context.addCondition(new StaticTextSqlNode(
+                            new StringBuilder(context.isOr ? " OR " : "AND")
+                                    .append(" `")
+                                    .append(context.remove(columnNameKey))
+                                    .append("` ")
+                                    .append(conditionRule.expression)
+                                    .toString()))));
         }
 
         conditionRules = new ConditionRule[]{BETWEEN ,NOT_BETWEEN};
         for (ConditionRule conditionRule : conditionRules) {
-            byPossibleEdges.add(new Edge()
+            toConditionPossibleEdges.add(new Edge()
                     .nextCard(new Card(standard(conditionRule.name().toLowerCase())))
                     .isConform(wherePredicate.and(context -> context.hasEnoughParams(2)))
                     .updateContext(context -> context.addEnoughParams(2))
-                    .dynamicParamsFunction(context -> context.put(conditionRuleKey, conditionRule)
-                            .put(conditionValueKey ,new StaticTextSqlNode(
-                                    new StringBuilder(context.getParamPlaceholder())
-                                    .append(" AND ")
-                                    .append(context.getParamPlaceholder())
-                                    .toString()))));
+                    .isTermination(truePredicate)
+                    .dynamicParamsFunction(context -> singleParameterCondition(
+                            null ,
+                            i -> new StaticTextSqlNode(new StringBuilder(
+                                    context.getParamPlaceholder(i))
+                                    .toString()),
+                            //看作两个condition来处理
+                            singleParameterCondition(conditionRule ,
+                                i -> new StaticTextSqlNode(new StringBuilder(
+                                    context.getParamPlaceholder(i))
+                                    .toString()) ,
+                                context).setOr(false)
+                            )
+                    )
+            );
         }
 
         conditionRules = new ConditionRule[]{IN ,NOT_IN};
         for (ConditionRule conditionRule : conditionRules) {
-            byPossibleEdges.add(new Edge()
+            toConditionPossibleEdges.add(new Edge()
                     .nextCard(new Card(standard(conditionRule.name().toLowerCase())))
                     .isConform(wherePredicate.and(context -> context.hasEnoughParams(1)))
                     .updateContext(context -> context.addEnoughParams(1))
-                    .dynamicParamsFunction(context -> context.put(conditionRuleKey, conditionRule)
-                            .put(conditionValueKey ,conditionInSqlNode(context))));
+                    .isTermination(truePredicate)
+                    .dynamicParamsFunction(context -> singleParameterCondition(
+                            conditionRule ,i -> conditionInSqlNode(context ,i) ,context)
+                    )
+            );
         }
 
-        return byPossibleEdges;
+        return toConditionPossibleEdges;
     }
 
-    private ForEachSqlNode conditionInSqlNode(DynamicParamsContext context){
+    private ForEachSqlNode conditionInSqlNode(DynamicParamsContext context ,int paramIndex)
+    {
         Method mappedMethod = context.mappedStatementMateData.getMapperMethodMateData().getMappedMethod();
-        Class<?> paramType = mappedMethod.getParameterTypes()[(int) context.get(context.paramIndexKey ,0)];
-        String collectionExpression = mappedMethod.getParameterCount() > 1 ? context.getParamName().toString() :
-                paramType.isArray() ? "array" : "collection";
+        Class<?> paramType = mappedMethod.getParameterTypes()[paramIndex];
+        String collectionExpression = mappedMethod.getParameterCount() > 1
+                ? context.getParamName(paramIndex).toString() : paramType.isArray()
+                ? "array" : "collection";
         Configuration configuration = context.mappedStatementMateData.getConfiguration();
         return new ForEachSqlNode(configuration ,new StaticTextSqlNode("#{item}"), collectionExpression,
                 null , "item" ,"(" ,")" ,",");
@@ -643,17 +685,44 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                         .orElse("") + columnName);
     }
 
-    private DynamicParamsContext nextColumnDynamicParamsFunction(ColumnCard columnCard ,
-                                                                 DynamicParamsContext context)
+    private DynamicParamsContext singleParameterCondition(ConditionRule conditionRule ,
+                                                          Function<Integer ,SqlNode> valueSqlNodeFunction,
+                                                          DynamicParamsContext context)
     {
-        context.addWhereCondition(columnCard.columnName ,
-                        //如果没有定义过滤规则，默认EQ
-                        (ConditionRule) Optional.ofNullable(context.remove(conditionRuleKey)).orElse(EQ) ,
-                        Optional.ofNullable((SqlNode) context.remove(conditionValueKey))
-                                .orElseGet(() -> new StaticTextSqlNode(
-                                        new StringBuilder(context.getParamPlaceholder())
-                                                .toString())));
+        StaticTextSqlNode keyRuleSqlNode = new StaticTextSqlNode(
+                new StringBuilder(context.isOr ? " OR " : " AND ")
+                        .append(Optional.ofNullable(context.remove(columnNameKey))
+                                .map(column -> "`" + column + "` ")
+                                .orElse(" "))
+                        .append(Optional.ofNullable(conditionRule)
+                                .map(rule -> rule.expression)
+                                .orElse(" "))
+                        .toString());
 
+        context.addEnoughParams(1);
+        int paramIndex = context.getParamIndex();
+        If ifAnnotation = context.mappedStatementMateData.getMapperMethodMateData()
+                .getMappedMethod().getParameters()[paramIndex].getAnnotation(If.class);
+
+        SqlNode valueSqlNode = valueSqlNodeFunction.apply(paramIndex);
+        SqlNode sqlNode = new MixedSqlNode(Arrays.asList(keyRuleSqlNode, valueSqlNode));
+        if (ifAnnotation != null){
+            String defaultValue = ifAnnotation.otherwise();
+            String test = ifAnnotation.test();
+            test = test.replaceAll(StringUtils.escapeExprSpecialWord(If.PARAM_PLACEHOLDER),
+                    context.getParamName(paramIndex).toString());
+            if (If.NULL.equals(defaultValue)){
+                //if 标签
+                sqlNode = new IfSqlNode(sqlNode, test);
+            }else {
+                // choose 标签
+                sqlNode = new MixedSqlNode(Arrays.asList(keyRuleSqlNode,
+                        new ChooseSqlNode(Arrays.asList(new IfSqlNode(valueSqlNode ,test)) ,
+                                new StaticTextSqlNode(defaultValue))));
+            }
+        }
+
+        context.addCondition(sqlNode);
         return context;
     }
 
@@ -748,6 +817,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
         final String paramIndexKey = "paramIndex";
 
+        final String expressionKey = "expression";
+
         public Context(MappedStatementMateData mappedStatementMateData) {
             this(new HashMap<>() ,mappedStatementMateData);
         }
@@ -805,10 +876,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             return paramIndex < mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getParameterCount();
         }
 
-        public int getParamIndexAndAdd(int paramCount){
-            int paramIndex = (int) status.getOrDefault(paramIndexKey, -1) + paramCount;
-            put(paramIndexKey, paramIndex);
-            return paramIndex;
+        public int getParamIndex(){
+            return (int) status.getOrDefault(paramIndexKey ,0);
         }
 
         public Context addEnoughParams(int paramCount){
@@ -816,49 +885,71 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             return cloneAndPut(paramIndexKey, paramIndex);
         }
 
+        public Context putExpression(String expression) {
+            return put(expressionKey ,expression);
+        }
+
+        public String getExpression(){
+            return (String) required(expressionKey);
+        }
+
     }
 
     class DynamicParamsContext extends Context{
 
-        private DynamicParams dynamicParams;
-
         private String selectContext;
+
+        private boolean isOr;
+
+        private final List<SqlNode> conditionSqlNodes = new ArrayList<>();
+
+        private final List<OrderRule> orderRules = new ArrayList<>();
 
         public DynamicParamsContext(MappedStatementMateData mappedStatementMateData) {
             super(mappedStatementMateData);
-            this.dynamicParams = new DynamicParams();
-            this.dynamicParams.where(new ConditionParams());
+        }
+
+        public boolean isOr() {
+            return isOr;
+        }
+
+        public DynamicParamsContext setOr(boolean or) {
+            isOr = or;
+            return this;
+        }
+
+        public StringBuilder getParamName(int paramIndex){
+            return new StringBuilder("param").append(paramIndex + 1);
         }
 
         public StringBuilder getParamName(){
-            return new StringBuilder("param").append(getParamIndexAndAdd(1) + 1);
+            return getParamName(getParamIndex());
+        }
+
+        public StringBuilder getParamPlaceholder(int paramIndex){
+            return new StringBuilder("#{").append(getParamName(paramIndex)).append("}");
         }
 
         public StringBuilder getParamPlaceholder(){
-            return new StringBuilder("#{").append(getParamName()).append("}");
+            return getParamPlaceholder(getParamIndex());
         }
 
-        /**
-         * @see #put(Object, Object)
-         * @param key
-         * @param value
-         * @return
-         */
         @Override
         public Context cloneAndPut(Object key, Object value) {
-            throw new IllegalStateException();
+            return put(key ,value);
         }
 
-        public void addWhereCondition(String columnName ,ConditionRule conditionRule ,SqlNode sqlNode ,boolean isOr){
-            ConditionParam conditionParam = new ConditionParam(columnName, conditionRule, sqlNode);
-            conditionParam.setOr(isOr);
-            dynamicParams.getWhereConditions().addConditionParam(conditionParam);
+        public DynamicParamsContext addCondition(SqlNode sqlNode){
+            conditionSqlNodes.add(sqlNode);
+            return this;
         }
 
-        public void addWhereCondition(String columnName ,ConditionRule conditionRule ,SqlNode sqlNode){
-            addWhereCondition(columnName ,conditionRule ,sqlNode ,false);
+        public DynamicParamsContext addOrderRule(OrderRule.Rule rule, String ... columns) {
+            for (String column : columns) {
+                this.orderRules.add(new OrderRule(column ,rule));
+            }
+            return this;
         }
-
     }
 
     /**

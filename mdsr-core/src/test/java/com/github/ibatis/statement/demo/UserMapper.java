@@ -13,14 +13,14 @@ public interface UserMapper extends KeyTableMapper<Integer ,User> {
 
     Integer selectMaxKey();
 
-    User selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(Integer id ,Date startDate ,Date endDate);
+    User selectByIdEqAndAddressNotNullOrCreateTimeBetweenOrderByNameCreateTimeDesc(Integer id , Date startDate , Date endDate);
 
-    User selectByInNameAndGtCreateTime(Collection<String> names ,Date startTime);
+    User selectByNameInAndCreateTimeGt(Collection<String> names , Date startTime);
 
-    User selectByInName(Collection<String> names);
+    User selectByNameIn(Collection<String> names);
 
     List<User> selectById(Integer id);
 
-    User selectByInId(int... ids);
+    User selectByIdIn(int... ids);
 
 }

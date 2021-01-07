@@ -60,4 +60,22 @@ public class StringUtils {
         return camelUnderscoreToCase(str ,false);
     }
 
+    /**
+     * 转义正则特殊字符 （$()*+.[]?\^{},|）
+     *
+     * @param keyword
+     * @return
+     */
+    public static String escapeExprSpecialWord(String keyword) {
+        if (keyword != null && keyword.length() > 0) {
+            String[] fbsArr = { "\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|" };
+            for (String key : fbsArr) {
+                if (keyword.contains(key)) {
+                    keyword = keyword.replace(key, "\\" + key);
+                }
+            }
+        }
+        return keyword;
+    }
+
 }

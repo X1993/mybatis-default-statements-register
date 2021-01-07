@@ -124,4 +124,10 @@ public class MappedStatementMateData implements Cloneable{
         return handler;
     }
 
+    @Override
+    public String toString() {
+        return "MappedStatementMateData{" +
+                "mapperMethodMateData=" + mapperMethodMateData +
+                '}';
+    }
 }

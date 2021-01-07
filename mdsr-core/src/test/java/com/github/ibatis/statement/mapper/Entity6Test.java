@@ -1,12 +1,12 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.register.factory.If;
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -136,28 +136,39 @@ public class Entity6Test{
 
         List<Entity6> selectByIndex(String index);
 
-        Collection<Entity6> selectByInIndex(Collection<String> index);
+        Collection<Entity6> selectByIndexIn(Collection<String> index);
 
-        Collection<Entity6> selectByIdAndInIndex(String id, List<String> strings);
+        Collection<Entity6> selectByIdAndIndexIn(String id, List<String> strings);
 
-        Set<Entity6> selectByInOr(String... or);
+        Set<Entity6> selectByOrIn(String... or);
 
-        List<Entity6> selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(String locationCode, String startOr, String endOr);
+        List<Entity6> selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(String locationCode, String startOr, String endOr);
 
-        List<Entity6> selectByLikeOrIndexOrGtLikeAndNotNullBy(String like, String index, String gtLike);
-
-        @Deprecated
-        List<Entity6> selectByLikeOrIndexOrGtLikeAndIsNullBy(String like, String index, String gtLike, String by);
+        List<Entity6> selectByLikeOrIndexOrLikeGtAndByNotNull(String like, String index, String gtLike);
 
         @Deprecated
-        Entity6 selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(String locationCode, String startOr);
+        List<Entity6> selectByLikeOrIndexOrLikeGtAndByIsNull(String like, String index, String gtLike, String by);
+
+        @Deprecated
+        Entity6 selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc(String locationCode, String or);
 
         int selectCountByIndex(String index);
 
         @Deprecated
         Integer selectCountOrderByIndexDesc();
 
-        int selectCountByLikeOrIndexOrGtLikeAndNotNullBy(String like, String index, String gtLike);
+        int selectCountByLikeOrIndexOrLikeGtAndByNotNull(String like, String index, String gtLike);
+
+        /**
+         * 忽略大小写
+         * @param like
+         * @param index
+         * @return
+         */
+        List<Entity6> selectByLIKEAnDIndex(String like ,String index);
+
+        List<Entity6> selectByLikeAndOrAndIndex(@If String like ,@If(otherwise = "'9'") String or ,String index);
+
     }
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity6`;\n" +
@@ -250,41 +261,41 @@ public class Entity6Test{
 
     @Test
     public void selectByIdAndInIndex(){
-        Assert.assertEquals(mapper.selectByIdAndInIndex("1" ,Arrays.asList("6", "26")).size() ,1);
+        Assert.assertEquals(mapper.selectByIdAndIndexIn("1" ,Arrays.asList("6", "26")).size() ,1);
     }
 
     @Test
     public void selectByInIndex(){
-        Assert.assertEquals(mapper.selectByInIndex(Arrays.asList("6", "26")).size() ,3);
+        Assert.assertEquals(mapper.selectByIndexIn(Arrays.asList("6", "26")).size() ,3);
     }
 
     @Test
     public void selectByInOr(){
-        Assert.assertEquals(mapper.selectByInOr("9", "19").size() ,2);
+        Assert.assertEquals(mapper.selectByOrIn("9", "19").size() ,2);
     }
 
     @Test
     public void selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(){
-        Assert.assertEquals(mapper.selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(
+        Assert.assertEquals(mapper.selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(
                 "8" ,"1" ,"29").size() , 2);
-        Assert.assertEquals(mapper.selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(
+        Assert.assertEquals(mapper.selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(
                 "8" ,"18" ,"27").size() , 1);
     }
 
     @Test
     public void selectByLikeOrIndexOrGtLikeAndNotNullBy(){
-        Assert.assertEquals(mapper.selectByLikeOrIndexOrGtLikeAndNotNullBy(
+        Assert.assertEquals(mapper.selectByLikeOrIndexOrLikeGtAndByNotNull(
                 "27" ,"6" ,"6").size() ,3);
     }
 
     @Test(expected = BindingException.class)
     public void selectByLikeOrIndexOrGtLikeAndIsNullBy(){
-        mapper.selectByLikeOrIndexOrGtLikeAndIsNullBy("27" ,"19" ,"6" ,null);
+        mapper.selectByLikeOrIndexOrLikeGtAndByIsNull("27" ,"19" ,"6" ,null);
     }
 
     @Test(expected = BindingException.class)
     public void selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(){
-        mapper.selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc("1" ,"2");
+        mapper.selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc("1" ,"2");
     }
 
     @Test
@@ -299,8 +310,21 @@ public class Entity6Test{
 
     @Test
     public void selectCountByLikeOrIndexOrGtLikeAndNotNullBy(){
-        Assert.assertEquals(mapper.selectCountByLikeOrIndexOrGtLikeAndNotNullBy(
+        Assert.assertEquals(mapper.selectCountByLikeOrIndexOrLikeGtAndByNotNull(
                 "27" ,"6" ,"6") ,3);
+    }
+
+    @Test
+    public void selectByLIKEAnDIndex(){
+        Assert.assertEquals(mapper.selectByLIKEAnDIndex("17" ,"6").size() ,1);
+    }
+
+    @Test
+    public void selectByLikeAndOrAndIndex(){
+        Assert.assertEquals(mapper.selectByLikeAndOrAndIndex(null ,null ,"6").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeAndOrAndIndex(null ,null ,null).size() ,0);
+        Assert.assertEquals(mapper.selectByLikeAndOrAndIndex("7" ,null ,"6").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeAndOrAndIndex("5" ,null ,"6").size() ,0);
     }
 
 }

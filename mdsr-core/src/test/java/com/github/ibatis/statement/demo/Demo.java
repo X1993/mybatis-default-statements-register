@@ -306,10 +306,10 @@ public class Demo {
     @Test
     public void methodNameParseTest(){
         userMapper.selectById(12);
-        userMapper.selectByEqIdAndNotNullAddressOrBetweenCreateTimeOrderByNameCreateTimeDesc(12 ,new Date() ,new Date());
-        userMapper.selectByInNameAndGtCreateTime(Arrays.asList("name1" ,"name2") ,new Date());
-        userMapper.selectByInName(Arrays.asList("name1" ,"name2"));
-        userMapper.selectByInId(1 ,3);
+        userMapper.selectByIdEqAndAddressNotNullOrCreateTimeBetweenOrderByNameCreateTimeDesc(12 ,new Date() ,new Date());
+        userMapper.selectByNameInAndCreateTimeGt(Arrays.asList("name1" ,"name2") ,new Date());
+        userMapper.selectByNameIn(Arrays.asList("name1" ,"name2"));
+        userMapper.selectByIdIn(1 ,3);
     }
 
 }
