@@ -5,6 +5,8 @@ import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
+import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
 import org.apache.ibatis.session.Configuration;
@@ -276,6 +278,69 @@ public class EntityMateData implements Cloneable{
                                             Function<StringBuilder ,StringBuilder> sqlContentFunction)
     {
         return new StaticTextSqlNode(defaultConditionsContent(sqlCommandType ,sqlContentFunction).toString());
+    }
+
+    /**
+     * 多主键过滤sqlNode
+     * @return
+     */
+    public SqlNode multivaluedKeyConditionSqlNode()
+    {
+        Map<String ,ColumnPropertyMapping> keyPrimaryColumnPropertyMappings = this.getKeyPrimaryColumnPropertyMappings();
+        if (this.isPrimaryKeyParameterIsEntity())
+        {
+            /*
+            <foreach collection="collectionExpression" item="item" index="index" open="(" close=")" separator="or">
+               1 = 1
+               and key1 = #{item.keyPropertyName1,jdbcType=XXX}
+               and key2 = #{item.keyPropertyName2,jdbcType=XXX}
+            </foreach>
+             */
+
+            StringBuilder whereConditions = new StringBuilder("(");
+
+            //主键的查询条件
+            for (ColumnPropertyMapping columnPropertyMapping : keyPrimaryColumnPropertyMappings.values()) {
+                whereConditions.append(columnPropertyMapping.createEqSqlContent(name -> "item." + name))
+                        .append(" AND ");
+            }
+
+            whereConditions.append(" 1 = 1 )");
+
+            return new ForEachSqlNode(configuration ,new StaticTextSqlNode(whereConditions.toString()) ,
+                    "collection" ,"index" , "item" ,
+                    "(" ,")" ," OR ");
+
+        }else {
+            /*
+                参数类型一定是唯一主键
+
+                `primaryKeyColName` in (
+             <foreach collection="collectionExpression" item="item" separator=",">
+                #{item}
+             </foreach>
+             )
+             */
+
+            //主键多值查询
+            ColumnPropertyMapping keyColumnPropertyMapping = keyPrimaryColumnPropertyMappings.values()
+                    .stream()
+                    .findFirst()
+                    .get();
+
+            List<SqlNode> sqlNodes = new ArrayList<>();
+
+            sqlNodes.add(new StaticTextSqlNode(new StringBuilder(
+                    keyColumnPropertyMapping.getColumnMateData().getEscapeColumnName())
+                    .append(" in ")
+                    .toString()));
+
+            sqlNodes.add(new ForEachSqlNode(configuration ,new StaticTextSqlNode("#{item}") ,
+                    "collection" ,null, "item" ,
+                    "(" ,")" ,","));
+
+            return new MixedSqlNode(sqlNodes);
+        }
     }
 
 }

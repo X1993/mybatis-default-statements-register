@@ -47,14 +47,15 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
         H2TableSchemaMapper tableSchemaMapper = this.getTableSchemaMapper(sqlSession).orElse(null);
         if (tableSchemaMapper != null){
             TableMateData tableMateData = tableSchemaMapper.tableMateData(tableName);
-            tableMateData.setType(mappingTableType(tableMateData.getTableType()));
-            tableMateData.setColumnMateDataList(queryTableColumns(sqlSession, tableName));
-            tableMateData.setKeyColumnUsages(tableSchemaMapper.keyColumnUsage(tableName));
-            return Optional.of(tableMateData);
-        }else {
-            LOGGER.warn("not exist table [{}]" ,tableName);
-            return Optional.empty();
+            if (tableMateData != null) {
+                tableMateData.setType(mappingTableType(tableMateData.getTableType()));
+                tableMateData.setColumnMateDataList(queryTableColumns(sqlSession, tableName));
+                tableMateData.setKeyColumnUsages(tableSchemaMapper.keyColumnUsage(tableName));
+                return Optional.of(tableMateData);
+            }
         }
+        LOGGER.warn("not exist table [{}]" ,tableName);
+        return Optional.empty();
     }
 
     @Override
