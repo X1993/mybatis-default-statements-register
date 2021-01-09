@@ -25,19 +25,19 @@ public interface Entity6Mapper extends EntityType<Entity6> {
 
         List<Entity6> selectByIndex(String index);
 
-        Collection<Entity6> selectByInIndex(Collection<String> index);
+        Collection<Entity6> selectByIndexIn(Collection<String> index);
 
-        Set<Entity6> selectByInOr(String... or);
+        Set<Entity6> selectByOrIn(String... or);
 
-        List<Entity6> selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(String locationCode, String startOr, String endOr);
+        List<Entity6> selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(String locationCode, String startOr, String endOr);
 
-        List<Entity6> selectByLikeOrIndexOrGtLikeAndNotNullBy(String like, String index, String gtLike);
-
-        @Deprecated
-        List<Entity6> selectByLikeOrIndexOrGtLikeAndIsNullBy(String like, String index, String gtLike, String by);
+        List<Entity6> selectByLikeOrIndexOrLikeGtAndByNotNull(String like, String index, String gtLike);
 
         @Deprecated
-        Entity6 selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(String locationCode, String startOr);
+        List<Entity6> selectByLikeOrIndexOrLikeGtAndByIsNull(String like, String index, String gtLike, String by);
+
+        @Deprecated
+        Entity6 selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc(String locationCode, String startOr);
 
         @Delete("delete from `entity6`")
         void deleteAll();

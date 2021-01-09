@@ -94,37 +94,37 @@ public class Entity6MapperTest {
     }
 
     @Test
-    public void selectByInIndex(){
-        Assert.assertEquals(mapper.selectByInIndex(Arrays.asList("6", "26")).size() ,3);
+    public void selectByIndexIn(){
+        Assert.assertEquals(mapper.selectByIndexIn(Arrays.asList("6", "26")).size() ,3);
     }
 
     @Test
-    public void selectByInOr(){
-        Assert.assertEquals(mapper.selectByInOr("9", "19").size() ,2);
+    public void selectByOrIn(){
+        Assert.assertEquals(mapper.selectByOrIn("9", "19").size() ,2);
     }
 
     @Test
-    public void selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(){
-        Assert.assertEquals(mapper.selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(
+    public void selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(){
+        Assert.assertEquals(mapper.selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(
                 "8" ,"1" ,"29").size() , 2);
-        Assert.assertEquals(mapper.selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(
+        Assert.assertEquals(mapper.selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(
                 "8" ,"18" ,"27").size() , 1);
     }
 
     @Test
-    public void selectByLikeOrIndexOrGtLikeAndNotNullBy(){
-        Assert.assertEquals(mapper.selectByLikeOrIndexOrGtLikeAndNotNullBy(
+    public void selectByLikeOrIndexOrLikeGtAndByNotNull(){
+        Assert.assertEquals(mapper.selectByLikeOrIndexOrLikeGtAndByNotNull(
                 "27" ,"6" ,"6").size() ,3);
     }
 
     @Test(expected = BindingException.class)
-    public void selectByLikeOrIndexOrGtLikeAndIsNullBy(){
-        mapper.selectByLikeOrIndexOrGtLikeAndIsNullBy("27" ,"19" ,"6" ,null);
+    public void selectByLikeOrIndexOrLikeGtAndByIsNull(){
+        mapper.selectByLikeOrIndexOrLikeGtAndByIsNull("27" ,"19" ,"6" ,null);
     }
 
     @Test(expected = BindingException.class)
-    public void selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(){
-        mapper.selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc("1" ,"2");
+    public void selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc(){
+        mapper.selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc("1" ,"2");
     }
 
 }
