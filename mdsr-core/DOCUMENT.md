@@ -1897,10 +1897,13 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     IsNull           |      findByNameIsNull()              |     where name is null
     NotNull          |      findByNameNotNull()             |     where name is not null
     Between          |      findByTimeBetween(?,?)          |     where name between ? and ?
+    Between          |      findByTimeBetween(BetweenParam) |     where name between ? and ?
     NotBetween       |      findByNameNotBetween(?,?)       |     where name not between ? and ?
     Ne               |      findByNameNe()                  |     where name <> ''
     OrderBy          |      findOrderByNameTimeDesc         |     order by name time desc
-    count            |      selectCountByNameAndCode(?,?)   |     select count(0) from `table` where name= ? and code = ?  
+    Count            |      selectCountByNameAndCode(?,?)   |     select count(0) from `table` where name= ? and code = ?  
+    Limit            |      findByNameNeLimit(int limit)    |     where name <> '' limit ?
+    Limit            |      findByNameNeLimit(LimitParam)   |     where name <> '' limit ? ,?
     
 
 
@@ -1945,7 +1948,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```
 
 -   效果演示
-mapper方法定义
+ mapper方法定义
 ```java
     package com.github.ibatis.statement.demo;
     
