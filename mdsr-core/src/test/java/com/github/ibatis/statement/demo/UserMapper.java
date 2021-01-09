@@ -1,6 +1,8 @@
 package com.github.ibatis.statement.demo;
 
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import com.github.ibatis.statement.register.factory.If;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -22,5 +24,7 @@ public interface UserMapper extends KeyTableMapper<Integer ,User> {
     List<User> selectById(Integer id);
 
     User selectByIdIn(int... ids);
+
+    User selectByNameAndAddressIn(@If(otherwise = "'jack'") String name ,@If String ... address);
 
 }

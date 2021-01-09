@@ -312,4 +312,11 @@ public class Demo {
         userMapper.selectByIdIn(1 ,3);
     }
 
+    @Test
+    public void selectByNameAndAddressIn(){
+        userMapper.selectByNameAndAddressIn(null ,"beijing");
+        userMapper.selectByNameAndAddressIn(null ,null);
+        userMapper.selectByNameAndAddressIn("tony" ,"hangzhou" ,"beijing");
+    }
+
 }

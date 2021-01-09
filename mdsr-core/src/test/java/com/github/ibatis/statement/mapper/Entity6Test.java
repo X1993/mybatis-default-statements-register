@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.mapper.param.BetweenParam;
 import com.github.ibatis.statement.register.factory.If;
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.session.SqlSession;
@@ -154,10 +155,14 @@ public class Entity6Test{
 
         int selectCountByIndex(String index);
 
+        int countByIndex(String index);
+
         @Deprecated
         Integer selectCountOrderByIndexDesc();
 
         int selectCountByLikeOrIndexOrLikeGtAndByNotNull(String like, String index, String gtLike);
+
+        int countByLikeOrIndexOrLikeGtAndByNotNull(String like, String index, String gtLike);
 
         /**
          * 忽略大小写
@@ -168,6 +173,23 @@ public class Entity6Test{
         List<Entity6> selectByLIKEAnDIndex(String like ,String index);
 
         List<Entity6> selectByLikeAndOrAndIndex(@If String like ,@If(otherwise = "'9'") String or ,String index);
+
+        List<Entity6> selectByLikeAndOrBetweenAndIndexAndIdNotNull(@If String like ,
+                                                                   @If(otherwise = "'1'") String minOr ,
+                                                                   @If String maxOr ,
+                                                                   String index);
+
+        List<Entity6> selectByIdIn(@If(otherwise = "('1' ,'2')") String... id);
+
+        List<Entity6> selectByLikeLike(@If(otherwise = "'7'") String like);
+
+        List<Entity6> selectByLikeLikeLeft(@If(otherwise = "'7'") String like);
+
+        List<Entity6> selectByLikeLikeRight(@If(otherwise = "'7'") String like);
+
+        List<Entity6> selectByLoCodeBetweenAndIdNotBetweenAndId2Between(
+                BetweenParam<String> loCode , @If BetweenParam<String> id ,
+                @If(otherwise = "'1' AND '3'") BetweenParam<String> id2);
 
     }
 
@@ -260,22 +282,22 @@ public class Entity6Test{
     }
 
     @Test
-    public void selectByIdAndInIndex(){
+    public void selectByIdAndIndexIn(){
         Assert.assertEquals(mapper.selectByIdAndIndexIn("1" ,Arrays.asList("6", "26")).size() ,1);
     }
 
     @Test
-    public void selectByInIndex(){
+    public void selectByIndexIn(){
         Assert.assertEquals(mapper.selectByIndexIn(Arrays.asList("6", "26")).size() ,3);
     }
 
     @Test
-    public void selectByInOr(){
+    public void selectByOrIn(){
         Assert.assertEquals(mapper.selectByOrIn("9", "19").size() ,2);
     }
 
     @Test
-    public void selectByLikeLeftLocationCodeAndBetweenOrOrderByLoCodeAsc(){
+    public void selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(){
         Assert.assertEquals(mapper.selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(
                 "8" ,"1" ,"29").size() , 2);
         Assert.assertEquals(mapper.selectByLocationCodeLikeLeftAndOrBetweenOrderByLoCodeAsc(
@@ -283,24 +305,29 @@ public class Entity6Test{
     }
 
     @Test
-    public void selectByLikeOrIndexOrGtLikeAndNotNullBy(){
+    public void selectByLikeOrIndexOrLikeGtAndByNotNull(){
         Assert.assertEquals(mapper.selectByLikeOrIndexOrLikeGtAndByNotNull(
                 "27" ,"6" ,"6").size() ,3);
     }
 
     @Test(expected = BindingException.class)
-    public void selectByLikeOrIndexOrGtLikeAndIsNullBy(){
+    public void selectByLikeOrIndexOrLikeGtAndByIsNull(){
         mapper.selectByLikeOrIndexOrLikeGtAndByIsNull("27" ,"19" ,"6" ,null);
     }
 
     @Test(expected = BindingException.class)
-    public void selectByLocationCodeAndNotBetweenOrOrderByLoCodeAsc(){
+    public void selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc(){
         mapper.selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc("1" ,"2");
     }
 
     @Test
     public void selectCountByIndex(){
         Assert.assertEquals(mapper.selectCountByIndex("6") ,2);
+    }
+
+    @Test
+    public void countByIndex(){
+        Assert.assertEquals(mapper.countByIndex("6") ,2);
     }
 
     @Test(expected = BindingException.class)
@@ -315,6 +342,12 @@ public class Entity6Test{
     }
 
     @Test
+    public void countByLikeOrIndexOrGtLikeAndNotNullBy(){
+        Assert.assertEquals(mapper.countByLikeOrIndexOrLikeGtAndByNotNull(
+                "27" ,"6" ,"6") ,3);
+    }
+
+    @Test
     public void selectByLIKEAnDIndex(){
         Assert.assertEquals(mapper.selectByLIKEAnDIndex("17" ,"6").size() ,1);
     }
@@ -325,6 +358,67 @@ public class Entity6Test{
         Assert.assertEquals(mapper.selectByLikeAndOrAndIndex(null ,null ,null).size() ,0);
         Assert.assertEquals(mapper.selectByLikeAndOrAndIndex("7" ,null ,"6").size() ,1);
         Assert.assertEquals(mapper.selectByLikeAndOrAndIndex("5" ,null ,"6").size() ,0);
+    }
+
+    @Test
+    public void selectByLikeAndOrBetweenAndIndexAndIdNotNull(){
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                null ,null ,"9" ,"6").size() ,2);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                "7" ,null ,"9" ,"6").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                "17" ,null ,"9" ,"6").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                null ,null ,"9" ,null).size() ,0);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                null ,"2" ,"1" ,"6").size() ,0);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                null ,"2" ,"3" ,"26").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                "27" ,"2" ,"3" ,"26").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeAndOrBetweenAndIndexAndIdNotNull(
+                "23" ,"2" ,"3" ,"26").size() ,0);
+    }
+
+    @Test
+    public void selectByIdIn(){
+        Assert.assertEquals(mapper.selectByIdIn("1" ,"11").size() ,2);
+        Assert.assertEquals(mapper.selectByIdIn(null).size() ,1);
+    }
+
+    @Test
+    public void selectByLikeLike(){
+        Assert.assertEquals(mapper.selectByLikeLike(null).size() ,3);
+        Assert.assertEquals(mapper.selectByLikeLike("17").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeLike("1").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeLike("3").size() ,0);
+    }
+
+    @Test
+    public void selectByLikeLikeLeft(){
+        Assert.assertEquals(mapper.selectByLikeLikeLeft(null).size() ,3);
+        Assert.assertEquals(mapper.selectByLikeLikeLeft("17").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeLikeLeft("37").size() ,0);
+    }
+
+    @Test
+    public void selectByLikeLikeRight(){
+        Assert.assertEquals(mapper.selectByLikeLikeRight(null).size() ,1);
+        Assert.assertEquals(mapper.selectByLikeLikeRight("2").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeLikeRight("3").size() ,0);
+    }
+
+    @Test
+    public void selectByLoCodeBetweenAndIdNotBetween(){
+        Assert.assertEquals(mapper.selectByLoCodeBetweenAndIdNotBetweenAndId2Between(
+                new BetweenParam<>("1" ,"4") ,
+                new BetweenParam<>("3" ,"4") ,null).size() ,2);
+        Assert.assertEquals(mapper.selectByLoCodeBetweenAndIdNotBetweenAndId2Between(
+                new BetweenParam<>("1" ,"4") ,
+                new BetweenParam<>("3" ,"4") ,new BetweenParam<>("1" ,"2")).size() ,1);
+        Assert.assertEquals(mapper.selectByLoCodeBetweenAndIdNotBetweenAndId2Between(
+                new BetweenParam<>("2" ,"4") ,
+                null ,null).size() ,1);
     }
 
 }

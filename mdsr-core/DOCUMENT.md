@@ -1874,38 +1874,109 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     /** @see  com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory*/
 ```
 
--   方法命名规则 
+
+#### 12.1 方法命名规则 
        
 
     关键字           |        方法                          |          sql
     :------          |      :-------------                  |        :------
     And              |      findByNameAndCode(?,?)          |     where name= ? and code = ?     
     Or               |      findByNameOrCode(?,?)           |     where name= ? or code = ?       
-    Eq               |      findByEqName(?)                 |     where name= ?
-    NotEq            |      findByNotEqName(?)              |     where name != ?
-    Lt               |      findByLtTime(?)                 |     where time < ?
-    Gt               |      findByGtTime(?)                 |     where time > ?
-    Le               |      findByLeTime(?)                 |     where time <= ?
-    Ge               |      findByGeTime(?)                 |     where time >= ?
-    NotLike          |      findByNotLikeName(?)            |     where name not like '%?%'
-    Like             |      findByLikeName(?)               |     where name like '%?%'
-    LikeLeft         |      findByLikeLeftName(?)           |     where name like '%?'
-    LikeRight        |      findByLikeRightName(?)          |     where name like '?%'
-    NotIn            |      findByNotInId(Collection<?>)    |     where id not in (?)
-    In               |      findByInId(Collection<?>)       |     where id in (?)
-    IsNull           |      findByIsNullName()              |     where name is null
-    NotNull          |      findByNotNullName()             |     where name is not null
-    Between          |      findByBetweenTime(?,?)          |     where name between ? and ?
-    NotBetween       |      findByNotBetweenName(?,?)       |     where name not between ? and ?
-    Ne               |      findByNeName()                  |     where name <> ''
+    Eq               |      findByNameEq(?)                 |     where name= ?
+    NotEq            |      findByNameNotEq(?)              |     where name != ?
+    Lt               |      findByTimeLt(?)                 |     where time < ?
+    Gt               |      findByTimeGt(?)                 |     where time > ?
+    Le               |      findByTimeLe(?)                 |     where time <= ?
+    Ge               |      findByTimeGe(?)                 |     where time >= ?
+    NotLike          |      findByNameNotLike(?)            |     where name not like '%?%'
+    Like             |      findByNameLike(?)               |     where name like '%?%'
+    LikeLeft         |      findByNameLikeLeft(?)           |     where name like '%?'
+    LikeRight        |      findByNameLikeRight(?)          |     where name like '?%'
+    NotIn            |      findByIdNotIn(Collection<?>)    |     where id not in (?)
+    In               |      findByIdIn(Collection<?>)       |     where id in (?)
+    IsNull           |      findByNameIsNull()              |     where name is null
+    NotNull          |      findByNameNotNull()             |     where name is not null
+    Between          |      findByTimeBetween(?,?)          |     where name between ? and ?
+    NotBetween       |      findByNameNotBetween(?,?)       |     where name not between ? and ?
+    Ne               |      findByNameNe()                  |     where name <> ''
     OrderBy          |      findOrderByNameTimeDesc         |     order by name time desc
+    count            |      selectCountByNameAndCode(?,?)   |     select count(0) from `table` where name= ? and code = ?  
     
+
+
+#### 12.2 If注解
+```java
+    package com.github.ibatis.statement.register.factory;
     
+    import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
+    import com.github.ibatis.statement.base.core.matedata.EntityMateData;
+    import java.lang.annotation.*;
     
--   语法规则  
-  
-<p align="center">
-  <a href="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/src/main/java/com/github/ibatis/statement/register/factory/MethodNameParseMappedStatementFactory.java">
-   <img alt="grammar" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/method-name-parse-rule.png">
-  </a>
-</p>    
+    /**
+     * 为方法参数添加if标签
+     * @see DefaultColumnConditionParser#parse(EntityMateData)
+     * @Author: junjie
+     * @Date: 2020/7/24
+     */
+    @Target({ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    public @interface If {
+    
+        String NULL = "";
+    
+        String PARAM_PLACEHOLDER = "#{?}";
+    
+        /**
+         * if标签条件
+         * #{param}：方法参数占位符
+         * @return
+         */
+        String test() default PARAM_PLACEHOLDER + " != null";
+    
+        /**
+         * {@link #otherwise()}设置了值且{@link #test()} == false，生效。
+         * ！如果值为字符串需要自己添加引号
+         * @return
+         */
+        String otherwise() default NULL;
+    
+    }
+```
+
+-   效果演示
+mapper方法定义
+```java
+    package com.github.ibatis.statement.demo;
+    
+    import com.github.ibatis.statement.mapper.EntityType;
+    import com.github.ibatis.statement.register.factory.If;
+    import java.util.Collection;
+    import java.util.Date;
+    import java.util.List;
+    
+    public interface UserMapper extends EntityType<User> {
+   
+        User selectByNameAndAddressIn(@If(otherwise = "'jack'") String name ,@If String ... address);
+    
+    }
+``` 
+
+方法调用
+```java
+    class Test{
+        @Test
+        public void selectByNameAndAddressIn(){
+            userMapper.selectByNameAndAddressIn(null ,"beijing");
+            userMapper.selectByNameAndAddressIn(null ,null);
+            userMapper.selectByNameAndAddressIn("tony" ,"hangzhou" ,"beijing");
+        }
+    }
+```
+
+    will execute the following SQL
+```sql
+    SELECT `update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE 1 = 1 AND `name` = 'jack' AND `address` IN ( 'beijing' ) ; 
+    SELECT `update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE 1 = 1 AND `name` = 'jack'; 
+    SELECT `update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE 1 = 1 AND `name` = 'tony' AND `address` IN ( 'hangzhou' , 'beijing' ) 
+```

@@ -17,7 +17,7 @@ public @interface If {
 
     String NULL = "";
 
-    String PARAM_PLACEHOLDER = "#{param}";
+    String PARAM_PLACEHOLDER = "#{?}";
 
     /**
      * if标签条件
