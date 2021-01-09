@@ -129,6 +129,11 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                     .append(orderRule.getRule().name()).toString()));
         }
 
+        SqlNode limitSqlNode = dynamicParamsContext.limitSqlNode;
+        if (limitSqlNode != null){
+            sqlNodes.add(limitSqlNode);
+        }
+
         Configuration configuration = mappedStatementMateData.getConfiguration();
         return Optional.of(new DynamicSqlSource(configuration ,new MixedSqlNode(sqlNodes)));
     }
@@ -318,7 +323,6 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         Card orderBy = new Card("OrderBy");
         Card desc = new Card("Desc");
         Card asc = new Card("Asc");
-        Card limit = new Card("Limit");
 
         Card[] conditionCards = Stream.of(ConditionRule.values())
                 .map(conditionRule -> new Card(standard(conditionRule.name().toLowerCase())))
@@ -350,7 +354,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         cardEdgeMap.put(select ,selectPossibleEdges);
 
         startPossibleEdges.add(new Edge().nextCard(select));
-        startPossibleEdges.add(new Edge().nextCard(find));;
+        startPossibleEdges.add(new Edge().nextCard(find));
         startPossibleEdges.add(new Edge().nextCard(count));
 
         // select / find -> by
@@ -361,6 +365,9 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         // select / find -> orderBy
         selectPossibleEdges.add(new Edge().nextCard(orderBy).updateContext(orderOperator)
                 .dynamicParamsFunction(selectColumnsConsumer));
+        // select / find -> limit
+        Edge toLimitEdge = toLimitEdge(false);
+        selectPossibleEdges.add(toLimitEdge);
 
         // count -> by
         countPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator)
@@ -378,6 +385,11 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         columnPossibleEdges.add(toOrderRuleEdge(desc ,OrderRule.Rule.DESC));
         // column -> asc
         columnPossibleEdges.add(toOrderRuleEdge(asc ,OrderRule.Rule.ASC));
+        // column -> limit
+        columnPossibleEdges.add(toLimitEdge(true));
+
+        // asc / desc -> limit
+        orderRulePossibleEdges.add(toLimitEdge);
 
         // condition -> or
         conditionPossibleEdges.add(new Edge().nextCard(or).isConform(wherePredicate));
@@ -386,6 +398,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         // condition -> orderBy
         conditionPossibleEdges.add(new Edge().nextCard(orderBy)
                 .isConform(wherePredicate).updateContext(orderOperator));
+        // condition -> limit
+        conditionPossibleEdges.add(toLimitEdge);
 
         for (ColumnCard columnCard : columnCards) {
             // and -> column
@@ -412,6 +426,55 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         syntaxTableCache = new WeakReference<>(syntaxTable);
 
         return syntaxTable;
+    }
+
+    private Edge toLimitEdge(boolean fromColumn)
+    {
+        return new Edge().nextCard(new Card("Limit"))
+                .isConform(context -> context.hasEnoughParams(fromColumn ? 2 : 1))
+                .updateContext(context -> context.addEnoughParams(fromColumn ? 2 : 1))
+                .isTermination(truePredicate)
+                .dynamicParamsFunction(context -> {
+                    if (fromColumn){
+                        singleParameterCondition(EQ ,
+                                i -> new StaticTextSqlNode(new StringBuilder(
+                                        context.getParamPlaceholder(i))
+                                        .toString()) ,
+                                context);
+                    }
+
+                    context.addEnoughParams(1);
+                    int paramIndex = context.getParamIndex();
+                    Method mappedMethod = context.mappedStatementMateData.getMapperMethodMateData().getMappedMethod();
+
+                    Class<?> paramType = mappedMethod.getParameterTypes()[paramIndex];
+                    StringBuilder limit = new StringBuilder(" LIMIT ");
+                    if (LimitParam.class.isAssignableFrom(paramType)){
+                        limit.append("#{param").append(paramIndex + 1)
+                                .append(".index} ,#{param").append(paramIndex + 1)
+                                .append(".size}");
+                    }else {
+                        limit.append("#{param").append(paramIndex + 1).append("}");
+                    }
+
+                    SqlNode limitSqlNode = new StaticTextSqlNode(limit.toString());
+
+                    If ifAnnotation = mappedMethod.getParameters()[paramIndex].getAnnotation(If.class);
+                    if (ifAnnotation != null){
+                        String defaultValue = ifAnnotation.otherwise();
+                        String test = ifAnnotation.test();
+                        test = test.replaceAll(StringUtils.escapeExprSpecialWord(If.PARAM_PLACEHOLDER),
+                                context.getParamName().toString());
+                        limitSqlNode = new IfSqlNode(limitSqlNode, test);
+                        if (!If.NULL.equals(defaultValue)){
+                            // choose 标签
+                            limitSqlNode = new ChooseSqlNode(Arrays.asList(limitSqlNode) ,
+                                    new StaticTextSqlNode(" LIMIT " + defaultValue));
+                        }
+                    }
+
+                    context.limitSqlNode = limitSqlNode;
+                });
     }
 
     /**
@@ -988,6 +1051,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         private final List<SqlNode> conditionSqlNodes = new ArrayList<>();
 
         private final List<OrderRule> orderRules = new ArrayList<>();
+
+        private SqlNode limitSqlNode;
 
         public DynamicParamsContext(MappedStatementMateData mappedStatementMateData) {
             super(mappedStatementMateData);

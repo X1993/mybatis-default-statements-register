@@ -2,6 +2,7 @@ package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.mapper.param.BetweenParam;
+import com.github.ibatis.statement.mapper.param.LimitParam;
 import com.github.ibatis.statement.register.factory.If;
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.session.SqlSession;
@@ -183,7 +184,7 @@ public class Entity6Test{
 
         List<Entity6> selectByLikeLike(@If(otherwise = "'7'") String like);
 
-        List<Entity6> selectByLikeLikeLeft(@If(otherwise = "'7'") String like);
+        List<Entity6> selectByLikeLikeLeftOrderByOrLikeAsc(@If(otherwise = "'7'") String like);
 
         List<Entity6> selectByLikeLikeRight(@If(otherwise = "'7'") String like);
 
@@ -191,6 +192,32 @@ public class Entity6Test{
                 BetweenParam<String> loCode , @If BetweenParam<String> id ,
                 @If(otherwise = "'1' AND '3'") BetweenParam<String> id2);
 
+        List<Entity6> selectByLoCodeLimit(String loCode ,Integer limit);
+
+        List<Entity6> selectByIdInLimit(Collection<String> id ,@If(otherwise = "4") Integer limit);
+
+        List<Entity6> selectByLikeInOrderByIdAscLimit(@If Collection<String> like ,@If LimitParam limitParam);
+
+    }
+
+    @Test
+    public void selectByLoCodeLimit(){
+        Assert.assertEquals(mapper.selectByLoCodeLimit("8" ,0).size() ,0);
+        Assert.assertEquals(mapper.selectByLoCodeLimit("8" ,3).size() ,1);
+    }
+
+    @Test
+    public void selectByIdInLimit(){
+        Assert.assertEquals(mapper.selectByIdInLimit(Arrays.asList("1" ,"11" ,"21") ,null).size() ,3);
+        Assert.assertEquals(mapper.selectByIdInLimit(Arrays.asList("1" ,"11" ,"21") ,2).size() ,2);
+    }
+
+    @Test
+    public void selectByLikeInOrderByIdAscLimit(){
+        Assert.assertEquals(mapper.selectByLikeInOrderByIdAscLimit(Arrays.asList("7" ,"17" ,"27") ,null).size() ,3);
+        Assert.assertEquals(mapper.selectByLikeInOrderByIdAscLimit(Arrays.asList("8" ,"17" ,"27") ,new LimitParam(4)).size() ,2);
+        Assert.assertEquals(mapper.selectByLikeInOrderByIdAscLimit(Arrays.asList("7" ,"17" ,"27") ,new LimitParam(1)).size() ,1);
+        Assert.assertEquals(mapper.selectByLikeInOrderByIdAscLimit(Arrays.asList("7" ,"17" ,"27") ,new LimitParam(2 ,1)).size() ,1);
     }
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity6`;\n" +
@@ -396,9 +423,9 @@ public class Entity6Test{
 
     @Test
     public void selectByLikeLikeLeft(){
-        Assert.assertEquals(mapper.selectByLikeLikeLeft(null).size() ,3);
-        Assert.assertEquals(mapper.selectByLikeLikeLeft("17").size() ,1);
-        Assert.assertEquals(mapper.selectByLikeLikeLeft("37").size() ,0);
+        Assert.assertEquals(mapper.selectByLikeLikeLeftOrderByOrLikeAsc(null).size() ,3);
+        Assert.assertEquals(mapper.selectByLikeLikeLeftOrderByOrLikeAsc("17").size() ,1);
+        Assert.assertEquals(mapper.selectByLikeLikeLeftOrderByOrLikeAsc("37").size() ,0);
     }
 
     @Test

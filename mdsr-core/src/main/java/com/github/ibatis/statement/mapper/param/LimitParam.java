@@ -13,7 +13,7 @@ public class LimitParam {
     private int index;
 
     /**
-     * 页大小
+     * 截取大小
      */
     private int size;
 
