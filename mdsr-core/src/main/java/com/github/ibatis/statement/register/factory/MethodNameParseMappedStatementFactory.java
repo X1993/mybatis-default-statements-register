@@ -459,18 +459,24 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
                     SqlNode limitSqlNode = new StaticTextSqlNode(limit.toString());
 
+                    // limit 默认支持使用if标签做非空判断
+                    String defaultValue = If.NULL;
+                    String paramName = context.getParamName().toString();
+                    String test = paramName + " != null";
+
                     If ifAnnotation = mappedMethod.getParameters()[paramIndex].getAnnotation(If.class);
                     if (ifAnnotation != null){
-                        String defaultValue = ifAnnotation.otherwise();
-                        String test = ifAnnotation.test();
+                        defaultValue = ifAnnotation.otherwise();
+                        test = ifAnnotation.test();
                         test = test.replaceAll(StringUtils.escapeExprSpecialWord(If.PARAM_PLACEHOLDER),
                                 context.getParamName().toString());
-                        limitSqlNode = new IfSqlNode(limitSqlNode, test);
-                        if (!If.NULL.equals(defaultValue)){
-                            // choose 标签
-                            limitSqlNode = new ChooseSqlNode(Arrays.asList(limitSqlNode) ,
-                                    new StaticTextSqlNode(" LIMIT " + defaultValue));
-                        }
+                    }
+
+                    limitSqlNode = new IfSqlNode(limitSqlNode, test);
+                    if (!If.NULL.equals(defaultValue)){
+                        // choose 标签
+                        limitSqlNode = new ChooseSqlNode(Arrays.asList(limitSqlNode) ,
+                                new StaticTextSqlNode(" LIMIT " + defaultValue));
                     }
 
                     context.limitSqlNode = limitSqlNode;

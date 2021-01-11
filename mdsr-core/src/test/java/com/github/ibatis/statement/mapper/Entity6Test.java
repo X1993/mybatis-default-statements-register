@@ -204,6 +204,7 @@ public class Entity6Test{
     public void selectByLoCodeLimit(){
         Assert.assertEquals(mapper.selectByLoCodeLimit("8" ,0).size() ,0);
         Assert.assertEquals(mapper.selectByLoCodeLimit("8" ,3).size() ,1);
+        Assert.assertEquals(mapper.selectByLoCodeLimit("8" ,null).size() ,1);
     }
 
     @Test
