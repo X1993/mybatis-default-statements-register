@@ -1323,7 +1323,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 
 #### 12.1 方法命名规则 
        
-
+-   例：
 
     关键字           |        方法                          |          sql
     :------          |      :-------------                  |        :------
@@ -1352,7 +1352,6 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Limit            |      findByNameNeLimit(int limit)    |     where name <> '' limit ?
     Limit            |      findByNameNeLimit(LimitParam)   |     where name <> '' limit ? ,?
     
-
 
 
 #### 12.2 If注解
