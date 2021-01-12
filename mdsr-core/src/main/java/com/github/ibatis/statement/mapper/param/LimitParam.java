@@ -17,6 +17,9 @@ public class LimitParam {
      */
     private int size;
 
+    public LimitParam() {
+    }
+
     public LimitParam(int size) {
         this(0 ,size);
     }
@@ -27,6 +30,26 @@ public class LimitParam {
         }
         this.index = index;
         this.size = size;
+    }
+
+    /**
+     * 分页
+     * @param pageIndex 下标从0开始计数
+     * @param pageSize 分页大小
+     * @return
+     */
+    public static LimitParam page0(int pageIndex ,int pageSize){
+        return new LimitParam((pageIndex > 0 ? pageIndex : 0) * pageSize ,pageSize);
+    }
+
+    /**
+     * 分页
+     * @param pageIndex 下标从1开始计数
+     * @param pageSize 分页大小
+     * @return
+     */
+    public static LimitParam page1(int pageIndex ,int pageSize){
+        return new LimitParam((pageIndex > 0 ? pageIndex - 1 : 0) * pageSize ,pageSize);
     }
 
     public int getIndex() {
@@ -44,4 +67,5 @@ public class LimitParam {
     public void setSize(int size) {
         this.size = size;
     }
+
 }

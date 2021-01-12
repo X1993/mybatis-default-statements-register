@@ -116,7 +116,7 @@ public class DynamicParams {
      * @return
      */
     public DynamicParams page1(int pageIndex ,int pageSize){
-        this.limitParam = new LimitParam((pageIndex > 0 ? pageIndex - 1 : 0) * pageSize ,pageSize);
+        this.limitParam = LimitParam.page1(pageIndex, pageSize);
         return this;
     }
 
@@ -127,7 +127,7 @@ public class DynamicParams {
      * @return
      */
     public DynamicParams page0(int pageIndex ,int pageSize){
-        this.limitParam = new LimitParam((pageIndex > 0 ? pageIndex : 0) * pageSize ,pageSize);
+        this.limitParam = LimitParam.page0(pageIndex, pageSize);
         return this;
     }
 
