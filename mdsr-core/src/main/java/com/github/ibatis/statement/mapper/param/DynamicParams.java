@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.mapper.param;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -87,6 +88,15 @@ public class DynamicParams {
         return this;
     }
 
+    public DynamicParams addOrderRule(Collection<? extends OrderRule> orderRules){
+        if (orderRules != null){
+            for (OrderRule orderRule : orderRules) {
+                this.orderRules.add(orderRule);
+            }
+        }
+        return this;
+    }
+
     public DynamicParams addOrderRule(String key ,OrderRule.Rule rule){
         this.orderRules.add(new OrderRule(key ,rule));
         return this;
@@ -107,7 +117,6 @@ public class DynamicParams {
         }
         return this;
     }
-
 
     /**
      * 分页
