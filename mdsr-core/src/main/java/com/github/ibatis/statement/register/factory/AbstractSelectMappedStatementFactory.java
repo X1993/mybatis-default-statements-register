@@ -49,7 +49,7 @@ public abstract class AbstractSelectMappedStatementFactory extends AbstractMappe
                 || (returnType.isArray() && TypeUtils.isAssignableFrom(entityClass ,returnType.getComponentType()))
                 || (genericReturnType instanceof GenericArrayType && TypeUtils.isAssignableFrom(entityClass ,
                 ((GenericArrayType) genericReturnType).getGenericComponentType()))) {
-            return mappedStatementMateData.getEntityMateData().getDefaultMappingResultMap(mapperMethodMateData.getMapperClass());
+            return mappedStatementMateData.getDefaultMappingResultMap();
         } else if (genericReturnType instanceof Class){
             return new ResultMap.Builder(
                     mappedStatementMateData.getConfiguration(),

@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.base.core.matedata;
 
+import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 
@@ -28,6 +29,10 @@ public class MappedStatementMateData implements Cloneable{
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public ResultMap getDefaultMappingResultMap(){
+        return entityMateData.getDefaultMappingResultMap(mapperMethodMateData.getMapperClass());
     }
 
     public EntityMateData getEntityMateData() {

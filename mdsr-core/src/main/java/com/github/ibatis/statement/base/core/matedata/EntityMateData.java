@@ -62,7 +62,7 @@ public class EntityMateData implements Cloneable{
 
     private Configuration configuration;
 
-    public static final String DEFAULT_MAPPING_RESULT_MAP_ID_SUFFIX = "defaultMappingResultMap";
+    public static final String DEFAULT_MAPPING_RESULT_MAP_ID_SUFFIX = "default";
 
     /**
      * 获取默认ResultMapper
