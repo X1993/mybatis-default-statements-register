@@ -20,12 +20,9 @@ public class SqlSessionFactoryBeanPostProcessor implements BeanPostProcessor,App
 
     private ApplicationContext applicationContext;
 
-    private StatementAutoRegister statementAutoRegister;
-
-    private boolean isInit;
-
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException
+    {
         return bean;
     }
 
@@ -39,10 +36,7 @@ public class SqlSessionFactoryBeanPostProcessor implements BeanPostProcessor,App
         if (bean instanceof MapperFactoryBean){
             MapperFactoryBean mapperFactoryBean = (MapperFactoryBean) bean;
             try (SqlSession sqlSession = mapperFactoryBean.getSqlSessionFactory().openSession()){
-                if (!isInit){
-                    //延迟初始化的原因是Bean处理器的创建时机太早了，提前获取相关依赖bean很可能出现问题
-                    init();
-                }
+                StatementAutoRegister statementAutoRegister = this.applicationContext.getBean(StatementAutoRegister.class);
                 statementAutoRegister.registerDefaultMappedStatement(sqlSession ,mapperFactoryBean.getMapperInterface());
             }
         }
@@ -52,11 +46,6 @@ public class SqlSessionFactoryBeanPostProcessor implements BeanPostProcessor,App
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    private void init(){
-        this.statementAutoRegister = this.applicationContext.getBean(StatementAutoRegister.class);
-        isInit = true;
     }
 
 }
