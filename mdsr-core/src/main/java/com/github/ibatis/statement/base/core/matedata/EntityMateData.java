@@ -4,12 +4,17 @@ import com.github.ibatis.statement.base.condition.ColumnCondition;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
+import org.apache.ibatis.mapping.ResultFlag;
+import org.apache.ibatis.mapping.ResultMap;
+import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.apache.ibatis.scripting.xmltags.MixedSqlNode;
 import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,6 +61,66 @@ public class EntityMateData implements Cloneable{
     private Map<SqlCommandType ,Map<String ,ColumnDefaultValue>> commandTypeDefaultValueMap =  Collections.EMPTY_MAP;
 
     private Configuration configuration;
+
+    public static final String DEFAULT_MAPPING_RESULT_MAP_ID_SUFFIX = "defaultMappingResultMap";
+
+    /**
+     * 获取默认ResultMapper
+     * @return
+     */
+    public ResultMap getDefaultMappingResultMap(Class<?> mapperClass)
+    {
+        Configuration configuration = getConfiguration();
+        Class<?> entityClass = this.getEntityClass();
+        String mappingResultMappingId = mapperClass.getName() + "." + DEFAULT_MAPPING_RESULT_MAP_ID_SUFFIX;
+        if (!configuration.hasResultMap(mappingResultMappingId))
+        {
+            Set<String> keyPrimaryPropertyNameSet = this.getKeyPrimaryColumnPropertyMappings()
+                    .values()
+                    .stream()
+                    .map(mapping -> mapping.getPropertyName())
+                    .collect(Collectors.toSet());
+
+            ResultMap autoMappingResultMapping = new ResultMap.Builder(configuration, mappingResultMappingId,
+                    entityClass, this.getColumnPropertyMappings()
+                    .values()
+                    .stream()
+                    .map(columnPropertyMapping -> new ResultMapping.Builder(configuration,
+                            columnPropertyMapping.getPropertyName(),
+                            columnPropertyMapping.getColumnName(),
+                            columnPropertyMapping.getPropertyMateData().getType())
+                            .jdbcType(columnPropertyMapping.getColumnMateData().getJdbcType())
+                            .flags(keyPrimaryPropertyNameSet.contains(columnPropertyMapping.getPropertyMateData()
+                                    .getField().getName()) ? Arrays.asList(ResultFlag.ID) : new ArrayList<>())
+                            .typeHandler(resolveTypeHandler(configuration ,
+                                    columnPropertyMapping.getPropertyMateData().getType(),
+                                    columnPropertyMapping.getPropertyMateData().getTypeHandlerClass()))
+                            .build())
+                    .collect(Collectors.toList()), null)
+                    .build();
+
+            configuration.addResultMap(autoMappingResultMapping);
+        }
+
+        return configuration.getResultMap(mappingResultMappingId);
+    }
+
+    private TypeHandler<?> resolveTypeHandler(Configuration configuration ,
+                                              Class<?> javaType,
+                                              Class<? extends TypeHandler<?>> typeHandlerType)
+    {
+        if (typeHandlerType == null) {
+            return null;
+        }
+        TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
+        // javaType ignored for injected handlers see issue #746 for full detail
+        TypeHandler<?> handler = typeHandlerRegistry.getMappingTypeHandler(typeHandlerType);
+        if (handler == null) {
+            // not in registry, create a new one
+            handler = typeHandlerRegistry.getInstance(javaType, typeHandlerType);
+        }
+        return handler;
+    }
 
     @Override
     public EntityMateData clone() throws CloneNotSupportedException

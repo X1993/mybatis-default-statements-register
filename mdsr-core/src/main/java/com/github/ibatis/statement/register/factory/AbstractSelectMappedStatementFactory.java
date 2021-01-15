@@ -43,13 +43,14 @@ public abstract class AbstractSelectMappedStatementFactory extends AbstractMappe
         Class<?> returnType = mapperMethodMateData.getMappedMethod().getReturnType();
 
         Class<?> entityClass = mappedStatementMateData.getEntityMateData().getEntityClass();
-        if (TypeUtils.isAssignableFrom(entityClass ,genericReturnType) || TypeUtils.isAssignableFrom(
+        if (TypeUtils.isAssignableFrom(entityClass ,genericReturnType)
+                || TypeUtils.isAssignableFrom(
                 ParameterizedTypeImpl.make(Collection.class ,new Type[]{entityClass} ,null) ,genericReturnType)
                 || (returnType.isArray() && TypeUtils.isAssignableFrom(entityClass ,returnType.getComponentType()))
                 || (genericReturnType instanceof GenericArrayType && TypeUtils.isAssignableFrom(entityClass ,
                 ((GenericArrayType) genericReturnType).getGenericComponentType()))) {
-            return mappedStatementMateData.getDefaultMappingResultMap();
-        }else if (genericReturnType instanceof Class){
+            return mappedStatementMateData.getEntityMateData().getDefaultMappingResultMap(mapperMethodMateData.getMapperClass());
+        } else if (genericReturnType instanceof Class){
             return new ResultMap.Builder(
                     mappedStatementMateData.getConfiguration(),
                     mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
