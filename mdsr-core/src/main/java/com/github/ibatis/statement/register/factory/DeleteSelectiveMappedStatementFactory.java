@@ -46,7 +46,7 @@ public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStateme
         boolean logicalDelete = sqlCommandType == SqlCommandType.UPDATE;
 
         List<SqlNode> sqlNodes = new LinkedList<>();
-        sqlNodes.add(DeleteByPrimaryKeyMappedStatementFactory.deleteSqlNodeNoWhere(logicalDelete ,entityMateData));
+        sqlNodes.add(entityMateData.deleteSqlNodeNoWhere(logicalDelete));
 
         /*
            where 1 = 1
@@ -64,8 +64,9 @@ public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStateme
         //where条件
         sqlNodes.add(new StaticTextSqlNode(" WHERE 1 = 1 "));
 
-        sqlNodes.add(entityMateData.defaultConditionsSqlNode(sqlCommandType(mappedStatementMateData) ,
-                        content -> content.insert(0 ," AND ")));
+        //默认过滤条件
+        sqlNodes.add(entityMateData.defaultConditionsSqlNode(sqlCommandType ,
+                content -> content.insert(0 ," AND ")));
 
         if (logicalDelete){
             //逻辑存在条件

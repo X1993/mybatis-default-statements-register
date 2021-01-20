@@ -110,6 +110,11 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         sqlNodes.add(baseSqlNode);
         sqlNodes.addAll(dynamicParamsContext.conditionSqlNodes);
 
+        //默认查询条件
+        sqlNodes.add(entityMateData.defaultConditionsSqlNode(
+                sqlCommandType(mappedStatementMateData) ,
+                content -> content.insert(0 ," AND ")));
+
         OrderRule[] orderRules = dynamicParamsContext.orderRules
                 .stream()
                 .toArray(size -> new OrderRule[size]);

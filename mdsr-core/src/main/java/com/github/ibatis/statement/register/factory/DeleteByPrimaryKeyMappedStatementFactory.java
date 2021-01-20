@@ -6,14 +6,12 @@ import com.github.ibatis.statement.base.core.matedata.ColumnPropertyMapping;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
-import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
-import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +53,11 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
 
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
-        boolean logicalDelete = sqlCommandType(mappedStatementMateData) == SqlCommandType.UPDATE;
+        SqlCommandType sqlCommandType = sqlCommandType(mappedStatementMateData);
+        boolean logicalDelete = sqlCommandType == SqlCommandType.UPDATE;
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append(deleteSqlContentNoWhere(logicalDelete ,entityMateData));
+        sqlBuilder.append(entityMateData.deleteSqlContentNoWhere(logicalDelete));
 
         Map<String ,ColumnPropertyMapping> keyPrimaryColumnPropertyMappings = entityMateData
                 .getKeyPrimaryColumnPropertyMappings();
@@ -85,9 +84,9 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
             parameterMappings.add(columnPropertyMapping.buildParameterMapping(configuration));
         }
 
-        //值固定的查询条件
+        //默认过滤条件
         whereConditionContent.append(entityMateData.defaultConditionsContent(
-                sqlCommandType(mappedStatementMateData) ,content -> content.append(" AND ")));
+                sqlCommandType ,content -> content.append(" AND ")));
 
         if (logicalDelete){
             //逻辑存在条件
@@ -98,48 +97,6 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
 
         return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,
                 sqlBuilder.append(whereConditionContent).toString() ,parameterMappings);
-    }
-
-    static StaticTextSqlNode deleteSqlNodeNoWhere(boolean logicalDelete , EntityMateData entityMateData){
-        return new StaticTextSqlNode(deleteSqlContentNoWhere(logicalDelete ,entityMateData).toString());
-    }
-
-    static StringBuilder deleteSqlContentNoWhere(boolean logicalDelete ,EntityMateData entityMateData)
-    {
-        LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
-        StringBuilder sqlContent = new StringBuilder();
-        if (logicalDelete && logicalColumnMateData != null)
-        {
-            /*
-              update table
-              set logicalCol = existValue
-              ,col1 = defaultValue1
-              ...
-            */
-            //逻辑删除
-            sqlContent.append("UPDATE `")
-                    .append(entityMateData.getTableName())
-                    .append("` SET ")
-                    .append(logicalColumnMateData.equalSqlContent(false));
-
-            Map<String, ColumnDefaultValue> overWriteCustomValues = entityMateData
-                    .filterColumnDefaultValues(SqlCommandType.UPDATE, true);
-
-            //值固定
-            for (ColumnDefaultValue columnDefaultValue : overWriteCustomValues.values()) {
-                sqlContent.append(",").append(columnDefaultValue.fixedValueSqlContent());
-            }
-
-        }else {
-            /*
-              delete from `table`
-            */
-            sqlContent.append("DELETE FROM `")
-                    .append(entityMateData.getTableName())
-                    .append("`");
-        }
-
-        return sqlContent;
     }
 
     @Override

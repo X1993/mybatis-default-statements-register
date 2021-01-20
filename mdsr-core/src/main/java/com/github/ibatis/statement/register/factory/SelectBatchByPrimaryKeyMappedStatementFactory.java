@@ -87,7 +87,7 @@ public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractSelec
         sqlNodes.add(new StaticTextSqlNode(sqlContext.toString()));
         sqlNodes.add(entityMateData.multivaluedKeyConditionSqlNode());
 
-        //值固定的查询条件
+        //默认过滤条件
         StringBuilder fixedValueConditions = entityMateData.defaultConditionsContent(
                 sqlCommandType(mappedStatementMateData) ,content -> content.insert(0 ," AND "));
 

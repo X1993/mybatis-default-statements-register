@@ -408,4 +408,46 @@ public class EntityMateData implements Cloneable{
         }
     }
 
+    public StaticTextSqlNode deleteSqlNodeNoWhere(boolean logicalDelete){
+        return new StaticTextSqlNode(deleteSqlContentNoWhere(logicalDelete).toString());
+    }
+
+    public StringBuilder deleteSqlContentNoWhere(boolean logicalDelete)
+    {
+        LogicalColumnMateData logicalColumnMateData = this.getLogicalColumnMateData();
+        StringBuilder sqlContent = new StringBuilder();
+        if (logicalDelete && logicalColumnMateData != null)
+        {
+            /*
+              update table
+              set logicalCol = existValue
+              ,col1 = defaultValue1
+              ...
+            */
+            //逻辑删除
+            sqlContent.append("UPDATE `")
+                    .append(this.getTableName())
+                    .append("` SET ")
+                    .append(logicalColumnMateData.equalSqlContent(false));
+
+            Map<String, ColumnDefaultValue> overWriteCustomValues = this
+                    .filterColumnDefaultValues(SqlCommandType.UPDATE, true);
+
+            //值固定
+            for (ColumnDefaultValue columnDefaultValue : overWriteCustomValues.values()) {
+                sqlContent.append(",").append(columnDefaultValue.fixedValueSqlContent());
+            }
+
+        }else {
+            /*
+              delete from `table`
+            */
+            sqlContent.append("DELETE FROM `")
+                    .append(this.getTableName())
+                    .append("`");
+        }
+
+        return sqlContent;
+    }
+
 }

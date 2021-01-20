@@ -100,7 +100,7 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
                     "(", ")", ","));
         }
 
-
+        //默认过滤条件
         whereSqlNodes.add(entityMateData.defaultConditionsSqlNode(SqlCommandType.UPDATE ,
                 content -> content.insert(0 ," AND ")));
 

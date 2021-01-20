@@ -42,8 +42,8 @@ public abstract class AbstractUpdateMappedStatementFactory extends AbstractMappe
      * @return
      */
     protected SqlNode createSqlNode(MappedStatementMateData mappedStatementMateData ,
-                                        Function<String ,String> propertyNameFunction ,
-                                        boolean isSelective)
+                                    Function<String ,String> propertyNameFunction ,
+                                    boolean isSelective)
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         List<SqlNode> sqlNodes = new ArrayList<>();
@@ -155,6 +155,7 @@ public abstract class AbstractUpdateMappedStatementFactory extends AbstractMappe
                             .toString()));
         }
 
+        //默认过滤条件
         whereSqlNodes.add(entityMateData.defaultConditionsSqlNode(SqlCommandType.UPDATE ,
                 content -> content.append(" AND ")));
 

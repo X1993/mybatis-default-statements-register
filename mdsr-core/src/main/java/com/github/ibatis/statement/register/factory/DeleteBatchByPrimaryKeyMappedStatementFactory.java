@@ -57,16 +57,17 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
         List<SqlNode> sqlNodes = new LinkedList<>();
 
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
-        boolean logicalDelete = sqlCommandType(mappedStatementMateData) == SqlCommandType.UPDATE;
+        SqlCommandType sqlCommandType = sqlCommandType(mappedStatementMateData);
+        boolean logicalDelete = sqlCommandType == SqlCommandType.UPDATE;
 
-        sqlNodes.add(DeleteByPrimaryKeyMappedStatementFactory.deleteSqlNodeNoWhere(logicalDelete ,entityMateData));
+        sqlNodes.add(entityMateData.deleteSqlNodeNoWhere(logicalDelete));
 
         sqlNodes.add(new StaticTextSqlNode(" WHERE "));
         sqlNodes.add(entityMateData.multivaluedKeyConditionSqlNode());
 
-        //值固定的查询条件
+        //默认过滤条件
         StringBuilder fixedValueConditions = entityMateData.defaultConditionsContent(
-                sqlCommandType(mappedStatementMateData) ,content -> content.insert(0 ," AND "));
+                sqlCommandType ,content -> content.insert(0 ," AND "));
 
         if (logicalDelete){
             //逻辑存在条件
