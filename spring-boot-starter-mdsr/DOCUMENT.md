@@ -12,7 +12,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         <dependency>
             <groupId>com.github.X1993</groupId>
             <artifactId>spring-boot-starter-mdsr</artifactId>
-            <version>3.1.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

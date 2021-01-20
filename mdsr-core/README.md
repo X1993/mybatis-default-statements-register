@@ -31,16 +31,6 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
   </a>
 </p>
 
-### 当前最新版本
--   Maven
-```xml
-    <dependency>
-        <groupId>com.github.X1993</groupId>
-        <artifactId>mdsr-core</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
-    </dependency>
-```
-
 ### 文档
 [文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/DOCUMENT.md)
 
