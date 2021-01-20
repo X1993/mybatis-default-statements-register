@@ -266,31 +266,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
     private final Predicate<Context> truePredicate = context -> true;
 
-    private final Map<CacheKey ,Map<Card ,List<Edge>>> edgeMapCache = new WeakHashMap<>();
-
     private Reference<SyntaxTable> syntaxTableCache;
-
-    class CacheKey{
-
-        private Class<?> entityClass;
-
-        public CacheKey(Class<?> entityClass) {
-            this.entityClass = entityClass;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CacheKey cacheKey = (CacheKey) o;
-            return Objects.equals(entityClass, cacheKey.entityClass);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(entityClass);
-        }
-    }
 
     /**
      * 语法规则
