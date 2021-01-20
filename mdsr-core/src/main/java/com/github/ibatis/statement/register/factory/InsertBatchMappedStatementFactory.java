@@ -3,6 +3,7 @@ package com.github.ibatis.statement.register.factory;
 import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.mapper.TableMapper;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
@@ -15,7 +16,7 @@ import java.util.*;
  * @Author: junjie
  * @Date: 2020/3/13
  */
-public class InsertBatchMappedStatementFactory extends AbstractInsertMappedStatementFactory {
+public class InsertBatchMappedStatementFactory extends AbstractMappedStatementFactory {
 
     public final static String INSERT_BATCH = "insertBatch";
 
@@ -48,7 +49,7 @@ public class InsertBatchMappedStatementFactory extends AbstractInsertMappedState
         List<SqlNode> columnSqlNodes = new LinkedList<>();
         List<SqlNode> propertySqlNodes = new LinkedList<>();
         String item = "item";
-        this.fillSqlNodes(mappedStatementMateData ,columnSqlNodes ,propertySqlNodes ,
+        mappedStatementMateData.insertColumnValueSqlNodes(columnSqlNodes ,propertySqlNodes ,
                 propertyName -> item + "." + propertyName ,false);
 
         sqlNodes.add(new TrimSqlNode(mappedStatementMateData.getConfiguration() ,
@@ -61,6 +62,11 @@ public class InsertBatchMappedStatementFactory extends AbstractInsertMappedState
                 "collection" ,null ,item ,null ,null ,","));
 
         return new DynamicSqlSource(mappedStatementMateData.getConfiguration() ,new MixedSqlNode(sqlNodes));
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.INSERT;
     }
 
 }

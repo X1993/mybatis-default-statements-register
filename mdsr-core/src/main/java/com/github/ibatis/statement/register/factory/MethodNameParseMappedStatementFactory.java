@@ -8,6 +8,7 @@ import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.mapper.param.*;
 import com.github.ibatis.statement.util.StringUtils;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.scripting.xmltags.*;
@@ -85,7 +86,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
 
-        SyntaxTable syntaxTable = syntaxMap(entityMateData);
+        SyntaxTable syntaxTable = syntaxMap(mappedStatementMateData);
         List<Edge> sentence = expressionParticiple(mappedStatementMateData ,syntaxTable);
         if (sentence == null || sentence.isEmpty()){
             return Optional.empty();
@@ -101,13 +102,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         }
 
         List<SqlNode> sqlNodes = new ArrayList<>();
-        SqlNode baseSqlNode = new StaticTextSqlNode(new StringBuilder("SELECT ")
-                .append(dynamicParamsContext.selectContext)
-                .append(" FROM `")
-                .append(entityMateData.getTableMateData().getTableName())
-                .append("` WHERE 1 = 1 ")
-                .toString());
-        sqlNodes.add(baseSqlNode);
+        sqlNodes.add(dynamicParamsContext.startSql);
+        sqlNodes.add(new StaticTextSqlNode(" WHERE 1 = 1 "));
         sqlNodes.addAll(dynamicParamsContext.conditionSqlNodes);
 
         //默认查询条件
@@ -155,7 +151,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
      */
     List<Edge> expressionParticiple(MappedStatementMateData mappedStatementMateData ,SyntaxTable syntaxTable)
     {
-        Context context = new Context(new HashMap<>() ,mappedStatementMateData);
+        Context context = new Context(mappedStatementMateData);
         long startTimeMillis = System.currentTimeMillis();
         Map<Card, List<Edge>> cardEdgeMap = syntaxTable.getSyntaxTable();
         String expression = getExpression(mappedStatementMateData);
@@ -246,23 +242,21 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         return StringUtils.camelUnderscoreToCase(str ,true);
     }
 
-    private final String columnNameKey = "columnName";
+    private final Predicate<Context> orderPredicate = context -> context.ordering.equals(context.operator);
 
-    private final String operatorKey = "operator";
+    private final Function<Context ,Context> orderOperator = context -> {
+        Context clone1 = context.clone1();
+        clone1.operator = context.ordering;
+        return clone1;
+    };
 
-    private final String ordering = "ordering";
+    private final Predicate<Context> wherePredicate = context -> context.filtering.equals(context.operator);
 
-    private final String filtering = "filtering";
-
-    private final String orderColumnsKey = "orderColumns";
-
-    private final Predicate<Context> orderPredicate = context -> context.match(operatorKey ,ordering);
-
-    private final Function<Context ,Context> orderOperator = context -> context.cloneAndPut(operatorKey ,ordering);
-
-    private final Predicate<Context> wherePredicate = context -> context.match(operatorKey ,filtering);
-
-    private final Function<Context ,Context> whereOperator = context -> context.cloneAndPut(operatorKey ,filtering);
+    private final Function<Context ,Context> whereOperator = context -> {
+        Context clone1 = context.clone1();
+        clone1.operator = context.filtering;
+        return clone1;
+    };
 
     private final Predicate<Context> truePredicate = context -> true;
 
@@ -270,11 +264,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
 
     /**
      * 语法规则
-     * @param entityMateData
+     * @param mappedStatementMateData
      * @return
      */
-    private SyntaxTable syntaxMap(EntityMateData entityMateData)
+    private SyntaxTable syntaxMap(MappedStatementMateData mappedStatementMateData)
     {
+        EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         if (syntaxTableCache != null){
             SyntaxTable syntaxTable = syntaxTableCache.get();
             if (syntaxTable != null && entityMateData.getEntityClass().equals(syntaxTable.getEntityClass())){
@@ -304,13 +299,21 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         Card orderBy = new Card("OrderBy");
         Card desc = new Card("Desc");
         Card asc = new Card("Asc");
+        Card delete = new Card("delete");
+        Card update = new Card("update");
 
         Card[] conditionCards = Stream.of(ConditionRule.values())
                 .map(conditionRule -> new Card(standard(conditionRule.name().toLowerCase())))
                 .toArray(length -> new Card[length]);
 
         Consumer<DynamicParamsContext> selectColumnsConsumer = context ->
-                context.selectContext = entityMateData.getBaseColumnListSqlContent().toString();
+                context.startSql = new StaticTextSqlNode(
+                        new StringBuilder("SELECT ")
+                        .append(entityMateData.getBaseColumnListSqlContent())
+                        .append(" FROM `")
+                        .append(entityMateData.getTableName())
+                        .append("` ")
+                        .toString());
 
         List<Edge> startPossibleEdges = new ArrayList<>();
         List<Edge> selectPossibleEdges = new ArrayList<>();
@@ -322,6 +325,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         List<Edge> andPossibleEdges = new ArrayList<>();
         List<Edge> orPossibleEdges = new ArrayList<>();
         List<Edge> byPossibleEdges = new ArrayList<>();
+        List<Edge> deletePossibleEdges = new ArrayList<>();
+        List<Edge> updatePossibleEdges = new ArrayList<>();
 
         cardEdgeMap.put(Card.START_CARD ,startPossibleEdges);
         cardEdgeMap.put(find ,selectPossibleEdges);
@@ -333,6 +338,8 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         cardEdgeMap.put(asc ,orderRulePossibleEdges);
         cardEdgeMap.put(orderBy ,orderPossibleEdges);
         cardEdgeMap.put(select ,selectPossibleEdges);
+        cardEdgeMap.put(delete ,deletePossibleEdges);
+        cardEdgeMap.put(update ,updatePossibleEdges);
 
         startPossibleEdges.add(new Edge().nextCard(select));
         startPossibleEdges.add(new Edge().nextCard(find));
@@ -347,12 +354,48 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         selectPossibleEdges.add(new Edge().nextCard(orderBy).updateContext(orderOperator)
                 .dynamicParamsFunction(selectColumnsConsumer));
         // select / find -> limit
-        Edge toLimitEdge = toLimitEdge(false);
-        selectPossibleEdges.add(toLimitEdge);
+        Edge selectToLimitEdge = toLimitEdge(false);
+        selectPossibleEdges.add(selectToLimitEdge);
+
+        Consumer<DynamicParamsContext> deleteConsumer = context ->
+                context.startSql = new StaticTextSqlNode(
+                        new StringBuilder("DELETE FROM `")
+                                .append(entityMateData.getTableName())
+                                .append("` ")
+                                .toString());
+        // delete -> by
+        deletePossibleEdges.add(new Edge().nextCard(by)
+                .updateContext(whereOperator)
+                .dynamicParamsFunction(deleteConsumer));
+        // delete -> limit
+        Edge deleteToLimitEdge = toLimitEdge(false);
+        deleteToLimitEdge.dynamicParamsFunction(deleteToLimitEdge.dynamicParamsFunction.andThen(deleteConsumer));
+        deletePossibleEdges.add(deleteToLimitEdge);
+
+        Consumer<DynamicParamsContext> updateConsumer = context ->
+                context.startSql = new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(
+                        new StringBuilder("UPDATE `")
+                        .append(entityMateData.getTableMateData().getTableName())
+                        .append("` ").toString()) ,
+                        mappedStatementMateData.updateSetSqlNode(name -> "#{param1}." + name ,true)));
+
+        // update -> by
+        updatePossibleEdges.add(new Edge().nextCard(by)
+                .isConform(context -> context.hasEnoughParams(1))
+                .updateContext(whereOperator.andThen(context -> context.addEnoughParams(1)))
+                .dynamicParamsFunction(updateConsumer.andThen(context -> context.addEnoughParams(1))));
+        // update -> limit
+        Edge updateToLimitEdge = toLimitEdge(false);
+        updateToLimitEdge.dynamicParamsFunction(updateToLimitEdge.dynamicParamsFunction.andThen(updateConsumer));
+        updatePossibleEdges.add(updateToLimitEdge);
 
         // count -> by
         countPossibleEdges.add(new Edge().nextCard(by).updateContext(whereOperator)
-                .dynamicParamsFunction(context -> context.selectContext = "COUNT(0)"));
+                .dynamicParamsFunction(context -> context.startSql = new StaticTextSqlNode(
+                        new StringBuilder("SELECT COUNT(0) FROM `")
+                        .append(entityMateData.getTableName())
+                        .append("` ")
+                        .toString())));
 
         // column -> and
         columnPossibleEdges.add(columnToAndEdge(and));
@@ -370,7 +413,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         columnPossibleEdges.add(toLimitEdge(true));
 
         // asc / desc -> limit
-        orderRulePossibleEdges.add(toLimitEdge);
+        orderRulePossibleEdges.add(selectToLimitEdge);
 
         // condition -> or
         conditionPossibleEdges.add(new Edge().nextCard(or).isConform(wherePredicate));
@@ -380,7 +423,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         conditionPossibleEdges.add(new Edge().nextCard(orderBy)
                 .isConform(wherePredicate).updateContext(orderOperator));
         // condition -> limit
-        conditionPossibleEdges.add(toLimitEdge);
+        conditionPossibleEdges.add(selectToLimitEdge);
 
         for (ColumnCard columnCard : columnCards) {
             // and -> column
@@ -493,7 +536,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                 })
                 .isTermination(wherePredicate)
                 .dynamicParamsFunction(context -> {
-                    context.setOr(isOr).put(columnNameKey ,columnCard.columnName);
+                    context.setOr(isOr).conditionColumnName = columnCard.columnName;
                     if (columnCard.value.equals(context.getExpression())){
                         singleParameterCondition(EQ ,i ->
                                 new StaticTextSqlNode(new StringBuilder(
@@ -560,10 +603,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     private Edge toOrderRuleEdge(Card card ,OrderRule.Rule rule){
         return new Edge().nextCard(card)
                 .isConform(orderPredicate)
-                .dynamicParamsFunction(dynamicParamsContext ->
-                        Optional.ofNullable(dynamicParamsContext.remove(orderColumnsKey))
-                                .ifPresent(columnNames -> dynamicParamsContext.addOrderRule(rule ,
-                                        ((String) columnNames).split(","))))
+                .dynamicParamsFunction(context -> {
+                            Optional.ofNullable(context.orderColumns)
+                            .ifPresent(columnNames -> context.addOrderRule(rule ,
+                                    (columnNames).split(",")));
+                            context.orderColumns = null;
+                        })
                 .isTermination(orderPredicate.and(truePredicate));
     }
 
@@ -669,7 +714,7 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
                 .updateContext(context -> context.addEnoughParams(1))
                 .isTermination(truePredicate)
                 .dynamicParamsFunction(context -> singleParameterCondition(
-                        LIKE_LEFT ,
+                        LIKE_RIGHT ,
                         i -> new StaticTextSqlNode(new StringBuilder("CONCAT(")
                                 .append(context.getParamPlaceholder(i))
                                 .append(",'%')").toString()) ,
@@ -685,13 +730,16 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
             toConditionPossibleEdges.add(new Edge()
                     .nextCard(new Card(standard(conditionRule.name().toLowerCase())))
                     .isTermination(truePredicate)
-                    .dynamicParamsFunction(context -> context.addCondition(new StaticTextSqlNode(
-                            new StringBuilder(context.isOr ? " OR " : "AND")
-                                    .append(" `")
-                                    .append(context.remove(columnNameKey))
-                                    .append("` ")
-                                    .append(conditionRule.expression)
-                                    .toString()))));
+                    .dynamicParamsFunction(context -> {
+                        context.addCondition(new StaticTextSqlNode(
+                                new StringBuilder(context.isOr ? " OR " : "AND")
+                                        .append(" `")
+                                        .append(context.conditionColumnName)
+                                        .append("` ")
+                                        .append(conditionRule.expression)
+                                        .toString()));
+                        context.conditionColumnName = null;
+                    }));
         }
 
         Predicate<Context> isBetweenParamType = context -> BetweenParam.class.isAssignableFrom(
@@ -768,10 +816,10 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     }
 
     private void orderColumnSpliceConsumer(String columnName ,DynamicParamsContext dynamicParamsContext){
-        dynamicParamsContext.put(orderColumnsKey ,
-                Optional.ofNullable(dynamicParamsContext.get(orderColumnsKey))
-                        .map(orderColumns -> orderColumns + ",")
-                        .orElse("") + columnName);
+        dynamicParamsContext.orderColumns = Optional.ofNullable(
+                dynamicParamsContext.orderColumns)
+                .map(orderColumns -> orderColumns + ",")
+                .orElse("") + columnName;
     }
 
     private DynamicParamsContext singleParameterCondition(ConditionRule conditionRule ,
@@ -782,13 +830,14 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
     {
         StaticTextSqlNode keyRuleSqlNode = new StaticTextSqlNode(
                 new StringBuilder(context.isOr ? " OR " : " AND ")
-                        .append(Optional.ofNullable(context.remove(columnNameKey))
+                        .append(Optional.ofNullable(context.conditionColumnName)
                                 .map(column -> "`" + column + "` ")
                                 .orElse(" "))
                         .append(Optional.ofNullable(conditionRule)
                                 .map(rule -> rule.expression)
                                 .orElse(" "))
                         .toString());
+        context.conditionColumnName = null;
 
         context.addEnoughParams(1);
         int paramIndex = context.getParamIndex();
@@ -934,104 +983,81 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         COLUMN,
     }
 
-    class Context{
-
-        /**
-         * 每次做了修改之前需要copy，如果使用同一个Context回溯的时候原状态可能会改变，且状态值应该确保不可变或深拷贝
-         */
-        private final Map status;
+    /**
+     * 每次做了修改之前需要clone，如果使用同一个Context回溯的时候原状态可能会改变，且状态值应该确保不可变或深拷贝
+     */
+    class Context implements Cloneable{
 
         protected final MappedStatementMateData mappedStatementMateData;
 
-        final String paramIndexKey = "paramIndex";
+        int paramIndex = -1;
 
-        final String expressionKey = "expression";
+        String expression;
+
+        String conditionColumnName;
+
+        String orderColumns;
+
+        String operator;
+
+        final String ordering = "ordering";
+
+        final String filtering = "filtering";
+
+        public Context clone1(){
+            try {
+                return clone();
+            } catch (CloneNotSupportedException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+
+        @Override
+        protected Context clone() throws CloneNotSupportedException {
+            return (Context) super.clone();
+        }
 
         public Context(MappedStatementMateData mappedStatementMateData) {
-            this(new HashMap<>() ,mappedStatementMateData);
-        }
-
-        public Context(Map<?, ?> status ,MappedStatementMateData MappedStatementMateData) {
-            this.status = status;
-            this.mappedStatementMateData = MappedStatementMateData;
-        }
-
-        public Context(Context context){
-            this(new HashMap(context.status) ,context.mappedStatementMateData);
-        }
-
-        public boolean match(Object key, Object value){
-            Object oldValue = status.get(key);
-            if (oldValue == null){
-                return value == null ? true : value.equals(oldValue);
-            }
-            return oldValue.equals(value);
-        }
-
-        public Context cloneAndPut(Object key , Object value){
-            //每次做了修改之前需要copy，如果使用同一个Context回溯的时候原状态可能会改变
-            Context newContext = new Context(this);
-            newContext.status.put(key ,value);
-            return newContext;
-        }
-
-        protected Context put(Object key ,Object value){
-            this.status.put(key ,value);
-            return this;
-        }
-
-        public Object get(Object key){
-            return status.get(key);
-        }
-
-        public Object get(Object key ,Object defaultValue){
-            return status.getOrDefault(key ,defaultValue);
-        }
-
-        public Object remove(Object key){
-            return status.remove(key);
-        }
-
-        public Object required(Object key){
-            return Optional.ofNullable(status.get(key))
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            MessageFormat.format("required key [{0}] is null" ,key)));
-
+            this.mappedStatementMateData = mappedStatementMateData;
         }
 
         public boolean hasEnoughParams(int paramCount){
             if (paramCount == 0){
                 return true;
             }
-            int paramIndex = (int) status.getOrDefault(paramIndexKey, -1) + paramCount;
-            return paramIndex < mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getParameterCount();
+            return paramIndex + paramCount < mappedStatementMateData.getMapperMethodMateData()
+                    .getMappedMethod().getParameterCount();
         }
 
         public int getParamIndex(){
-            return (int) status.getOrDefault(paramIndexKey ,0);
+            return paramIndex < 0 ? 0 : paramIndex;
         }
 
         public Context addEnoughParams(int paramCount){
             if (paramCount == 0){
                 return this;
             }
-            int paramIndex = (int) status.getOrDefault(paramIndexKey, -1) + paramCount;
-            return cloneAndPut(paramIndexKey, paramIndex);
+            Context clone1 = clone1();
+            clone1.paramIndex += paramCount;
+            return clone1;
         }
 
         public Context putExpression(String expression) {
-            return put(expressionKey ,expression);
+            this.expression = expression;
+            return this;
         }
 
         public String getExpression(){
-            return (String) required(expressionKey);
+            return expression;
         }
 
     }
 
     class DynamicParamsContext extends Context{
 
-        private String selectContext;
+        private SqlNode startSql;
+
+        private SqlCommandType sqlCommandType = SqlCommandType.SELECT;
 
         private boolean isOr;
 
@@ -1071,8 +1097,12 @@ public class MethodNameParseMappedStatementFactory extends AbstractSelectMappedS
         }
 
         @Override
-        public Context cloneAndPut(Object key, Object value) {
-            return put(key ,value);
+        public Context addEnoughParams(int paramCount){
+            if (paramCount == 0){
+                return this;
+            }
+            this.paramIndex += paramCount;
+            return this;
         }
 
         public DynamicParamsContext addCondition(SqlNode sqlNode){

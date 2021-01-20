@@ -6,6 +6,7 @@ import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
@@ -21,7 +22,7 @@ import java.util.function.Function;
  * @Author: junjie
  * @Date: 2020/4/27
  */
-public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedStatementFactory {
+public class UpdateSameBatchMappedStatementFactory extends AbstractMappedStatementFactory {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateSameBatchMappedStatementFactory.class);
 
@@ -54,7 +55,7 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
                 .append(mappedStatementMateData.getEntityMateData().getTableName())
                 .append("` ").toString());
 
-        SqlNode setSqlNode = super.getSetSqlNode(mappedStatementMateData, propertyNameFunction, true);
+        SqlNode setSqlNode = mappedStatementMateData.updateSetSqlNode(propertyNameFunction, true);
 
         SqlNode whereSqlNode = this.whereSqlNode(mappedStatementMateData);
 
@@ -115,6 +116,11 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractUpdateMappedS
         }
 
         return new WhereSqlNode(configuration ,new MixedSqlNode(whereSqlNodes));
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.UPDATE;
     }
 
 }

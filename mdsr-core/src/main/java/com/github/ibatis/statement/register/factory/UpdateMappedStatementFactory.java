@@ -4,6 +4,8 @@ import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
@@ -12,7 +14,7 @@ import org.apache.ibatis.mapping.SqlSource;
  * @Author: junjie
  * @Date: 2020/3/6
  */
-public class UpdateMappedStatementFactory extends AbstractUpdateMappedStatementFactory {
+public class UpdateMappedStatementFactory extends AbstractMappedStatementFactory {
 
     public static final String UPDATE_BY_PRIMARY_KEY = "updateByPrimaryKey";
 
@@ -36,7 +38,13 @@ public class UpdateMappedStatementFactory extends AbstractUpdateMappedStatementF
     protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData)
     {
         String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        return super.createSqlSource(mappedStatementMateData ,name -> name , UPDATE_BY_PRIMARY_KEY_SELECTIVE.equals(methodName));
+        return mappedStatementMateData.updateSqlSource(name -> name ,
+                UPDATE_BY_PRIMARY_KEY_SELECTIVE.equals(methodName));
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.UPDATE;
     }
 
 }

@@ -3,6 +3,7 @@ package com.github.ibatis.statement.register.factory;
 import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
@@ -14,7 +15,7 @@ import java.util.Collection;
  * @Author: junjie
  * @Date: 2020/4/27
  */
-public class UpdateBatchMappedStatementFactory extends AbstractUpdateMappedStatementFactory {
+public class UpdateBatchMappedStatementFactory extends AbstractMappedStatementFactory {
 
     public static final String UPDATE_BATCH = "updateBatch";
 
@@ -47,7 +48,7 @@ public class UpdateBatchMappedStatementFactory extends AbstractUpdateMappedState
     {
         return new DynamicSqlSource(mappedStatementMateData.getConfiguration() ,new ForEachSqlNode(
                 mappedStatementMateData.getConfiguration() ,
-                super.createSqlNode(mappedStatementMateData ,name -> "item." + name ,false) ,
+                mappedStatementMateData.updateSqlNode(name -> "item." + name ,false) ,
                 "collection" ,"index" ,"item" ,
                 null ,null ,";"));
     }
@@ -56,4 +57,5 @@ public class UpdateBatchMappedStatementFactory extends AbstractUpdateMappedState
     protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
         return SqlCommandType.UPDATE;
     }
+
 }
