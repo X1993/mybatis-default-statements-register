@@ -1325,6 +1325,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
        
 -   例：
 
+
     关键字           |        方法                          |          sql
     :------          |      :-------------                  |        :------
     And              |      findByNameAndCode(?,?)          |     where name= ? and code = ?     
@@ -1353,6 +1354,16 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Limit            |      findByNameNeLimit(LimitParam)   |     where name <> '' limit ? ,?
     
 
+
+-  最新支持：修改和删除
+
+
+    关键字                  |        方法                                   |         sql
+    :------                 |      :-------------                          |       :------
+    delete(没有定义逻辑列)   |      deleteByNameNeLimit(LimitParam)         |   delete from `table` where name <> '' limit ? ,?
+    delete(有定义逻辑列)     |      deleteByNameNeLimit(LimitParam)         |   update `table` set logical_column = 'delVal' where name <> '' limit ? ,?
+    update                  |      updateByNameNeLimit(Entity ,LimitParam) |   update `table` set column = ?, column2 = ? where name <> '' limit ? ,?
+        
 
 #### 12.2 If注解
 ```java
