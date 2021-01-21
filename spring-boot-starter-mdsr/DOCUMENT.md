@@ -1358,11 +1358,11 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 -  最新支持：修改和删除
 
 
-    关键字                  |        方法                                   |         sql
-    :------                 |      :-------------                          |       :------
-    delete(没有定义逻辑列)   |      deleteByNameNeLimit(LimitParam)         |   delete from `table` where name <> '' limit ? ,?
-    delete(有定义逻辑列)     |      deleteByNameNeLimit(LimitParam)         |   update `table` set logical_column = 'delVal' where name <> '' limit ? ,?
-    update                  |      updateByNameNeLimit(Entity ,LimitParam) |   update `table` set column = ?, column2 = ? where name <> '' limit ? ,?
+    关键字                                       |        方法                                  |         sql
+    :------                                      |      :-------------                          |       :------
+    delete(没有定义逻辑列)                        |      deleteByNameNeLimit(LimitParam)         |   delete from `table` where name <> '' limit ? ,?
+    delete(有定义逻辑列)                          |      deleteByNameNeLimit(LimitParam)         |   update `table` set logical_column = 'delVal' where name <> '' limit ? ,?
+    update(方法第一个为实体类，非空属性作为赋值项) |      updateByNameNeLimit(Entity ,LimitParam) |   update `table` set column = ?, column2 = ? where name <> '' limit ? ,?
         
 
 #### 12.2 If注解
