@@ -36,6 +36,19 @@ public class StringUtils {
     }
 
     /**
+     * 首字母大写
+     * @param name
+     * @return
+     */
+    public static String firstCharUpperCase(String name) {
+        char[] cs = name.toCharArray();
+        if (cs[0] >= 'a' && cs[0] <= 'z'){
+            cs[0] -= 32;
+        }
+        return String.valueOf(cs);
+    }
+
+    /**
      * 下划线转驼峰
      * @param str
      * @param firstCharUpperCase 首字母是否大写

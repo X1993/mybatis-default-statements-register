@@ -4,6 +4,7 @@ import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.base.logical.Logical;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
+import lombok.Data;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 public class Entity2Test {
 
+    @Data
     @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")
     static class Entity2 {
 
@@ -46,62 +48,6 @@ public class Entity2Test {
         public Entity2(String id, String id2) {
             this.id = id;
             this.id2 = id2;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getId2() {
-            return id2;
-        }
-
-        public void setId2(String id2) {
-            this.id2 = id2;
-        }
-
-        public String getValueOne() {
-            return valueOne;
-        }
-
-        public void setValueOne(String valueOne) {
-            this.valueOne = valueOne;
-        }
-
-        public Integer getValue2() {
-            return value2;
-        }
-
-        public void setValue2(Integer value2) {
-            this.value2 = value2;
-        }
-
-        public String getValue3() {
-            return value3;
-        }
-
-        public void setValue3(String value3) {
-            this.value3 = value3;
-        }
-
-        public Date getUpdateTime() {
-            return updateTime;
-        }
-
-        public void setUpdateTime(Date updateTime) {
-            this.updateTime = updateTime;
-        }
-
-        public Date getCreateTime() {
-            return createTime;
-        }
-
-        public void setCreateTime(Date createTime) {
-            this.createTime = createTime;
         }
 
     }

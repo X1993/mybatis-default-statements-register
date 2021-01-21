@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.base.core.matedata;
 
+import lombok.Data;
 import org.apache.ibatis.type.JdbcType;
 
 /**
@@ -7,6 +8,7 @@ import org.apache.ibatis.type.JdbcType;
  * @author junjie
  * @date 2020/2/22
  */
+@Data
 public class ColumnMateData implements Cloneable{
 
     /**
@@ -34,44 +36,12 @@ public class ColumnMateData implements Cloneable{
         return (ColumnMateData) super.clone();
     }
 
-    public String getColumnName() {
-        return columnName;
-    }
-
     /**
      * 获取转义列名，`{@link ColumnMateData#columnName}`
      * @return
      */
     public String getEscapeColumnName(){
         return "`" + columnName + "`";
-    }
-
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
-    }
-
-    public String getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
-    }
-
-    public boolean isPrimaryKey() {
-        return primaryKey;
-    }
-
-    public void setPrimaryKey(boolean primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public JdbcType getJdbcType() {
-        return jdbcType;
-    }
-
-    public void setJdbcType(JdbcType jdbcType) {
-        this.jdbcType = jdbcType;
     }
 
 }

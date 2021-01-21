@@ -1,10 +1,13 @@
 package com.github.ibatis.statement.base.core.matedata;
 
+import lombok.Data;
+
 /**
  * 主键信息
  * @Author: junjie
  * @Date: 2020/12/18
  */
+@Data
 public class KeyColumnUsage implements Comparable<KeyColumnUsage>{
 
     /**
@@ -22,22 +25,6 @@ public class KeyColumnUsage implements Comparable<KeyColumnUsage>{
 
     public KeyColumnUsage(int ordinalPosition, String columnName) {
         this.ordinalPosition = ordinalPosition;
-        this.columnName = columnName;
-    }
-
-    public int getOrdinalPosition() {
-        return ordinalPosition;
-    }
-
-    public void setOrdinalPosition(int ordinalPosition) {
-        this.ordinalPosition = ordinalPosition;
-    }
-
-    public String getColumnName() {
-        return columnName;
-    }
-
-    public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 

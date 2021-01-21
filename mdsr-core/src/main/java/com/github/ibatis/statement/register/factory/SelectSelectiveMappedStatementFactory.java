@@ -53,7 +53,7 @@ public class SelectSelectiveMappedStatementFactory extends AbstractSelectMappedS
     @Override
     protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData)
     {
-        return selectEntity(mappedStatementMateData) ? mappedStatementMateData.selectResultMaps() :
+        return selectEntity(mappedStatementMateData) ? mappedStatementMateData.resultMapsByReturnType() :
                 new ResultMap.Builder(mappedStatementMateData.getConfiguration(),
                         mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
                         int.class,

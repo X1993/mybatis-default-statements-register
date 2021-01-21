@@ -2,6 +2,7 @@ package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.logical.Logical;
+import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import java.util.stream.IntStream;
  */
 public class Entity4Test {
 
+    @Data
     @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")
     static class Entity4 {
 
@@ -37,38 +39,6 @@ public class Entity4Test {
             this.id = id;
             this.value = value;
             this.remark = remark;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getRemark() {
-            return remark;
-        }
-
-        public void setRemark(String remark) {
-            this.remark = remark;
-        }
-
-        public String getValueOne() {
-            return valueOne;
-        }
-
-        public void setValueOne(String valueOne) {
-            this.valueOne = valueOne;
         }
     }
 

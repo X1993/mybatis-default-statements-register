@@ -4,6 +4,7 @@ import com.github.ibatis.statement.base.condition.ColumnCondition;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
+import lombok.Data;
 import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * @author junjie
  * @date 2020/2/22
  */
+@Data
 public class EntityMateData implements Cloneable{
 
     public EntityMateData() {
@@ -135,36 +137,8 @@ public class EntityMateData implements Cloneable{
         return tableMateData.getTableName();
     }
 
-    public Class<?> getEntityClass() {
-        return entityClass;
-    }
-
-    public void setEntityClass(Class<?> entityClass) {
-        this.entityClass = entityClass;
-    }
-
-    public TableMateData getTableMateData() {
-        return tableMateData;
-    }
-
-    public void setTableMateData(TableMateData tableMateData) {
-        this.tableMateData = tableMateData;
-    }
-
     public TableSchemaResolutionStrategy getSchemaResolutionStrategy() {
         return tableMateData.getSchemaResolutionStrategy();
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
-    public Map<String, ColumnPropertyMapping> getColumnPropertyMappings() {
-        return columnPropertyMappings;
     }
 
     public void setColumnPropertyMappings(Map<String, ColumnPropertyMapping> columnPropertyMappings) {
@@ -176,14 +150,6 @@ public class EntityMateData implements Cloneable{
                 .stream()
                 .filter(columnPropertyMapping -> columnPropertyMapping.isPrimaryKey())
                 .collect(Collectors.toMap(mapping -> mapping.getColumnName() ,mapping -> mapping));
-    }
-
-    public LogicalColumnMateData getLogicalColumnMateData() {
-        return logicalColumnMateData;
-    }
-
-    public void setLogicalColumnMateData(LogicalColumnMateData logicalColumnMateData) {
-        this.logicalColumnMateData = logicalColumnMateData;
     }
 
     public int getPrimaryKeyCount() {
@@ -267,7 +233,8 @@ public class EntityMateData implements Cloneable{
 
     public Map<String ,ColumnDefaultValue> filterColumnDefaultValues(SqlCommandType sqlCommandType ,boolean overwriteCustom)
     {
-        return Optional.ofNullable(getCommandTypeDefaultValueMap().get(sqlCommandType))
+        return Optional.ofNullable(getCommandTypeDefaultValueMap()
+                .get(sqlCommandType))
                 .map(map -> map.entrySet()
                         .stream()
                         .filter(entry -> logicalColumnMateData == null
@@ -361,16 +328,16 @@ public class EntityMateData implements Cloneable{
                and key2 = #{item.keyPropertyName2,jdbcType=XXX}
             </foreach>
              */
-
             StringBuilder whereConditions = new StringBuilder("(");
+            String joiner = " AND ";
 
             //主键的查询条件
             for (ColumnPropertyMapping columnPropertyMapping : keyPrimaryColumnPropertyMappings.values()) {
                 whereConditions.append(columnPropertyMapping.createEqSqlContent(name -> "item." + name))
-                        .append(" AND ");
+                        .append(joiner);
             }
 
-            whereConditions.append(" 1 = 1 )");
+            whereConditions.delete(whereConditions.length() - joiner.length() ,whereConditions.length()).append(")");
 
             return new ForEachSqlNode(configuration ,new StaticTextSqlNode(whereConditions.toString()) ,
                     "collection" ,"index" , "item" ,

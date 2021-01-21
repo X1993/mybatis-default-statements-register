@@ -1,9 +1,9 @@
 package com.github.ibatis.statement.register;
 
+import com.github.ibatis.statement.base.core.matedata.MapperMethodMateData;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
-import com.github.ibatis.statement.base.core.matedata.RootMapperMethodMateData;
 import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
@@ -89,7 +89,7 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
         Collection<String> mappedStatementNames = new ArrayList<>(configuration.getMappedStatementNames());
         for (Method method : mapperClass.getMethods())
         {
-            RootMapperMethodMateData statementMateData = new RootMapperMethodMateData(method, mapperClass);
+            MapperMethodMateData statementMateData = new MapperMethodMateData(method, mapperClass);
             final String mappedStatementId = statementMateData.getMappedStatementId();
             if (method.isDefault() || method.isBridge() || mappedStatementNames.contains(mappedStatementId)) {
                 continue;
@@ -102,7 +102,12 @@ public class DefaultStatementAutoRegister implements StatementAutoRegister {
             for (MappedStatementFactory mappedStatementFactory : getMappedStatementFactories())
             {
                 //尝试自动注册
-                mappedStatement = mappedStatementFactory.tryBuild(mappedStatementMateData).orElse(null);
+                try {
+                    mappedStatement = mappedStatementFactory.tryBuild(mappedStatementMateData).orElse(null);
+                } catch (Exception e) {
+                    LOGGER.error("{} try build mapped statement exception" ,mappedStatementFactory ,e);
+                    continue;
+                }
 
                 if (mappedStatement != null) {
                     configuration.addMappedStatement(mappedStatement);

@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.base.dv;
 
+import lombok.Data;
 import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.stream.Stream;
  * @Author: junjie
  * @Date: 2020/7/22
  */
+@Data
 public class ColumnDefaultValue implements Cloneable {
 
     /**
@@ -40,48 +42,6 @@ public class ColumnDefaultValue implements Cloneable {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
-    }
-
-    public SqlCommandType getSqlCommandType() {
-        return sqlCommandType;
-    }
-
-    public void setSqlCommandType(SqlCommandType sqlCommandType) {
-        this.sqlCommandType = sqlCommandType;
-    }
-
-    public String getColumnName() {
-        return columnName;
-    }
-
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public boolean isOverwriteCustom() {
-        return overwriteCustom;
-    }
-
-    public void setOverwriteCustom(boolean overwriteCustom) {
-        this.overwriteCustom = overwriteCustom;
-    }
-
-    @Override
-    public String toString() {
-        return "ColumnDefaultValue{" +
-                "sqlCommandType=" + sqlCommandType +
-                ", columnName='" + columnName + '\'' +
-                ", value='" + value + '\'' +
-                ", overwriteCustom=" + overwriteCustom +
-                '}';
     }
 
     public static List<ColumnDefaultValue> build(DefaultValue defaultValue, String defaultColumnName)

@@ -7,6 +7,7 @@ import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
+import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import java.util.stream.IntStream;
 public class Entity5Test {
 
     @Removed
+    @Data
     @Entity(resolutionStrategy = TableSchemaResolutionStrategy.ENTITY)
     static class Entity5 {
 
@@ -48,38 +50,6 @@ public class Entity5Test {
             this.id = id;
             this.id2 = id2;
             this.valueOne = valueOne;
-            this.value2 = value2;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getId2() {
-            return id2;
-        }
-
-        public void setId2(String id2) {
-            this.id2 = id2;
-        }
-
-        public String getValueOne() {
-            return valueOne;
-        }
-
-        public void setValueOne(String valueOne) {
-            this.valueOne = valueOne;
-        }
-
-        public String getValue2() {
-            return value2;
-        }
-
-        public void setValue2(String value2) {
             this.value2 = value2;
         }
     }

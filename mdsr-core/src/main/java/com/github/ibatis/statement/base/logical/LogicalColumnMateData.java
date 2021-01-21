@@ -1,12 +1,14 @@
 package com.github.ibatis.statement.base.logical;
 
 import com.github.ibatis.statement.base.core.matedata.ColumnMateData;
+import lombok.Data;
 
 /**
  * 逻辑存在标识列元数据
  * @Author: junjie
  * @Date: 2020/3/4
  */
+@Data
 public class LogicalColumnMateData extends ColumnMateData implements Cloneable{
 
     /**
@@ -22,22 +24,6 @@ public class LogicalColumnMateData extends ColumnMateData implements Cloneable{
     @Override
     public LogicalColumnMateData clone() throws CloneNotSupportedException {
         return (LogicalColumnMateData) super.clone();
-    }
-
-    public String getExistValue() {
-        return existValue;
-    }
-
-    public void setExistValue(String existValue) {
-        this.existValue = existValue;
-    }
-
-    public String getNotExistValue() {
-        return notExistValue;
-    }
-
-    public void setNotExistValue(String notExistValue) {
-        this.notExistValue = notExistValue;
     }
 
     /**

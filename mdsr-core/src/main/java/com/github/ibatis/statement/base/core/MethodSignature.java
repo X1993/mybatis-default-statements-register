@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.base.core;
 
+import lombok.Data;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -9,6 +10,7 @@ import java.util.Objects;
  * @author junjie
  * @date 2020/3/28
  */
+@Data
 public class MethodSignature {
 
     /**
@@ -37,18 +39,6 @@ public class MethodSignature {
         this.methodName = methodName;
         this.genericReturnType = genericReturnType;
         this.genericParameterTypes = genericParameterTypes;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public Type getGenericReturnType() {
-        return genericReturnType;
-    }
-
-    public Type[] getGenericParameterTypes() {
-        return genericParameterTypes;
     }
 
     @Override

@@ -4,6 +4,13 @@ import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.util.TypeUtils;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
+import lombok.Data;
+import org.apache.ibatis.annotations.CacheNamespaceRef;
+import org.apache.ibatis.builder.BuilderException;
+import org.apache.ibatis.builder.CacheRefResolver;
+import org.apache.ibatis.builder.IncompleteElementException;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
@@ -21,6 +28,7 @@ import java.util.function.Function;
  * @Author: junjie
  * @Date: 2020/3/5
  */
+@Data
 public class MappedStatementMateData implements Cloneable{
 
     private EntityMateData entityMateData;
@@ -47,18 +55,6 @@ public class MappedStatementMateData implements Cloneable{
         return entityMateData.getDefaultMappingResultMap(mapperMethodMateData.getMapperClass());
     }
 
-    public EntityMateData getEntityMateData() {
-        return entityMateData;
-    }
-
-    public MapperMethodMateData getMapperMethodMateData() {
-        return mapperMethodMateData;
-    }
-
-    public SqlSession getSqlSession() {
-        return sqlSession;
-    }
-
     public Configuration getConfiguration() {
         return sqlSession.getConfiguration();
     }
@@ -68,6 +64,43 @@ public class MappedStatementMateData implements Cloneable{
         return "MappedStatementMateData{" +
                 "mapperMethodMateData=" + mapperMethodMateData +
                 '}';
+    }
+
+    /**
+     * 来源
+     * @return
+     */
+    public String resource(){
+        return this.getMapperMethodMateData().getMapperClass().getName();
+    }
+
+    /**
+     * 获取缓存引用
+     * @return
+     */
+    public final Cache getCacheRef()
+    {
+        Class<?> type = this.getMapperMethodMateData().getMapperClass();
+        Cache cache = null;
+        CacheNamespaceRef cacheDomainRef = type.getAnnotation(CacheNamespaceRef.class);
+        if (cacheDomainRef != null) {
+            Class<?> refType = cacheDomainRef.value();
+            String refName = cacheDomainRef.name();
+            if (refType == void.class && refName.isEmpty()) {
+                throw new BuilderException("Should be specified either value() or name() attribute in the @CacheNamespaceRef");
+            }
+            if (refType != void.class && !refName.isEmpty()) {
+                throw new BuilderException("Cannot use both value() and name() attribute in the @CacheNamespaceRef");
+            }
+            String namespace = (refType != void.class) ? refType.getName() : refName;
+            MapperBuilderAssistant assistant = new MapperBuilderAssistant(getConfiguration(), resource());
+            try {
+                cache = assistant.useCacheRef(namespace);
+            } catch (IncompleteElementException e) {
+                cache = new CacheRefResolver(assistant, namespace).resolveCacheRef();
+            }
+        }
+        return cache;
     }
 
     /**
@@ -206,27 +239,31 @@ public class MappedStatementMateData implements Cloneable{
         }else {
             whereSqlNodes.add(new StaticTextSqlNode(" 1 = 1 "));
         }
-        
+
         return new WhereSqlNode(configuration ,new MixedSqlNode(whereSqlNodes));
     }
 
     /**
-     * 定义{@link ResultMap}
+     * 根据方法返回类型生成默认{@link ResultMap}
      * @return
      */
-    public ResultMap selectResultMaps()
+    public ResultMap resultMapsByReturnType()
     {
         MapperMethodMateData mapperMethodMateData = this.getMapperMethodMateData();
         Type genericReturnType = mapperMethodMateData.getMethodSignature().getGenericReturnType();
         Class<?> returnType = mapperMethodMateData.getMappedMethod().getReturnType();
 
         Class<?> entityClass = this.getEntityMateData().getEntityClass();
-        if (TypeUtils.isAssignableFrom(entityClass ,genericReturnType)
-                || TypeUtils.isAssignableFrom(
-                ParameterizedTypeImpl.make(Collection.class ,new Type[]{entityClass} ,null) ,genericReturnType)
-                || (returnType.isArray() && TypeUtils.isAssignableFrom(entityClass ,returnType.getComponentType()))
-                || (genericReturnType instanceof GenericArrayType && TypeUtils.isAssignableFrom(entityClass ,
-                ((GenericArrayType) genericReturnType).getGenericComponentType()))) {
+        if (TypeUtils.isAssignableFrom(entityClass ,genericReturnType)){
+            return this.getDefaultMappingResultMap();
+        }else if (TypeUtils.isAssignableFrom(
+                ParameterizedTypeImpl.make(Collection.class ,new Type[]{entityClass} ,null) ,genericReturnType)){
+            return this.getDefaultMappingResultMap();
+        }else if (returnType.isArray() && TypeUtils.isAssignableFrom(entityClass ,returnType.getComponentType())){
+            return this.getDefaultMappingResultMap();
+        }else if (genericReturnType instanceof GenericArrayType && TypeUtils.isAssignableFrom(entityClass ,
+                ((GenericArrayType) genericReturnType).getGenericComponentType()))
+        {
             return this.getDefaultMappingResultMap();
         } else if (genericReturnType instanceof Class){
             return new ResultMap.Builder(
@@ -357,5 +394,5 @@ public class MappedStatementMateData implements Cloneable{
 
         return new DynamicSqlSource(this.getConfiguration() ,new MixedSqlNode(sqlNodes));
     }
-    
+
 }

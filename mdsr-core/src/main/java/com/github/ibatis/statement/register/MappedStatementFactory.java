@@ -18,6 +18,6 @@ public interface MappedStatementFactory extends Sorter {
      * @return
      * @throws Exception
      */
-    Optional<MappedStatement> tryBuild(MappedStatementMateData mappedStatementMateData);
+    Optional<MappedStatement> tryBuild(MappedStatementMateData mappedStatementMateData) throws Exception;
 
 }

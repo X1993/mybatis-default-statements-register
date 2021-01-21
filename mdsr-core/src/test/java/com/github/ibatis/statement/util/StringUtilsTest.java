@@ -19,4 +19,10 @@ public class StringUtilsTest {
         Assert.assertEquals(StringUtils.camelUnderscoreToCase("in_eq" ,true) ,"InEq");
     }
 
+    @Test
+    public void firstCharUpperCase(){
+        Assert.assertEquals(StringUtils.firstCharUpperCase("abc") ,"Abc");
+        Assert.assertEquals(StringUtils.firstCharUpperCase("Abc") ,"Abc");
+    }
+
 }

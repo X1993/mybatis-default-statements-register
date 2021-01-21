@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.base.core.matedata;
 
 import com.github.ibatis.statement.mapper.param.ConditionRule;
+import lombok.Data;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.scripting.xmltags.IfSqlNode;
 import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
@@ -13,6 +14,7 @@ import java.util.function.Function;
  * @Author: junjie
  * @Date: 2020/3/10
  */
+@Data
 public class ColumnPropertyMapping implements Cloneable{
 
     /**
@@ -45,32 +47,16 @@ public class ColumnPropertyMapping implements Cloneable{
         return getColumnMateData().getEscapeColumnName();
     }
 
+    public boolean isPrimaryKey(){
+        return columnMateData.isPrimaryKey();
+    }
+
     @Override
     public ColumnPropertyMapping clone() throws CloneNotSupportedException {
         ColumnPropertyMapping cloneColumnPropertyMapping = (ColumnPropertyMapping) super.clone();
         cloneColumnPropertyMapping.setColumnMateData(columnMateData.clone());
         cloneColumnPropertyMapping.setPropertyMateData(propertyMateData.clone());
         return cloneColumnPropertyMapping;
-    }
-
-    public PropertyMateData getPropertyMateData() {
-        return propertyMateData;
-    }
-
-    public void setPropertyMateData(PropertyMateData propertyMateData) {
-        this.propertyMateData = propertyMateData;
-    }
-
-    public ColumnMateData getColumnMateData() {
-        return columnMateData;
-    }
-
-    public void setColumnMateData(ColumnMateData columnMateData) {
-        this.columnMateData = columnMateData;
-    }
-
-    public boolean isPrimaryKey(){
-        return columnMateData.isPrimaryKey();
     }
 
     /**

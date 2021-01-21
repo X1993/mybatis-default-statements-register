@@ -6,6 +6,7 @@ import com.github.ibatis.statement.base.core.Entity;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.base.logical.Logical;
 import com.github.ibatis.statement.mapper.param.ConditionRule;
+import lombok.Data;
 import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ import java.util.Date;
 @Entity(tableName = "user")//申明实体映射的表
 @DefaultValue(commandTypes = SqlCommandType.UPDATE,columnName = "note" ,value = "CONCAT(&{column} ,'1')")
 @DefaultValue(columnName = "address2" ,value = "'中国'" ,overwriteCustom = false)
+@Data
 public class User
 {
     @Column(value = "id")//申明字段映射的列
@@ -41,51 +43,4 @@ public class User
     @DefaultValue(commandTypes = {SqlCommandType.UPDATE} ,value = "&{column} + 1")
     private int version;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
 }

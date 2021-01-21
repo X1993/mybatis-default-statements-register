@@ -1,11 +1,13 @@
 package com.github.ibatis.statement.mapper.param;
 
+import lombok.Data;
 import java.util.Objects;
 
 /**
  * @Author: junjie
  * @Date: 2020/9/1
  */
+@Data
 public class BetweenParam<T> {
 
     private T minVal;
@@ -19,19 +21,4 @@ public class BetweenParam<T> {
         this.maxVal = maxVal;
     }
 
-    public T getMinVal() {
-        return minVal;
-    }
-
-    public void setMinVal(T minVal) {
-        this.minVal = minVal;
-    }
-
-    public T getMaxVal() {
-        return maxVal;
-    }
-
-    public void setMaxVal(T maxVal) {
-        this.maxVal = maxVal;
-    }
 }

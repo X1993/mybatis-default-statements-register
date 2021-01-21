@@ -2,6 +2,7 @@ package com.github.ibatis.statement.base.core.matedata;
 
 import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.register.MappedStatementFactory;
+import lombok.Data;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.type.TypeHandler;
 import java.lang.reflect.Field;
@@ -12,6 +13,7 @@ import java.util.Objects;
  * @Author: junjie
  * @Date: 2020/3/10
  */
+@Data
 public class PropertyMateData implements Cloneable{
 
     /**
@@ -56,38 +58,6 @@ public class PropertyMateData implements Cloneable{
         return (PropertyMateData) super.clone();
     }
 
-    public Field getField() {
-        return field;
-    }
-
-    public Class<?> getType(){
-        return field.getType();
-    }
-
-    public void setField(Field field) {
-        this.field = field;
-    }
-
-    public String getPropertyName(){
-        return getField().getName();
-    }
-
-    public String getMappingColumnName() {
-        return mappingColumnName;
-    }
-
-    public void setMappingColumnName(String mappingColumnName) {
-        this.mappingColumnName = mappingColumnName;
-    }
-
-    public MappingStrategy getMappingStrategy() {
-        return mappingStrategy;
-    }
-
-    public void setMappingStrategy(MappingStrategy mappingStrategy) {
-        this.mappingStrategy = mappingStrategy;
-    }
-
     public boolean isSelectMapping() {
         for (SqlCommandType commandTypeMapping : commandTypeMappings) {
             if (SqlCommandType.SELECT.equals(commandTypeMapping)){
@@ -115,10 +85,6 @@ public class PropertyMateData implements Cloneable{
         return false;
     }
 
-    public SqlCommandType[] getCommandTypeMappings() {
-        return commandTypeMappings;
-    }
-
     public boolean isRequiredMappingColumn() {
         return MappingStrategy.REQUIRED.equals(mappingStrategy)
                 || MappingStrategy.PRIMARY_KEY.equals(mappingStrategy);
@@ -140,12 +106,12 @@ public class PropertyMateData implements Cloneable{
         }
     }
 
-    public Class<? extends TypeHandler<?>> getTypeHandlerClass() {
-        return typeHandlerClass;
+    public Class<?> getType(){
+        return field.getType();
     }
 
-    public void setTypeHandlerClass(Class<? extends TypeHandler<?>> typeHandlerClass) {
-        this.typeHandlerClass = typeHandlerClass;
+    public String getPropertyName(){
+        return getField().getName();
     }
 
     @Override

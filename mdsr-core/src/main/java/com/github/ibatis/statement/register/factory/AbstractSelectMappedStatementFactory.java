@@ -18,9 +18,9 @@ public abstract class AbstractSelectMappedStatementFactory extends AbstractMappe
                                                     MappedStatement.Builder builder)
     {
         return super.customBuilder(mappedStatementMateData, builder)
-                .resultMaps(Arrays.asList(mappedStatementMateData.selectResultMaps()))
+                .resultMaps(Arrays.asList(mappedStatementMateData.resultMapsByReturnType()))
                 .useCache(true)
-                .cache(getCacheRef(mappedStatementMateData));
+                .cache(mappedStatementMateData.getCacheRef());
     }
 
     /**
@@ -29,7 +29,7 @@ public abstract class AbstractSelectMappedStatementFactory extends AbstractMappe
      * @return
      */
     protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData){
-        return mappedStatementMateData.selectResultMaps();
+        return mappedStatementMateData.resultMapsByReturnType();
     }
 
     @Override

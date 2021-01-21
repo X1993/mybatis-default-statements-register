@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.base.condition;
 
 import com.github.ibatis.statement.mapper.param.ConditionRule;
+import lombok.Data;
 import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
  * @Author: junjie
  * @Date: 2020/7/22
  */
+@Data
 public class ColumnCondition implements Cloneable{
 
     /**
@@ -39,48 +41,6 @@ public class ColumnCondition implements Cloneable{
     @Override
     public ColumnCondition clone() throws CloneNotSupportedException {
         return (ColumnCondition) super.clone();
-    }
-
-    public SqlCommandType getSqlCommandType() {
-        return sqlCommandType;
-    }
-
-    public void setSqlCommandType(SqlCommandType sqlCommandType) {
-        this.sqlCommandType = sqlCommandType;
-    }
-
-    public String getColumnName() {
-        return columnName;
-    }
-
-    public void setColumnName(String columnName) {
-        this.columnName = columnName;
-    }
-
-    public ConditionRule getRule() {
-        return rule;
-    }
-
-    public void setRule(ConditionRule rule) {
-        this.rule = rule;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "ColumnCondition{" +
-                "sqlCommandType=" + sqlCommandType +
-                ", columnName='" + columnName + '\'' +
-                ", rule=" + rule +
-                ", value='" + value + '\'' +
-                '}';
     }
 
     public static List<ColumnCondition> build(Condition condition ,String defaultColumnName) {

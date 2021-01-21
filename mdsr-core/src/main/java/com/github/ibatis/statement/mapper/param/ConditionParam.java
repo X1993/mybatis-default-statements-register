@@ -1,10 +1,13 @@
 package com.github.ibatis.statement.mapper.param;
 
+import lombok.Data;
+
 /**
  * 过滤条件
  * @author junjie
  * @date 2020/08/31
  */
+@Data
 public class ConditionParam
 {
     /**
@@ -34,45 +37,4 @@ public class ConditionParam
         this.value = value;
     }
 
-    public String getKey() {
-        return this.key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public ConditionRule getRule() {
-        return rule;
-    }
-
-    public void setRule(ConditionRule rule) {
-        this.rule = rule;
-    }
-
-    public Object getValue() {
-        return this.value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public void setOr(boolean or) {
-        this.or = or;
-    }
-
-    public boolean isOr() {
-        return this.or;
-    }
-
-    @Override
-    public String toString() {
-        return "ConditionParam{" +
-                "key='" + key + '\'' +
-                ", rule=" + rule +
-                ", value=" + value +
-                ", or=" + or +
-                '}';
-    }
 }

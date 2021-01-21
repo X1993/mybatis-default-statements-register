@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.core.Column;
+import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,6 +19,7 @@ import java.util.stream.IntStream;
  */
 public class Entity1Test {
 
+    @Data
     static class Entity1 {
 
         private String id;
@@ -33,30 +35,6 @@ public class Entity1Test {
         public Entity1(String id, String value) {
             this.id = id;
             this.value = value;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
-        public String getValue1() {
-            return value1;
-        }
-
-        public void setValue1(String value1) {
-            this.value1 = value1;
         }
     }
 

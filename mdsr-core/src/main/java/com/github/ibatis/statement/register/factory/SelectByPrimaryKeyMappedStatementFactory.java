@@ -55,7 +55,7 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
     @Override
     protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData)
     {
-        return selectEntity(mappedStatementMateData) ? mappedStatementMateData.selectResultMaps() :
+        return selectEntity(mappedStatementMateData) ? mappedStatementMateData.resultMapsByReturnType() :
                 new ResultMap.Builder(mappedStatementMateData.getConfiguration(),
                 mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
                 boolean.class,

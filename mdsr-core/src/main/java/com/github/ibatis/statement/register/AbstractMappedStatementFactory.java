@@ -3,9 +3,6 @@ package com.github.ibatis.statement.register;
 import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.util.TypeUtils;
-import org.apache.ibatis.annotations.CacheNamespaceRef;
-import org.apache.ibatis.builder.*;
-import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 import org.slf4j.Logger;
@@ -42,7 +39,7 @@ public abstract class AbstractMappedStatementFactory implements MappedStatementF
 
         return customBuilder(mappedStatementMateData ,new MappedStatement.Builder(configuration,
                 mappedStatementId, sqlSource, sqlCommandType(mappedStatementMateData))
-                .resource(resource(mappedStatementMateData))
+                .resource(mappedStatementMateData.resource())
                 .statementType(StatementType.PREPARED)
                 .databaseId(configuration.getDatabaseId())
                 .resultSetType(configuration.getDefaultResultSetType()))
@@ -107,45 +104,5 @@ public abstract class AbstractMappedStatementFactory implements MappedStatementF
      * @return
      */
     protected abstract SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData);
-
-    /**
-     * 来源
-     * @param mappedStatementMateData
-     * @return
-     */
-    protected String resource(MappedStatementMateData mappedStatementMateData){
-        return mappedStatementMateData.getMapperMethodMateData().getMapperClass().getName();
-    }
-
-    /**
-     * 获取缓存引用
-     * @param mappedStatementMateData
-     * @return
-     */
-    protected final Cache getCacheRef(MappedStatementMateData mappedStatementMateData)
-    {
-        Class<?> type = mappedStatementMateData.getMapperMethodMateData().getMapperClass();
-        Cache cache = null;
-        CacheNamespaceRef cacheDomainRef = type.getAnnotation(CacheNamespaceRef.class);
-        if (cacheDomainRef != null) {
-            Class<?> refType = cacheDomainRef.value();
-            String refName = cacheDomainRef.name();
-            if (refType == void.class && refName.isEmpty()) {
-                throw new BuilderException("Should be specified either value() or name() attribute in the @CacheNamespaceRef");
-            }
-            if (refType != void.class && !refName.isEmpty()) {
-                throw new BuilderException("Cannot use both value() and name() attribute in the @CacheNamespaceRef");
-            }
-            String namespace = (refType != void.class) ? refType.getName() : refName;
-            MapperBuilderAssistant assistant = new MapperBuilderAssistant(
-                    mappedStatementMateData.getConfiguration(), resource(mappedStatementMateData));
-            try {
-                cache = assistant.useCacheRef(namespace);
-            } catch (IncompleteElementException e) {
-                cache = new CacheRefResolver(assistant, namespace).resolveCacheRef();
-            }
-        }
-        return cache;
-    }
 
 }

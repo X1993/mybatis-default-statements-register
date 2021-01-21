@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.util;
 
 import com.github.ibatis.statement.mapper.KeyTableMapper;
-import com.github.ibatis.statement.base.core.matedata.RootMapperMethodMateData;
 import com.github.ibatis.statement.base.core.matedata.MapperMethodMateData;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.util.reflect.GenericArrayTypeImpl;
@@ -15,9 +14,9 @@ public class TypeUtilsTest {
 
     interface InterfaceA<T ,C extends MapperMethodMateData, X> extends KeyTableMapper<T ,C> {}
 
-    interface InterfaceB<T> extends List<String>, KeyTableMapper<T, RootMapperMethodMateData> {}
+    interface InterfaceB<T> extends List<String>, KeyTableMapper<T, MapperMethodMateData> {}
 
-    interface InterfaceC extends List<String>, KeyTableMapper<String, RootMapperMethodMateData> {}
+    interface InterfaceC extends List<String>, KeyTableMapper<String, MapperMethodMateData> {}
 
     interface InterfaceD<K ,T> extends KeyTableMapper<K ,Map<String ,T>> {}
 
@@ -53,9 +52,9 @@ public class TypeUtilsTest {
     @Test
     public void parseBaseClassTypeVariable()
     {
-       Assert.assertEquals(RootMapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(InterfaceC.class ,
+       Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(InterfaceC.class ,
                EntityType.class ,"T"));
-        Assert.assertEquals(RootMapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(InterfaceB.class ,
+        Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(InterfaceB.class ,
                 EntityType.class.getTypeParameters()[0]));
         Assert.assertTrue(TypeUtils.parseSuperTypeVariable(InterfaceA.class ,
                 EntityType.class ,"T") instanceof TypeVariable);

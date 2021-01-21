@@ -1,10 +1,13 @@
 package com.github.ibatis.statement.mapper.param;
 
+import lombok.Data;
+
 /**
  * limit参数
  * @author junjie
  * @date 2020/08/31
  */
+@Data
 public class LimitParam {
 
     /**
@@ -50,22 +53,6 @@ public class LimitParam {
      */
     public static LimitParam page1(int pageIndex ,int pageSize){
         return new LimitParam((pageIndex > 0 ? pageIndex - 1 : 0) * pageSize ,pageSize);
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
 }

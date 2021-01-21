@@ -1,6 +1,7 @@
 package com.github.ibatis.statement.base.core.matedata;
 
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
+import lombok.Data;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
  * @Author: junjie
  * @Date: 2020/2/21
  */
+@Data
 public class TableMateData implements Cloneable{
 
     /**
@@ -47,36 +49,12 @@ public class TableMateData implements Cloneable{
         return (TableMateData) super.clone();
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
     public String getEscapeTableName(){
         return "`" + tableName + "`";
     }
 
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
-
-    public String getTableType() {
-        return tableType;
-    }
-
-    public void setTableType(String tableType) {
-        this.tableType = tableType;
-    }
-
-    public List<ColumnMateData> getColumnMateDataList() {
-        return columnMateDataList;
-    }
-
     public void setColumnMateDataList(List<ColumnMateData> columnMateDataList) {
         this.columnMateDataList = Collections.unmodifiableList(columnMateDataList);
-    }
-
-    public List<KeyColumnUsage> getKeyColumnUsages() {
-        return keyColumnUsages;
     }
 
     public void setKeyColumnUsages(List<KeyColumnUsage> keyColumnUsages) {
@@ -103,22 +81,6 @@ public class TableMateData implements Cloneable{
                 .filter(columnMateData -> columnMateData.isPrimaryKey())
                 .collect(Collectors.toMap(columnMateData -> columnMateData.getColumnName() ,
                         columnMateData -> columnMateData));
-    }
-
-    public TableSchemaResolutionStrategy getSchemaResolutionStrategy() {
-        return schemaResolutionStrategy;
-    }
-
-    public void setSchemaResolutionStrategy(TableSchemaResolutionStrategy schemaResolutionStrategy) {
-        this.schemaResolutionStrategy = schemaResolutionStrategy;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 
     /**
