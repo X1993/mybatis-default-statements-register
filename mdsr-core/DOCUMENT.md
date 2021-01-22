@@ -1877,7 +1877,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 
 #### 12.1 方法命名规则 
     
--   例：    
+-   查询（select/find 开头）：
    
 
     关键字           |        方法                          |          sql
@@ -1908,16 +1908,27 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Limit            |      findByNameNeLimit(LimitParam)   |     where name <> '' limit ? ,?
     
     
--  最新支持：修改和删除
+-  修改（update 开头）：
 
+除了前缀update，之后支持的规则和SELECT命令一样
+
+
+    关键字                                       |        方法                                  |         sql
+    :------                                      |      :-------------                          |       :------
+    update(方法第一个为实体类，非空属性作为赋值项) |      updateByNameNeLimit(Entity ,LimitParam) |   update `table` set column = ?, column2 = ? where name <> '' limit ? ,?
+     
+     
+-  删除
+    
+根据是否定义了逻辑列采用合适的删除策略，除了前缀delete，之后支持的规则和SELECT命令一样
+    
 
     关键字                                       |        方法                                  |         sql
     :------                                      |      :-------------                          |       :------
     delete(没有定义逻辑列)                        |      deleteByNameNeLimit(LimitParam)         |   delete from `table` where name <> '' limit ? ,?
     delete(有定义逻辑列)                          |      deleteByNameNeLimit(LimitParam)         |   update `table` set logical_column = 'delVal' where name <> '' limit ? ,?
-    update(方法第一个为实体类，非空属性作为赋值项) |      updateByNameNeLimit(Entity ,LimitParam) |   update `table` set column = ?, column2 = ? where name <> '' limit ? ,?
-        
-
+   
+   
 #### 12.2 If注解
 ```java
     package com.github.ibatis.statement.register.factory;
