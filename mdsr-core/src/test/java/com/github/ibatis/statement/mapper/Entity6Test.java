@@ -2,9 +2,9 @@ package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.condition.Condition;
 import com.github.ibatis.statement.base.core.Column;
-import com.github.ibatis.statement.base.core.Entity;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.mapper.param.BetweenParam;
+import com.github.ibatis.statement.mapper.param.ConditionRule;
 import com.github.ibatis.statement.mapper.param.LimitParam;
 import com.github.ibatis.statement.register.factory.If;
 import lombok.Data;
@@ -53,7 +53,9 @@ public class Entity6Test{
         @Column(value = "lo_code")
         private String locationCode;
 
-        @DefaultValue(value = "&{column} + 1")
+        @DefaultValue(value = "&{column} + 1" ,commandTypes = SqlCommandType.UPDATE)
+        @DefaultValue(value = "1" ,commandTypes = SqlCommandType.INSERT)
+        @Condition(rule = ConditionRule.GT ,value = "0" ,commandTypes = {SqlCommandType.UPDATE ,SqlCommandType.DELETE ,SqlCommandType.SELECT})
         private int version;
 
         public Entity6(String id, String id2) {
@@ -76,6 +78,7 @@ public class Entity6Test{
             "  `by_and_like` varchar(30) DEFAULT NULL,\n" +
             "  `index` varchar(30) DEFAULT NULL,\n" +
             "  `lo_code` varchar(30) DEFAULT NULL,\n" +
+            "  `version` integer DEFAULT 0,\n" +
             "  `removed` char(1) ,\n" +
             "  CONSTRAINT table_entity6_pk PRIMARY KEY (id, id2) \n" +
             ") DEFAULT CHARSET=utf8; ";
@@ -154,112 +157,34 @@ public class Entity6Test{
 
         List<Entity6> selectByLoCodeLimit(String loCode ,Integer limit);
 
+        List<Entity6> selectLimit(Integer limit);
+
         List<Entity6> selectByIdInLimit(Collection<String> id ,@If(otherwise = "4") Integer limit);
 
         List<Entity6> selectByLikeInOrderByIdAscLimit(@If Collection<String> like ,@If LimitParam limitParam);
-
-        List<Entity6> selectLimit(Integer limit);
 
         int deleteByIdInAndLike(String[] id ,@If String like);
 
         void deleteByIdInAndLikeLimit(String[] id ,String like ,Integer limit);
 
-        int updateByIdInAndLike(Entity6 update ,String[] id ,@If String like);
+        void deleteByIdInAndLikeOrderByIdAscLimit(String[] id ,String like ,Integer limit);
 
-    }
+        int deleteLimit(Integer limit);
 
-    private List<Entity6> deleteEntity6(){
-        Entity6 entity61 = new Entity6();
-        entity61.setId("31");
-        entity61.setId2("32");
-        entity61.setAnd("33");
-        entity61.setBy("34");
-        entity61.setByAndLike("35");
-        entity61.setIndex("36");
-        entity61.setLike("37");
-        entity61.setLocationCode("38");
-        entity61.setOr("39");
+        int deleteOrderByIdDescLimit(Integer limit);
 
-        Entity6 entity62 = new Entity6();
-        entity62.setId("41");
-        entity62.setId2("42");
-        entity62.setAnd("43");
-        entity62.setBy("44");
-        entity62.setByAndLike("45");
-        entity62.setIndex("46");
-        entity62.setLike("47");
-        entity62.setLocationCode("48");
-        entity62.setOr("49");
+        int updateOrderByIdAsc(Entity6 update);
 
-        List<Entity6> entity6s = Arrays.asList(entity61, entity62);
-        return entity6s;
-    }
+        int updateByIdInAndLike(Entity6 update ,String[] ids ,@If String like);
 
-    @Test
-    public void updateByIdInAndLike(){
-        List<Entity6> entity6s = deleteEntity6();
-        mapper.insertBatch(entity6s);
+        int updateLimit(Entity6 update ,Integer limit);
 
-        try {
-            Entity6 entity6 = new Entity6();
-            entity6.setBy("25");
-            Assert.assertEquals(mapper.updateByIdInAndLike(entity6 ,new String[]{"31" ,"41"} ,null) ,2);
+        void updateOrderByIdId2AscLimit(Entity6 update ,Integer limit);
 
-            for (Entity6 entity61 : mapper.selectBatchByPrimaryKey(entity6s)) {
-                Assert.assertEquals(entity61.getBy() ,"25");
-            }
+        int updateByIdInAndLikeLimit(Entity6 update ,String[] id ,String like ,Integer limit);
 
-            entity6.setBy("12");
-            Assert.assertEquals(mapper.updateByIdInAndLike(entity6 ,new String[]{"31" ,"41"} ,"47") ,1);
+        int updateByIdInAndLikeOrderByIdAscLimit(Entity6 update ,String[] id ,@If String like ,Integer limit);
 
-            for (Entity6 entity61 : mapper.selectBatchByPrimaryKey(entity6s)) {
-                if (entity61.getId().equals("31")){
-                    Assert.assertEquals(entity61.getBy() ,"25");
-                }else if (entity61.getId().equals("41")){
-                    Assert.assertEquals(entity61.getBy() ,"12");
-                }
-            }
-        }finally {
-            mapper.deleteBatchByPrimaryKeyOnPhysical(entity6s);
-        }
-    }
-
-    @Test
-    public void deleteByIdInAndLikeLimit()
-    {
-        List<Entity6> entity6s = deleteEntity6();
-        mapper.insertBatch(entity6s);
-        try {
-            Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity6s).size() ,entity6s.size());
-            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,"37" ,0);
-            Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity6s).size() ,entity6s.size());
-            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,"37" ,null);
-            Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity6s).size() ,entity6s.size() - 1);
-            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,"47" ,1);
-            Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity6s).size() ,entity6s.size() - 2);
-        }finally {
-            mapper.deleteBatchByPrimaryKeyOnPhysical(entity6s);
-        }
-    }
-
-    @Test
-    public void deleteByIdInAndLike()
-    {
-        List<Entity6> entity6s = deleteEntity6();
-        mapper.insertBatch(entity6s);
-
-        try {
-            Assert.assertEquals(mapper.deleteByIdInAndLike(new String[]{"31" ,"41"} ,"37") ,1);
-            Assert.assertEquals(mapper.deleteByIdInAndLike(new String[]{"31" ,"41"} ,null) ,1);
-        }finally {
-            mapper.deleteBatchByPrimaryKeyOnPhysical(entity6s);
-        }
-    }
-
-    @Test
-    public void selectLimit(){
-        Assert.assertEquals(mapper.selectLimit(2).size() ,2);
-        Assert.assertEquals(mapper.selectLimit(null).size() ,3);
     }
 
     private static final Entity6Mapper mapper = entity6Mapper();
@@ -392,7 +317,7 @@ public class Entity6Test{
 
     @Test(expected = BindingException.class)
     public void selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc(){
-        mapper.selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc("1" ,"2");
+        mapper.selectByLocationCodeAndOrNotBetweenOrderByLoCodeAsc("31" ,"41");
     }
 
     @Test
@@ -490,10 +415,99 @@ public class Entity6Test{
                 new BetweenParam<>("3" ,"4") ,null).size() ,2);
         Assert.assertEquals(mapper.selectByLoCodeBetweenAndIdNotBetweenAndId2Between(
                 new BetweenParam<>("1" ,"4") ,
-                new BetweenParam<>("3" ,"4") ,new BetweenParam<>("1" ,"2")).size() ,1);
+                new BetweenParam<>("3" ,"4") ,new BetweenParam<>("21" ,"41")).size() ,1);
         Assert.assertEquals(mapper.selectByLoCodeBetweenAndIdNotBetweenAndId2Between(
                 new BetweenParam<>("2" ,"4") ,
                 null ,null).size() ,1);
+    }
+
+    @Test
+    public void selectLimit(){
+        Assert.assertEquals(mapper.selectLimit(2).size() ,2);
+        Assert.assertEquals(mapper.selectLimit(null).size() ,3);
+    }
+
+    private List<Entity6> getTmpEntity6()
+    {
+        Entity6 entity61 = new Entity6();
+        entity61.setId("31");
+        entity61.setId2("32");
+        entity61.setAnd("33");
+        entity61.setBy("34");
+        entity61.setByAndLike("35");
+        entity61.setIndex("36");
+        entity61.setLike("37");
+        entity61.setLocationCode("38");
+        entity61.setOr("39");
+
+        Entity6 entity62 = new Entity6();
+        entity62.setId("41");
+        entity62.setId2("42");
+        entity62.setAnd("43");
+        entity62.setBy("44");
+        entity62.setByAndLike("45");
+        entity62.setIndex("46");
+        entity62.setLike("47");
+        entity62.setLocationCode("48");
+        entity62.setOr("49");
+
+        List<Entity6> entity6s = Arrays.asList(entity61, entity62);
+        return entity6s;
+    }
+
+    @Test
+    public void testUpdate(){
+        List<Entity6> entity6s = getTmpEntity6();
+        mapper.insertBatch(entity6s);
+
+        try {
+            Entity6 entity6 = new Entity6();
+            entity6.setBy("25");
+            Assert.assertEquals(mapper.updateByIdInAndLike(entity6 ,new String[]{"31" ,"41"} ,null) ,2);
+            Assert.assertEquals(mapper.updateByIdInAndLike(entity6 ,new String[]{"31" ,"41"} ,"47") ,1);
+            Assert.assertEquals(mapper.updateByIdInAndLikeLimit(entity6 ,new String[]{"31" ,"41"} ,null ,null) ,0);
+            Assert.assertEquals(mapper.updateByIdInAndLikeOrderByIdAscLimit(entity6 ,new String[]{"31" ,"41"} ,"37" ,2) ,1);
+            Assert.assertEquals(mapper.updateByIdInAndLikeOrderByIdAscLimit(entity6 ,new String[]{"31" ,"41"} ,null ,2) ,2);
+
+            entity6.setBy(null);
+            entity6.setVersion(10);
+            Assert.assertEquals(mapper.updateOrderByIdAsc(entity6) ,5);
+            Assert.assertEquals(mapper.updateLimit(entity6 ,1) ,1);
+            mapper.updateOrderByIdId2AscLimit(entity6 ,1);
+        }finally {
+            mapper.deleteBatchByPrimaryKeyOnPhysical(entity6s);
+        }
+    }
+
+    @Test
+    public void testDelete()
+    {
+        List<Entity6> entity6s = getTmpEntity6();
+        mapper.insertBatch(entity6s);
+
+        try {
+            mapper.deleteByIdInAndLike(new String[]{"31" ,"41"} ,"34");
+            mapper.deleteByIdInAndLike(new String[]{"31" ,"41"} ,null);
+            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,null ,1);
+            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,"1" ,1);
+            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,"1" ,null);
+            mapper.deleteByIdInAndLikeLimit(new String[]{"31" ,"41"} ,null ,null);
+            mapper.deleteByIdInAndLikeOrderByIdAscLimit(new String[]{"31" ,"41"} ,null ,null);
+            mapper.deleteByIdInAndLikeOrderByIdAscLimit(new String[]{"31" ,"41"} ,"1" ,null);
+            mapper.deleteByIdInAndLikeOrderByIdAscLimit(new String[]{"31" ,"41"} ,null ,1);
+            mapper.deleteByIdInAndLikeOrderByIdAscLimit(new String[]{"31" ,"41"} ,"1" ,1);
+        }finally {
+            mapper.deleteBatchByPrimaryKeyOnPhysical(entity6s);
+        }
+    }
+
+//    @Test
+    public void testDelete1(){
+        //会影响其他测试，单独测试
+        mapper.deleteLimit(1);
+        mapper.deleteLimit(null);
+        mapper.deleteOrderByIdDescLimit(1);
+        mapper.deleteOrderByIdDescLimit(null);
     }
 
 }

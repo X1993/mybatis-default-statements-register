@@ -1906,27 +1906,29 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     Count            |      selectCountByNameAndCode(?,?)   |     select count(0) from `table` where name= ? and code = ?  
     Limit            |      findByNameNeLimit(int limit)    |     where name <> '' limit ?
     Limit            |      findByNameNeLimit(LimitParam)   |     where name <> '' limit ? ,?
-    
+       
     
 -  修改（update 开头）：
 
-除了前缀update，之后支持的规则和SELECT命令一样
+    除了前缀update，之后支持的规则和SELECT命令一样，方法的第一个参数类型必须为实体类型，实体对象非空属性映射的列作为
+    update column（注意基本类型），注意 update sql 不支持 limit ?,? ，只允许为 limit ?
 
 
-    关键字                                       |        方法                                  |         sql
-    :------                                      |      :-------------                          |       :------
-    update(方法第一个为实体类，非空属性作为赋值项) |      updateByNameNeLimit(Entity ,LimitParam) |   update `table` set column = ?, column2 = ? where name <> '' limit ? ,?
+    关键字                                       |        方法                              |         sql
+    :------                                      |      :-------------                      |       :------
+    update(方法第一个为实体类，非空属性作为赋值项) | updateByNameNeOrderByIdAscLimit(int)     |   update `table` set column = ?, column2 = ? where name <> '' order by `id` limit ?
      
      
 -  删除
     
-根据是否定义了逻辑列采用合适的删除策略，除了前缀delete，之后支持的规则和SELECT命令一样
+    根据是否定义了逻辑列采用合适的删除策略，除了前缀delete，之后支持的规则和SELECT命令一样，
+    注意 update/delete sql 不支持 limit ?,? ，只允许为 limit ?
     
 
-    关键字                                       |        方法                                  |         sql
-    :------                                      |      :-------------                          |       :------
-    delete(没有定义逻辑列)                        |      deleteByNameNeLimit(LimitParam)         |   delete from `table` where name <> '' limit ? ,?
-    delete(有定义逻辑列)                          |      deleteByNameNeLimit(LimitParam)         |   update `table` set logical_column = 'delVal' where name <> '' limit ? ,?
+    关键字                      |        方法                                   |         sql
+    :------                     |      :-------------                          |       :------
+    delete(没有定义逻辑列)       |      deleteByNameNeOrderByIdAscLimit(int)    |   delete from `table` where name <> '' order by `id` limit ? ,?
+    delete(有定义逻辑列)         |      deleteByNameNeOrderByIdAscLimit(int)    |   update `table` set logical_column = 'delVal' where name <> '' order by `id` limit ?
    
    
 #### 12.2 If注解
