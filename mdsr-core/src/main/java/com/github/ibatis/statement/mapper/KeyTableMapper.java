@@ -9,7 +9,7 @@ import com.github.ibatis.statement.register.factory.*;
  * 支持带主键的表
  * @see K 主键类型或实体类型{@link KeyParameterType}
  * @see T 映射的实体类型
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T>{

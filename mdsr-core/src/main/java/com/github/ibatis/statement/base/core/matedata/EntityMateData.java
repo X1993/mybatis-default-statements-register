@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * 实体类元数据
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 @Data

@@ -3,7 +3,7 @@ package com.github.ibatis.statement.base.dv;
 import java.lang.annotation.*;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 @Target({ElementType.TYPE ,ElementType.FIELD})

@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 /**
  * 数据库表-列 -》 类型-属性 映射
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/10
  */
 @Data

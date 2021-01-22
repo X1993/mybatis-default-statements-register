@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * 表元数据
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 @Data
@@ -84,7 +84,7 @@ public class TableMateData implements Cloneable{
     }
 
     /**
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/3/12
      */
     public enum Type {

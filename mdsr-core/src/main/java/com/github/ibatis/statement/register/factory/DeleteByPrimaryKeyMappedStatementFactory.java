@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * @see KeyTableMapper#deleteByPrimaryKey(Object)
  * @see KeyTableMapper#deleteByPrimaryKeyOnPhysical(Object)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/9
  */
 public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory

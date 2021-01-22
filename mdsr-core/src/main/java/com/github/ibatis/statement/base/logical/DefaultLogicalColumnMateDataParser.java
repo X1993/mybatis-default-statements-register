@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/4
  */
 public class DefaultLogicalColumnMateDataParser implements LogicalColumnMateDataParser {

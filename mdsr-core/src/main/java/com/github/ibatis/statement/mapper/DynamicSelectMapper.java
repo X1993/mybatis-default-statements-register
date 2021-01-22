@@ -8,7 +8,7 @@ import com.github.ibatis.statement.register.factory.DynamicParamsSelectStatement
 
 /**
  * 动态参数查询接口
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/8/31
  */
 public interface DynamicSelectMapper<T> extends EntityType<T> {

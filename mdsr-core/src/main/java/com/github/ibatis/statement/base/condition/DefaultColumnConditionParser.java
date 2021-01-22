@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * 默认条件列解析器
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 public class DefaultColumnConditionParser implements ColumnConditionParser {

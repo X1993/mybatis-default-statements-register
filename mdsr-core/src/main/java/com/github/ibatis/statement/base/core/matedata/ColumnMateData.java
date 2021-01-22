@@ -5,7 +5,7 @@ import org.apache.ibatis.type.JdbcType;
 
 /**
  * 列元数据
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 @Data

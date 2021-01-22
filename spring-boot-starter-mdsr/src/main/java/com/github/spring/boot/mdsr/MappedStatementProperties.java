@@ -8,7 +8,7 @@ import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/17
  */
 @ConfigurationProperties(MappedStatementProperties.PREFIX)

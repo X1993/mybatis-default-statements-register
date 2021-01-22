@@ -6,7 +6,7 @@ import java.lang.annotation.*;
 /**
  * 添加该注解的属性映射的列每次执行插入/修改操作的时候会自动赋值
  * @see ColumnDefaultValue
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/21
  */
 @Target({ElementType.FIELD ,ElementType.TYPE})

@@ -8,7 +8,7 @@ import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import java.text.MessageFormat;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/10/29
  */
 public class TableMapperListener implements DefaultStatementAutoRegister.Listener {

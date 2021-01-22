@@ -19,7 +19,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/9/8
  */
 public class MybatisEnvironment {

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 /**
  * Mapper接口支持的实体类解析
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public interface MapperEntityParser extends Sorter {

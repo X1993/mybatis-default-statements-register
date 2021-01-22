@@ -11,7 +11,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.Date;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/9/9
  */
 @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列

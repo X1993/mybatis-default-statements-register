@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * 测试列名中包含关键字时方法名解析是否正常
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/11/27
  */
 public class Entity6Test{

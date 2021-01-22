@@ -8,7 +8,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.Date;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/9/9
  */
 //列名为`removed`的列为逻辑列

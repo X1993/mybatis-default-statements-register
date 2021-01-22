@@ -5,7 +5,7 @@ import com.github.mdsr.sample.model.User;
 import org.apache.ibatis.annotations.Select;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/9/9
  */
 public interface UserMapper extends KeyTableMapper<Integer ,User> {

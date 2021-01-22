@@ -15,7 +15,7 @@ import java.util.*;
 /**
  * @see KeyTableMapper#deleteBatchByPrimaryKey(Collection)
  * @see KeyTableMapper#deleteBatchByPrimaryKeyOnPhysical(Collection)
- * @author junjie
+ * @author X1993
  * @date 2020/3/14
  */
 public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory

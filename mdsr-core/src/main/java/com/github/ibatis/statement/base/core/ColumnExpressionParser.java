@@ -18,7 +18,7 @@ import java.util.Map;
  * </p>
  * @see DefaultColumnValueParser#expressionParser
  * @see DefaultColumnConditionParser#expressionParser
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/8/3
  */
 public class ColumnExpressionParser implements ExpressionParser {

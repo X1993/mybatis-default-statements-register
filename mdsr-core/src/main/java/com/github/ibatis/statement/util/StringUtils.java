@@ -1,7 +1,7 @@
 package com.github.ibatis.statement.util;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/2/23
  */
 public class StringUtils {

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 /**
  * H2 表结构查询接口
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public class H2TableSchemaQuery extends AbstractTableSchemaQuery
@@ -97,7 +97,7 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
 
     /**
      * 查询H2表schema
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/3/19
      */
     public interface H2TableSchemaMapper {

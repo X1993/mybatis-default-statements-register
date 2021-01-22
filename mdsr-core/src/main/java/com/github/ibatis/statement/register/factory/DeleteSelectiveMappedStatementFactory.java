@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @see  TableMapper#deleteSelectiveOnPhysical(Object)
  * @see  TableMapper#deleteSelective(Object)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/4/27
  */
 public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStatementFactory {

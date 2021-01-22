@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/10/21
  */
 public abstract class AbstractTableSchemaQuery implements TableSchemaQuery {

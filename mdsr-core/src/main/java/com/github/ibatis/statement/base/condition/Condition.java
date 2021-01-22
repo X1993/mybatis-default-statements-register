@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 
 /**
  * 声明列作为过滤条件
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 @Target({ElementType.FIELD ,ElementType.TYPE})

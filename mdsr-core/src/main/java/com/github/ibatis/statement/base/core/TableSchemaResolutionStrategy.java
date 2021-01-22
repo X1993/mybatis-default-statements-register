@@ -4,7 +4,7 @@ import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
 
 /**
  * 表结构来源
- * @author junjie
+ * @author X1993
  * @date 2020/10/6
  */
 public enum TableSchemaResolutionStrategy {

@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * 逻辑存在标识列元数据
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/4
  */
 @Data

@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 /**
  * 使用自定义规则{@link SpecificColumnValueParser#predicate}解析所有匹配的默认赋值列
  * @see ColumnDefaultValue
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 public class SpecificColumnValueParser implements ColumnValueParser {

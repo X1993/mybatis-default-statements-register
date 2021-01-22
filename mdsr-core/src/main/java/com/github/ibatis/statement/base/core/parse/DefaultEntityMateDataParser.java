@@ -23,7 +23,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/24
  */
 public class DefaultEntityMateDataParser implements EntityMateDataParser{

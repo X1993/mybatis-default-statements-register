@@ -9,7 +9,7 @@ import org.apache.ibatis.mapping.SqlSource;
 
 /**
  * @see KeyTableMapper#selectMaxKey()
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/12/18
  */
 public class SelectMaxKeyStatementFactory extends AbstractSelectMappedStatementFactory {

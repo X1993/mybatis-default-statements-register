@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 public class TypeUtils {

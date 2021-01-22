@@ -6,7 +6,7 @@ import java.util.Optional;
 
 /**
  * 表结构查询接口注册器
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 public interface TableSchemaQueryRegister {

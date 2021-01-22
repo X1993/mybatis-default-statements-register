@@ -8,7 +8,7 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.Arrays;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/5
  */
 public abstract class AbstractSelectMappedStatementFactory extends AbstractMappedStatementFactory {

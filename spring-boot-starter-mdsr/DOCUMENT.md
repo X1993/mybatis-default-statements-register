@@ -106,7 +106,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import org.apache.ibatis.annotations.Select;
     
     /**
-     * @author junjie
+     * @author X1993
      * @date 2020/9/9
      */
     public interface UserMapper extends KeyTableMapper<Integer ,User> {
@@ -221,7 +221,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import org.apache.ibatis.annotations.Select;
     
     /**
-     * @author junjie
+     * @author X1993
      * @date 2020/9/9
      */
     public interface UserMapper extends KeyTableMapper<Integer ,User> {
@@ -263,7 +263,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import java.util.Collection;
     
     /**
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/9/14
      */
     public interface CustomUserMapper extends KeyParameterType<Integer> ,EntityType<User>{
@@ -327,7 +327,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import java.util.Optional;
     
     /**
-     * @author junjie
+     * @author X1993
      * @date 2020/9/13
      */
     
@@ -392,7 +392,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import org.springframework.boot.context.properties.ConfigurationProperties;
     
     /**
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/3/17
      */
     @ConfigurationProperties(MappedStatementProperties.PREFIX)
@@ -444,7 +444,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     
     /**
      * 解析类属性对应列名
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/2/21
      */
     public interface PropertyMateDataParser extends Sorter {
@@ -501,7 +501,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 
     /**
      * 逻辑列元数据解析
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/3/4
      */
     public interface LogicalColumnMateDataParser extends Sorter{
@@ -683,7 +683,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```java
     /**
      * 添加该注解的属性映射的列每次执行插入/修改操作的时候会自动赋值
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/7/21
      */
     @Target({ElementType.FIELD ,ElementType.TYPE})
@@ -725,7 +725,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```java
     /**
      * 解析使用默认赋值的列
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/7/22
      */
     public interface ColumnValueParser extends Sorter{
@@ -852,7 +852,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     
     /**
      * 声明列作为过滤条件
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/7/22
      */
     @Target({ElementType.FIELD ,ElementType.TYPE})
@@ -892,7 +892,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 ```java
     /**
      * 解析使用默认赋值的列
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/7/22
      */
     public interface ColumnValueParser extends Sorter{
@@ -1085,7 +1085,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     
     /**
      * 自定义规则查询接口
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/8/31
      */
     public interface DynamicSelectMapper<T> extends EntityType<T> {
@@ -1163,7 +1163,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
 #### 10.1.指定实体类配置
 ```java
     /**
-     * @author junjie
+     * @author X1993
      * @date 2020/9/9
      */
     @Entity(tableName = "user" ,resolutionStrategy = TableSchemaResolutionStrategy.ENTITY)
@@ -1221,7 +1221,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import org.apache.ibatis.annotations.Select;
     
     /**
-     * @author junjie
+     * @author X1993
      * @date 2020/9/9
      */
     public interface UserMapper extends KeyTableMapper<Integer ,User> {
@@ -1246,7 +1246,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     import java.util.Collections;
     
     /**
-     * @author junjie
+     * @author X1993
      * @date 2020/9/27
      */
     @Component
@@ -1375,7 +1375,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     /**
      * 为方法参数添加if标签
      * @see DefaultColumnConditionParser#parse(EntityMateData)
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/7/24
      */
     @Target({ElementType.PARAMETER})

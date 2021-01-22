@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 /**
  * MySQL/MariaDB 表结构查询接口
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public class MysqlTableSchemaQuery extends AbstractTableSchemaQuery
@@ -80,7 +80,7 @@ public class MysqlTableSchemaQuery extends AbstractTableSchemaQuery
 
     /**
      * 查询Mysql表schema
-     * @Author: junjie
+     * @Author: X1993
      * @Date: 2020/3/19
      */
     public interface MysqlTableSchemaMapper {

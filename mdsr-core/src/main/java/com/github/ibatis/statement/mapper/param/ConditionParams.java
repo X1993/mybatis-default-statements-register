@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/9/1
  */
 public class ConditionParams {

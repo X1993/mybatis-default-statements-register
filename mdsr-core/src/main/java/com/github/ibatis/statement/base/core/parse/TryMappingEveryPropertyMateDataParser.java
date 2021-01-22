@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * 默认为每一个属性需要尝试映射列
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/9/8
  */
 public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataParser {

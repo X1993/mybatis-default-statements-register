@@ -10,7 +10,7 @@ import java.util.Objects;
 
 /**
  * 实体类属性元数据
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/10
  */
 @Data

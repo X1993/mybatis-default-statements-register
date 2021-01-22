@@ -12,7 +12,7 @@ import java.util.Collection;
 
 /**
  * @see KeyTableMapper#updateBatch(Collection)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/4/27
  */
 public class UpdateBatchMappedStatementFactory extends AbstractMappedStatementFactory {

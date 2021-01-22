@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 /**
  * 测试列名中包含关键字时方法名解析是否正常
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/11/27
  */
 @RunWith(SpringRunner.class)

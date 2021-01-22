@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 /**
  * 使用自定义规则{@link SpecificColumnConditionParser#predicate}解析所有匹配的条件过滤列
  * @see ColumnCondition
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 public class SpecificColumnConditionParser implements ColumnConditionParser {

@@ -2,7 +2,7 @@ package com.github.ibatis.statement.mapper.param;
 
 /**
  * 条件过滤规则
- * @author junjie
+ * @author X1993
  * @date 2020/08/31
  */
 public enum ConditionRule

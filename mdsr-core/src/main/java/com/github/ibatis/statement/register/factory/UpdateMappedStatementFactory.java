@@ -11,7 +11,7 @@ import org.apache.ibatis.mapping.SqlSource;
 /**
  * @see  KeyTableMapper#updateByPrimaryKey(Object)
  * @see KeyTableMapper#updateByPrimaryKeySelective(Object)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/6
  */
 public class UpdateMappedStatementFactory extends AbstractMappedStatementFactory {

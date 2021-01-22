@@ -16,7 +16,7 @@ import java.util.*;
  * @see KeyTableMapper#countByPrimaryKeysOnPhysical(Collection)
  * @see KeyTableMapper#selectBatchByPrimaryKey(Collection)
  * @see KeyTableMapper#selectBatchByPrimaryKeyOnPhysical(Collection)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/12/29
  */
 public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractSelectMappedStatementFactory{

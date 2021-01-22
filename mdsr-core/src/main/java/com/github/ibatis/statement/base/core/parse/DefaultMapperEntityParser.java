@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public class DefaultMapperEntityParser implements MapperEntityParser {

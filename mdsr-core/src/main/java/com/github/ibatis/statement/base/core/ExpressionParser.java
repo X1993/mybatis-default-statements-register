@@ -4,7 +4,7 @@ import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 
 /**
  * 自定义表达式解析
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/8/3
  */
 public interface ExpressionParser {

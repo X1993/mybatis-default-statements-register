@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 /**
  * @see KeyTableMapper#updateBatchSameValue(Collection, Object)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/4/27
  */
 public class UpdateSameBatchMappedStatementFactory extends AbstractMappedStatementFactory {

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * {@link MappedStatement}构建工厂
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public interface MappedStatementFactory extends Sorter {

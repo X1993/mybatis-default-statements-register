@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 /**
  * 对指定的列禁用默认赋值，优先级大于{@link DefaultValue}
  * @see DefaultColumnConditionParser#parse(EntityMateData)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/24
  */
 @Target({ElementType.TYPE ,ElementType.FIELD})

@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * limit参数
- * @author junjie
+ * @author X1993
  * @date 2020/08/31
  */
 @Data

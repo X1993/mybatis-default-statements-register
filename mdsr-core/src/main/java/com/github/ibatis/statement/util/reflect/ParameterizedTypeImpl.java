@@ -11,7 +11,7 @@ import java.util.Objects;
  * copy from
  * @see sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
  * 避免对rt.jar的依赖
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/4/28
  */
 public class ParameterizedTypeImpl implements ParameterizedType

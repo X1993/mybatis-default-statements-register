@@ -18,7 +18,7 @@ import java.util.*;
  * @see DynamicSelectMapper#selectByDynamicParams(DynamicParams)
  * @see DynamicSelectMapper#countByDynamicParams(DynamicParams)
  *
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/4/5
  */
 public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedStatementFactory

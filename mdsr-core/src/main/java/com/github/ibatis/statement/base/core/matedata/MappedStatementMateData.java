@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 /**
  * 构建{@link org.apache.ibatis.mapping.MappedStatement}的元数据
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/5
  */
 @Data

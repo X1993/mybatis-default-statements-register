@@ -6,7 +6,7 @@ import com.github.mdsr.sample.model.User;
 import java.util.Collection;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/9/14
  */
 public interface CustomUserMapper extends KeyParameterType<Integer> ,EntityType<User>{

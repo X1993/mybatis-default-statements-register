@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 
 /**
  * 实体类属性映射的列信息
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 @Target({ElementType.FIELD})

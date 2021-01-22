@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * 表结构查询接口，不同数据库可能有不同实现
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public interface TableSchemaQuery {

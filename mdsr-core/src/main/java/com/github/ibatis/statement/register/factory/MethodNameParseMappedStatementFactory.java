@@ -27,7 +27,7 @@ import static com.github.ibatis.statement.register.factory.MethodNameParseMapped
 
 /**
  * 特定规则的方法
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/11/23
  */
 public class MethodNameParseMappedStatementFactory implements MappedStatementFactory {

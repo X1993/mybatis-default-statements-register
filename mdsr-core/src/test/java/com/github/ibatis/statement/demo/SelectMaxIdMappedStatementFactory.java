@@ -11,7 +11,7 @@ import org.apache.ibatis.mapping.SqlSource;
 import java.util.Collections;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/9/27
  */
 public class SelectMaxIdMappedStatementFactory extends AbstractSelectMappedStatementFactory {

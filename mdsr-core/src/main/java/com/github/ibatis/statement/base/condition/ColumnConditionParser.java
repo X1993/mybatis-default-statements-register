@@ -6,7 +6,7 @@ import com.github.ibatis.statement.util.Sorter;
 /**
  * 解析使用默认条件过滤的列
  * @see EntityMateData#commandTypeConditionMap
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 public interface ColumnConditionParser extends Sorter {

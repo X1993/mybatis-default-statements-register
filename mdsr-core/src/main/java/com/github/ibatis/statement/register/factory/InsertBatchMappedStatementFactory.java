@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * @see TableMapper#insertBatch(Collection)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/13
  */
 public class InsertBatchMappedStatementFactory extends AbstractMappedStatementFactory {

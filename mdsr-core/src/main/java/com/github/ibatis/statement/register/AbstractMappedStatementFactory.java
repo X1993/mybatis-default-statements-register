@@ -12,7 +12,7 @@ import java.util.*;
 
 /**
  * 模板类
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/5
  */
 public abstract class AbstractMappedStatementFactory implements MappedStatementFactory {

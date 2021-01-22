@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 /**
  * 动态参数
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/8/31
  */
 public class DynamicParams {

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * 当mapper接口加载完成后，尝试为实现{@link EntityType}
  * 的mapper接口方法注册默认{@link MappedStatement}，如果没有注册的话
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public class DefaultStatementAutoRegister implements StatementAutoRegister {

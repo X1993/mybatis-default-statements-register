@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * 实体类元数据解析器
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/24
  */
 public interface EntityMateDataParser{

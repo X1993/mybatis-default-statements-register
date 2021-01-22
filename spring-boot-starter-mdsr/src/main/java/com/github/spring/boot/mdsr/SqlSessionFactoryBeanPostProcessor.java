@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/9
  */
 @Import(DefaultStatementConfiguration.class)

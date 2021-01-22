@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * 定义逻辑存在列
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 @Target({ElementType.TYPE ,ElementType.ANNOTATION_TYPE})

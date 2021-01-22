@@ -5,7 +5,7 @@ import com.github.ibatis.statement.util.Sorter;
 
 /**
  * 逻辑列元数据解析
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/4
  */
 public interface LogicalColumnMateDataParser extends Sorter{

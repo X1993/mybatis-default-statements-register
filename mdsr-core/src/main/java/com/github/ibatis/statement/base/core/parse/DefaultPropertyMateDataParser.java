@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public class DefaultPropertyMateDataParser implements PropertyMateDataParser {

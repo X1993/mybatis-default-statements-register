@@ -8,7 +8,7 @@ import java.util.Objects;
  * copy from
  * @see sun.reflect.generics.reflectiveObjects.GenericArrayTypeImpl
  * 避免对rt.jar的依赖
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/4/28
  */
 public class GenericArrayTypeImpl implements GenericArrayType {

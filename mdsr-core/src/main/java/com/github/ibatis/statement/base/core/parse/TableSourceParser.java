@@ -6,7 +6,7 @@ import java.util.Optional;
 
 /**
  * 解析实体类映射的表来源信息
- * @author junjie
+ * @author X1993
  * @date 2020/2/23
  */
 public interface TableSourceParser extends Sorter{
@@ -20,7 +20,7 @@ public interface TableSourceParser extends Sorter{
 
     /**
      * 表来源
-     * @author junjie
+     * @author X1993
      * @date 2020/9/26
      */
     class Source {

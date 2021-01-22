@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 /**
  * 为方法参数添加if标签
  * @see DefaultColumnConditionParser#parse(EntityMateData)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/24
  */
 @Target({ElementType.PARAMETER})

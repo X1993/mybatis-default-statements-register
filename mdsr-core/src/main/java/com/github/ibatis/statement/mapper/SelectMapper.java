@@ -6,7 +6,7 @@ import com.github.ibatis.statement.register.factory.SelectSelectiveMappedStateme
 
 /**
  * 支持表或视图查询
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/16
  */
 public interface SelectMapper<T> extends EntityType<T> ,DynamicSelectMapper<T> {

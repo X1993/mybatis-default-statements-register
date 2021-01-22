@@ -16,7 +16,7 @@ import java.util.*;
  * @see KeyTableMapper#selectByPrimaryKeyOnPhysical(Object)
  * @see KeyTableMapper#existByPrimaryKey(Object)
  * @see KeyTableMapper#existByPrimaryKeyOnPhysical(Object)
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMappedStatementFactory {

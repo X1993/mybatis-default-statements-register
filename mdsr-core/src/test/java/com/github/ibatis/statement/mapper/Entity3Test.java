@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 /**
  * 测试 定义了复合主键、默认排序的实体注册的MappedStatement是否符合预期
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/9/8
  */
 public class Entity3Test {

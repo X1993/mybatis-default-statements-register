@@ -10,7 +10,7 @@ import org.apache.ibatis.mapping.SqlSource;
 /**
  * @see TableMapper#insert(Object)
  * @see TableMapper#insertSelective(Object)
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/6
  */
 public class InsertMappedStatementFactory extends AbstractMappedStatementFactory {

@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/7/22
  */
 public class DefaultColumnValueParser implements ColumnValueParser {

@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 
 /**
  * 测试 定义 联合主键、逻辑列、默认排序的实体注册的MappedStatement是否符合预期
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/9/8
  */
 public class Entity5Test {

@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * 解析类属性映射的列名
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public interface PropertyMateDataParser extends Sorter {

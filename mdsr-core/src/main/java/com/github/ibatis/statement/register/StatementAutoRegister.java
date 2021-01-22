@@ -7,7 +7,7 @@ import java.util.Collection;
 
 /**
  * 缺省的{@link MappedStatement}注册器
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/2/21
  */
 public interface StatementAutoRegister {

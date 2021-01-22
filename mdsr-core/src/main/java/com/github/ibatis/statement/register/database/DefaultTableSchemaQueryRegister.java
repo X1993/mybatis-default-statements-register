@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/9/26
  */
 public class DefaultTableSchemaQueryRegister implements TableSchemaQueryRegister {

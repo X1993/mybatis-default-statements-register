@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author junjie
+ * @author X1993
  * @date 2020/2/23
  */
 public class DefaultTableSourceParser implements TableSourceParser {

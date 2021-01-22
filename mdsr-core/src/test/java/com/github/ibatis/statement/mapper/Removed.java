@@ -5,7 +5,7 @@ import com.github.ibatis.statement.base.logical.Logical;
 import java.lang.annotation.*;
 
 /**
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/9
  */
 @Target({ElementType.TYPE})

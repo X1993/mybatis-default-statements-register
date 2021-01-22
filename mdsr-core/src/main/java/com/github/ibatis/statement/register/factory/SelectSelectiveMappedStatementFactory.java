@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 /**
  * @see {@link SelectMapper#selectSelective(Object, boolean)}
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/13
  */
 public class SelectSelectiveMappedStatementFactory extends AbstractSelectMappedStatementFactory {

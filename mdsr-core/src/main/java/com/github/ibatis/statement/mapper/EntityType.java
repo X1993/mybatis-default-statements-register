@@ -3,7 +3,7 @@ package com.github.ibatis.statement.mapper;
 /**
  * 定义实体类型
  * @see T 映射的实体类型
- * @author junjie
+ * @author X1993
  * @date 2020/2/22
  */
 public interface EntityType<T> {

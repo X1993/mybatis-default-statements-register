@@ -5,7 +5,7 @@ import com.github.ibatis.statement.register.factory.*;
 
 /**
  * 表操作mapper
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/3/18
  */
 public interface TableMapper<T> extends SelectMapper<T> {
