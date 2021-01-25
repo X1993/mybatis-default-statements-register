@@ -7,6 +7,8 @@ import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.register.factory.*;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.register.factory.DeleteSelectiveMappedStatementFactory;
+import com.github.ibatis.statement.register.factory.DynamicParamsSelectStatementFactory;
+import com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory;
 import com.github.ibatis.statement.register.listener.KeyParameterMapperListener;
 import com.github.ibatis.statement.register.listener.TableMapperListener;
 import com.github.ibatis.statement.util.Sorter;

@@ -15,7 +15,6 @@ import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -24,13 +23,13 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static com.github.ibatis.statement.mapper.param.ConditionRule.*;
-import static com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory.Card.START_CARD;
 
 /**
  * 特定规则的方法
  * @Author: X1993
  * @Date: 2020/11/23
  */
+@Data
 public class MethodNameParseMappedStatementFactory implements MappedStatementFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodNameParseMappedStatementFactory.class);
@@ -38,7 +37,17 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
     /**
      * 忽略方法名大小写
      */
-    static final boolean IGNORE_CASE = true;
+    private boolean ignoreCase = true;
+
+    /**
+     * 是否支持update命令
+     */
+    private boolean supportUpdate = true;
+
+    /**
+     * 是否支持delete命令
+     */
+    private boolean supportDelete = true;
 
     @Override
     public Optional<MappedStatement> tryBuild(MappedStatementMateData mappedStatementMateData) {
@@ -121,7 +130,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
 
     private String getExpression(MappedStatementMateData mappedStatementMateData){
         String expression = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        return IGNORE_CASE ? expression.toUpperCase() : expression;
+        return ignoreCase ? expression.toUpperCase() : expression;
     }
 
     /**
@@ -136,7 +145,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
         long startTimeMillis = System.currentTimeMillis();
         Map<Card, List<Edge>> cardEdgeMap = syntaxTable.getSyntaxTable();
         String expression = getExpression(mappedStatementMateData);
-        List<List<Edge>> sentences = parseParticiple(expression, Edge.START_EDGE, context, cardEdgeMap);
+        List<List<Edge>> sentences = parseParticiple(expression, START_EDGE, context, cardEdgeMap);
 
         for (List<Edge> sentence : sentences) {
             //removed Card.START_CARD
@@ -245,7 +254,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
 
     private final Predicate<Context> truePredicate = context -> true;
 
-    private Reference<SyntaxTable> syntaxTableCache;
+    private WeakReference<SyntaxTable> syntaxTableCache;
 
     /**
      * 语法规则
@@ -303,7 +312,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
         List<Edge> updatePossibleEdges = new ArrayList<>();
 
         Map<Card ,List<Edge>> cardEdgeMap = new HashMap<>();
-        cardEdgeMap.put(Card.START_CARD ,startPossibleEdges);
+        cardEdgeMap.put(START_CARD ,startPossibleEdges);
         cardEdgeMap.put(find ,selectPossibleEdges);
         cardEdgeMap.put(count ,countPossibleEdges);
         cardEdgeMap.put(and ,andPossibleEdges);
@@ -895,13 +904,14 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
                 i -> context.getParamName(i).toString() ,dv -> new StaticTextSqlNode(dv) ,context);
     }
 
+
+    final Card START_CARD = new Card("");
+
     /**
      * 单词
      */
     @Data
-    static class Card {
-
-        static final Card START_CARD = new Card("");
+    class Card {
 
         /**
          * 单词类型
@@ -921,7 +931,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
             Objects.requireNonNull(type);
             Objects.requireNonNull(expression);
             this.type = type;
-            this.expression = IGNORE_CASE ? expression.toUpperCase() : expression;
+            this.expression = ignoreCase ? expression.toUpperCase() : expression;
         }
 
         @Override
@@ -959,7 +969,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
         }
     }
 
-    static class ColumnCard extends Card{
+    class ColumnCard extends Card{
 
         public final String columnName;
 
@@ -1125,13 +1135,13 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
         }
     }
 
+    private Edge START_EDGE = new Edge().nextCard(START_CARD);
+
     /**
      * 有向边
      */
     @Data
-    static class Edge{
-
-        static Edge START_EDGE = new Edge().nextCard(START_CARD);
+    class Edge{
 
         /**
          * 下个单词
