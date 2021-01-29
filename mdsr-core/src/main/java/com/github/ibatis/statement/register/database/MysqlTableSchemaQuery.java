@@ -110,7 +110,8 @@ public class MysqlTableSchemaQuery extends AbstractTableSchemaQuery
          */
         @Select("SELECT column_name as columnName, ordinal_position as ordinalPosition " +
                 "FROM information_schema.KEY_COLUMN_USAGE WHERE table_name = #{0} AND " +
-                "table_schema = (SELECT DATABASE()) ORDER BY ordinal_position ASC")
+                "table_schema = (SELECT DATABASE()) AND CONSTRAINT_NAME = 'PRIMARY' " +
+                "ORDER BY ordinal_position ASC")
         List<KeyColumnUsage> keyColumnUsage(String tableName);
 
     }

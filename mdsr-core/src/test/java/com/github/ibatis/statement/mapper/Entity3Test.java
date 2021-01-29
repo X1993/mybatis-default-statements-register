@@ -48,6 +48,7 @@ public class Entity3Test {
             "  `id2` int(32) ,\n" +
             "  `value` varchar(30) DEFAULT NULL,\n" +
             "  `value2` varchar(30) DEFAULT NULL,\n" +
+            "  CONSTRAINT table_entity7_value2_pk UNIQUE (value2) ," +
             "  CONSTRAINT table_entity3_pk PRIMARY KEY (id1, id2) \n" +
             ") DEFAULT CHARSET=utf8;";
 

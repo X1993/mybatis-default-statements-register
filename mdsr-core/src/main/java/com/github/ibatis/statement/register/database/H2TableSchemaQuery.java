@@ -36,7 +36,7 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
                         .peek(columnMateData -> columnMateData.setJdbcType(
                                 mappingJdbcType(columnMateData.getDataType())))
                         .peek(columnMateData -> columnMateData.setPrimaryKey(
-                                keyColumnNames.contains(columnMateData.getColumnName().toUpperCase()))
+                                keyColumnNames.contains(columnMateData.getColumnName()))
                         ).collect(Collectors.toList()))
                 .orElseGet(() -> new ArrayList());
     }
@@ -126,8 +126,9 @@ public class H2TableSchemaQuery extends AbstractTableSchemaQuery
          * @return
          */
         @Select("SELECT column_name as columnName, ordinal_position as ordinalPosition " +
-                "FROM information_schema.KEY_COLUMN_USAGE WHERE table_name = #{0} AND " +
-                "TABLE_CATALOG = (SELECT DATABASE()) ORDER BY ordinal_position ASC")
+                "FROM information_schema.INDEXES WHERE table_name = #{0} AND " +
+                "TABLE_CATALOG = (SELECT DATABASE()) AND `PRIMARY_KEY` = 1 " +
+                "ORDER BY ordinal_position ASC")
         List<KeyColumnUsage> keyColumnUsage(String tableName);
 
     }
