@@ -91,41 +91,46 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
                 return null;
             }
 
-            Map<String ,PropertyMateData> columnMappingPropertyMateData = new HashMap<>();
-            for (Field field : ClassUtils.getFields(entityClass, false)) {
-                PropertyMateData propertyMateData = propertyMateDataParser.parse(entityClass, field).orElse(null);
-                if (propertyMateData != null){
-                    String mappingColumnName = propertyMateData.getMappingColumnName();
-                    if (columnMappingPropertyMateData.containsKey(mappingColumnName)){
-                        throw new IllegalStateException(MessageFormat.format(
-                                "[{0}] and [{1}] mapping repeat column [{2}]" ,field ,
-                                propertyMateData.getField() ,mappingColumnName));
-                    }
-                    columnMappingPropertyMateData.put(propertyMateData.getMappingColumnName() ,propertyMateData);
-                }
-            }
-
-            Collection<PropertyMateData> propertyMateDatas = columnMappingPropertyMateData.values();
+            Collection<PropertyMateData> propertyMateDataCollection = parsePropertyMateData(entityClass);
 
             if (TableSchemaResolutionStrategy.DATA_BASE.equals(strategy)) {
                 return parseEntityMateDataByDatabase(entityClass ,tableName ,
-                        sqlSession ,propertyMateDatas);
+                        sqlSession ,propertyMateDataCollection);
             }
             if (TableSchemaResolutionStrategy.DATA_BASE_PRIORITY.equals(strategy)) {
                 EntityMateData entityMateData = parseEntityMateDataByDatabase(entityClass ,tableName ,
-                        sqlSession ,propertyMateDatas);
+                        sqlSession ,propertyMateDataCollection);
                 if (entityMateData == null){
                     entityMateData = parseEntityMateDataByEntity(entityClass ,tableName ,
-                            sqlSession ,propertyMateDatas);
+                            sqlSession ,propertyMateDataCollection);
                 }
                 return entityMateData;
             }
             if (TableSchemaResolutionStrategy.ENTITY.equals(strategy)) {
                 return parseEntityMateDataByEntity(entityClass ,tableName ,
-                        sqlSession ,propertyMateDatas);
+                        sqlSession ,propertyMateDataCollection);
             }
         }
         return null;
+    }
+
+    private Collection<PropertyMateData> parsePropertyMateData(Class<?> entityClass)
+    {
+        Map<String ,PropertyMateData> columnMappingPropertyMateData = new HashMap<>();
+        for (Field field : ClassUtils.getFields(entityClass, false)) {
+            PropertyMateData propertyMateData = propertyMateDataParser.parse(entityClass, field).orElse(null);
+            if (propertyMateData != null){
+                String mappingColumnName = propertyMateData.getMappingColumnName();
+                if (columnMappingPropertyMateData.containsKey(mappingColumnName)){
+                    throw new IllegalStateException(MessageFormat.format(
+                            "[{0}] and [{1}] mapping repeat column [{2}]" ,field ,
+                            propertyMateData.getField() ,mappingColumnName));
+                }
+                columnMappingPropertyMateData.put(propertyMateData.getMappingColumnName() ,propertyMateData);
+            }
+        }
+
+        return columnMappingPropertyMateData.values();
     }
 
     private EntityMateData parseEntityMateDataByDatabase(Class entityClass ,
