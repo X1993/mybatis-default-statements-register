@@ -448,13 +448,14 @@ JDK 8+, Maven, Mysql/MariaDB/H2
      * @Date: 2020/2/21
      */
     public interface PropertyMateDataParser extends Sorter {
-    
+        
         /**
          * 解析
          * @param entityClass 实体类
+         * @param field 类型属性
          * @return
          */
-        Optional<PropertyMateData> parse(Class<?> entityClass);
+        Optional<PropertyMateData> parse(Class<?> entityClass ,Field field);
     
     }
 ```

@@ -1,13 +1,11 @@
 package com.github.ibatis.statement.base.core.parse;
 
 import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
-import com.github.ibatis.statement.util.ClassUtils;
 import com.github.ibatis.statement.util.StringUtils;
 import java.lang.annotation.*;
-import java.util.Collections;
+import java.lang.reflect.Field;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * 默认为每一个属性需要尝试映射列
@@ -24,17 +22,16 @@ public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataPa
 
     @Override
     public int order() {
-        return Integer.MAX_VALUE;
+        return 0;
     }
 
     @Override
-    public Set<PropertyMateData> parse(Class<?> entityClass)
+    public Optional<PropertyMateData> parse(Class<?> entityClass ,Field field)
     {
-        return entityClass.getAnnotation(Prohibit.class) == null ?
-                ClassUtils.getFields(entityClass ,false)
-                .stream()
-                .map(field -> new PropertyMateData(defaultNameFunction.apply(field.getName()) ,field))
-                .collect(Collectors.toSet()) : Collections.EMPTY_SET;
+        if (entityClass.getAnnotation(Prohibit.class) == null){
+            return Optional.of(new PropertyMateData(defaultNameFunction.apply(field.getName()) ,field));
+        }
+        return Optional.empty();
     }
 
     public PropertyToColumnNameFunction getDefaultNameFunction() {
