@@ -18,7 +18,9 @@ public class ClassUtils {
      */
     public static List<Field> getFields(Class<?> clazz ,boolean containStatic)
     {
-        if (clazz == null || clazz.isInterface() || clazz.getPackage().getName().startsWith("java")){
+        if (clazz == null || clazz.isInterface()
+                || clazz.getClassLoader() == null || clazz.getClassLoader().getParent() == null)
+        {
             return Collections.EMPTY_LIST;
         }
         List<Field> fields = new ArrayList<>();
