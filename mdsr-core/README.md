@@ -33,9 +33,9 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
 </p>
 
 ### 文档
-[文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/DOCUMENT.md)
+[文档](DOCUMENT.md)
 
 ## 快速开始
-[参考单元测试](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
+[参考单元测试](../../../../tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
 
   
