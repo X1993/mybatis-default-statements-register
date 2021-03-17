@@ -2,7 +2,7 @@
 =================
 
    * [目录](#目录)
-         * [运行环境:](#运行环境)
+      * [运行环境:](#运行环境)
       * [快速开始](#快速开始)
          * [配置参数](#配置参数)
          * [项目启动](#项目启动)
@@ -37,7 +37,7 @@
 
 >  Directory Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
-### 运行环境:
+## 运行环境:
 JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 *支持的数据库*:
