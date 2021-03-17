@@ -1,7 +1,57 @@
-# 文档
+使用文档
+=================
 
-## 运行环境:
-JDK 8+, Maven, Mysql/MariaDB/H2
+   * [文档](#文档)
+      * [运行环境:](#运行环境)
+      * [快速开始](#快速开始)
+         * [配置参数](#配置参数)
+         * [项目启动](#项目启动)
+      * [功能介绍](#功能介绍)
+         * [1.使用自动注册的Mapper方法](#1使用自动注册的mapper方法)
+            * [1.1.演示](#11演示)
+            * [1.2.自定义sql覆盖自动注册的方法](#12自定义sql覆盖自动注册的方法)
+            * [1.3.选择性注册](#13选择性注册)
+         * [2.实体类表名自定义解析](#2实体类表名自定义解析)
+            * [2.1.默认Entity类名驼峰转下划线](#21默认entity类名驼峰转下划线)
+            * [2.2.自定义解析规则](#22自定义解析规则)
+         * [3.实体类字段映射的列解析](#3实体类字段映射的列解析)
+            * [3.1 通过yaml配置默认类#属性-&gt;表#列映射规则](#31-通过yaml配置默认类属性-表列映射规则)
+            * [3.2.自定义解析规则](#32自定义解析规则)
+         * [4.逻辑列](#4逻辑列)
+            * [4.1.在实体类上使用注解申明逻辑列](#41在实体类上使用注解申明逻辑列)
+            * [4.2.全局配置匹配逻辑列](#42全局配置匹配逻辑列)
+         * [5.复合主键](#5复合主键)
+         * [6.默认赋值](#6默认赋值)
+            * [6.1 在实体类属性上申明默认赋值规则](#61-在实体类属性上申明默认赋值规则)
+            * [6.2 全局配置解析默认赋值规则](#62-全局配置解析默认赋值规则)
+         * [7.默认where条件](#7默认where条件)
+            * [7.1 在实体类属性上申明默认where条件](#71-在实体类属性上申明默认where条件)
+            * [7.2 全局配置解析默认赋值规则](#72-全局配置解析默认赋值规则)
+         * [8.禁止特定列查询/修改/新增](#8禁止特定列查询修改新增)
+         * [9.动态条件查询](#9动态条件查询)
+         * [10.指定table schema解析策略](#10指定table-schema解析策略)
+            * [10.1.指定实体类配置](#101指定实体类配置)
+            * [10.2全局默认配置](#102全局默认配置)
+         * [11.自定义MappedStatementFactory](#11自定义mappedstatementfactory)
+         * [12.特定规则方法缺省MappedStatement自动注册](#12特定规则方法缺省mappedstatement自动注册)
+            * [12.1 方法命名规则](#121-方法命名规则)
+            * [12.2 If注解](#122-if注解)
+
+>  Directory Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
+### 运行环境:
+JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
+
+*支持的数据库*:
+  
+1.TableSchemaResolutionStrategy=DATA_BASE，适用mysql 、mariaDB 、H2
+> 其他数据库只需实现特定的适配器
+```java
+    /**
+    * @see com.github.ibatis.statement.register.database.TableSchemaQuery
+    */
+```
+2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
 
 ## 快速开始
 >   Spring-Boot项目 [参考](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample) 
@@ -530,7 +580,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         }
     }
 ```
-#### 效果演示
+>   效果演示
 -   insert
 ```java
     @RunWith(SpringRunner.class)
@@ -766,7 +816,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         }
     }
 ```
-#### 效果演示
+>   效果演示
 -   insert
 ```java
     @RunWith(SpringRunner.class)
@@ -945,7 +995,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         }
     }
 ```
-#### 效果演示
+>   效果演示
 -   select
 ```java
     @RunWith(SpringRunner.class)
@@ -1043,7 +1093,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     
     }
 ```
-#### 效果演示
+>   效果演示
 -   update
 ```java
     @RunWith(SpringRunner.class)
@@ -1129,7 +1179,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     
     }
 ```
-#### 效果演示
+>   效果演示
 ```java
     @RunWith(SpringRunner.class)
     @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -1185,7 +1235,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-#### 效果演示
+>   效果演示
 -   select
 ```java
     public class Demo{
@@ -1295,7 +1345,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-#### 效果演示
+>   效果演示
 -   select
 ```java
     @RunWith(SpringRunner.class)

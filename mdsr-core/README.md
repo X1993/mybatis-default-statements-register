@@ -12,19 +12,6 @@
 -   5.功能：除自动注入特定CRUD方法外，支持逻辑列、复合主键、默认where条件、默认赋值、禁止特定列查询/修改/新增、
     动态条件查询、方法名称解析注册。
 
-### 运行环境:
-JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
-
-### 支持的数据库:  
-1.TableSchemaResolutionStrategy=DATA_BASE，适用mysql 、mariaDB 、H2
-> 其他数据库只需实现特定的适配器
-```java
-    /**
-    * @see com.github.ibatis.statement.register.database.TableSchemaQuery
-    */
-```
-2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
-
 ### 流程框架:
 <p align="center">
   <a>
@@ -32,10 +19,10 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
   </a>
 </p>
 
-### 文档
-[文档](DOCUMENT.md)
+### [文档](DOCUMENT.md)
+>   直接使用基础组件比较繁琐，通常使用spring boot封装版本[spring-boot-starter-mdsr](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr)
 
-## 快速开始
+### 快速开始
 [参考单元测试](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
 
   

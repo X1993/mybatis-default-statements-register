@@ -12,11 +12,10 @@
 -   5.功能：除自动注入特定方法外，支持逻辑列、复合主键、默认where条件、默认赋值、禁止特定列查询/修改/新增、动态条件查询、方法名称解析注册。
 
 ## 详细介绍
--   1.核心模块：[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core) 
-    演示：[参考单元测试](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core/src/test/java/com/github/ibatis/statement/demo)
+-   核心模块：[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core) 
+>   直接使用比较繁琐，很多组件需要组装，建议直接使用spring-boot组装版本
 
--   2.基于spring-boot组装：[spring-boot-starter-mdsr](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr) 
-    演示：[sample](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
+-   基于spring-boot组装：[spring-boot-starter-mdsr](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr) 
 
 
   

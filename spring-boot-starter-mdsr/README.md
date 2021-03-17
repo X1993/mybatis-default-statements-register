@@ -30,10 +30,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
   </a>
 </p>
 
-### 文档
-[文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/spring-boot-starter-mdsr/DOCUMENT.md)
+### [文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/spring-boot-starter-mdsr/DOCUMENT.md)
 
-## 快速开始
-[参考](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
+### [快速开始](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
 
   

@@ -1,55 +1,55 @@
-#文档
-
-
-目录
+使用文档
 =================
 
-  * [运行环境:](#运行环境)
-  * [快速开始](#快速开始)
-     * [配置参数](#配置参数)
-     * [项目启动](#项目启动)
-  * [功能介绍](#功能介绍)
-     * [1.自动注册特定Mapper方法](#1自动注册特定mapper方法)
-        * [1.1.演示效果](#11演示效果)
-        * [1.2.自定义sql覆盖自动注册的方法](#12自定义sql覆盖自动注册的方法)
-        * [1.3.选择性注册](#13选择性注册)
-     * [2.实体类自定义表名解析](#2实体类自定义表名解析)
-        * [2.1.默认Entity类名驼峰转下划线](#21默认entity类名驼峰转下划线)
-        * [2.2.自定义解析规则](#22自定义解析规则)
-     * [3.实体类字段映射的列解析](#3实体类字段映射的列解析)
-        * [3.1.自定义解析规则](#31自定义解析规则)
-     * [4.逻辑列](#4逻辑列)
-        * [4.1.在实体类上使用注解申明逻辑列](#41在实体类上使用注解申明逻辑列)
-        * [4.2.全局配置匹配逻辑列](#42全局配置匹配逻辑列)
-        * [效果演示](#效果演示)
-     * [5.复合主键](#5复合主键)
-     * [6.默认赋值](#6默认赋值)
-        * [6.1 在实体类属性上申明默认赋值规则](#61-在实体类属性上申明默认赋值规则)
-        * [6.2 全局配置解析默认赋值规则](#62-全局配置解析默认赋值规则)
-        * [效果演示](#效果演示-1)
-     * [7.默认where条件](#7默认where条件)
-        * [7.1 在实体类属性上申明默认where条件](#71-在实体类属性上申明默认where条件)
-        * [7.2 全局配置解析默认赋值规则](#72-全局配置解析默认赋值规则)
-        * [效果演示](#效果演示-2)
-     * [8.禁止特定列查询/修改/新增](#8禁止特定列查询修改新增)
-        * [效果演示](#效果演示-3)
-     * [9.动态条件查询](#9动态条件查询)
-        * [效果演示](#效果演示-4)
-     * [10.table schema解析策略](#10table-schema解析策略)
-        * [10.1指定table schema解析策略](#101指定table-schema解析策略)
-        * [效果演示](#效果演示-5)
-        * [10.2全局配置](#102全局配置)
-     * [11.自定义mappedStatementFactory](#11自定义mappedstatementfactory)
-        * [效果演示](#效果演示-6)
-     * [12.特定规则方法缺省MappedStatement自动注册](#12特定规则方法缺省mappedstatement自动注册)
-        * [12.1 方法命名规则](#121-方法命名规则)
-        * [12.2 If注解](#122-if注解)
+   * [目录](#目录)
+         * [运行环境:](#运行环境)
+      * [快速开始](#快速开始)
+         * [配置参数](#配置参数)
+         * [项目启动](#项目启动)
+      * [功能](#功能)
+         * [1.通用方法自动注册](#1通用方法自动注册)
+            * [1.2.自定义sql覆盖自动注册的方法](#12自定义sql覆盖自动注册的方法)
+            * [1.3.选择性注册](#13选择性注册)
+         * [2.实体类自定义表名解析](#2实体类自定义表名解析)
+            * [2.1.默认Entity类名驼峰转下划线](#21默认entity类名驼峰转下划线)
+            * [2.2.自定义解析规则](#22自定义解析规则)
+         * [3.实体类字段映射的列解析](#3实体类字段映射的列解析)
+            * [3.1.自定义解析规则](#31自定义解析规则)
+         * [4.逻辑列](#4逻辑列)
+            * [4.1.在实体类上使用注解申明逻辑列](#41在实体类上使用注解申明逻辑列)
+            * [4.2.全局配置匹配逻辑列](#42全局配置匹配逻辑列)
+         * [5.复合主键](#5复合主键)
+         * [6.默认赋值](#6默认赋值)
+            * [6.1 在实体类属性上申明默认赋值规则](#61-在实体类属性上申明默认赋值规则)
+            * [6.2 全局配置解析默认赋值规则](#62-全局配置解析默认赋值规则)
+         * [7.默认where条件](#7默认where条件)
+            * [7.1 在实体类属性上申明默认where条件](#71-在实体类属性上申明默认where条件)
+            * [7.2 全局配置解析默认赋值规则](#72-全局配置解析默认赋值规则)
+         * [8.禁止特定列查询/修改/新增](#8禁止特定列查询修改新增)
+         * [9.动态条件查询](#9动态条件查询)
+         * [10.table schema解析策略](#10table-schema解析策略)
+            * [10.1指定table schema解析策略](#101指定table-schema解析策略)
+            * [10.2全局配置](#102全局配置)
+         * [11.自定义mappedStatementFactory](#11自定义mappedstatementfactory)
+         * [12.特定规则方法缺省MappedStatement自动注册](#12特定规则方法缺省mappedstatement自动注册)
+            * [12.1 方法命名规则](#121-方法命名规则)
+            * [12.2 If注解](#122-if注解)
 
-Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+>  Directory Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
+### 运行环境:
+JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
-## 运行环境:
-JDK 8+, Maven, Mysql/MariaDB/H2
+*支持的数据库*:
+  
+1.TableSchemaResolutionStrategy=DATA_BASE，适用mysql 、mariaDB 、H2
+> 其他数据库只需实现特定的适配器
+```java
+    /**
+    * @see com.github.ibatis.statement.register.database.TableSchemaQuery
+    */
+```
+2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
 
 ## 快速开始
 ### 配置参数
@@ -296,9 +296,9 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-## 功能介绍
-### 1.自动注册特定Mapper方法
-#### 1.1.演示效果
+## 功能
+### 1.通用方法自动注册
+>   演示效果
 -   insert
 ```java
     package com.github.ibatis.statement.demo;
@@ -890,7 +890,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         }
     }
 ```
-#### 效果演示
+>   效果演示
 -   insert
 ```java
     package com.github.ibatis.statement.demo;
@@ -1172,7 +1172,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         }
     }
 ```
-#### 效果演示
+>   效果演示
 -   insert
 ```java
     import com.github.ibatis.statement.demo.User;
@@ -1402,7 +1402,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
         }
     }
 ```
-#### 效果演示
+>   效果演示
 -   select
 ```java
     package com.github.ibatis.statement.demo;
@@ -1509,7 +1509,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-#### 效果演示
+>   效果演示
 -   update
 ```java
     import com.github.ibatis.statement.demo.User;
@@ -1617,7 +1617,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 
 ```
-#### 效果演示
+>   效果演示
 ```java
     import com.github.ibatis.statement.demo.User;
     import com.github.ibatis.statement.demo.UserMapper;
@@ -1711,7 +1711,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-#### 效果演示
+>   效果演示
 -   select
 ```java
     package com.github.ibatis.statement.demo;
@@ -1896,7 +1896,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
-#### 效果演示
+>   效果演示
 -   select
 ```java
     package com.github.ibatis.statement.demo;
@@ -2020,7 +2020,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2
     }
 ```
 
--   效果演示
+>   效果演示
  mapper方法定义
 ```java
     package com.github.ibatis.statement.demo;
