@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper.param;
 
+import lombok.Data;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.List;
  * @Author: X1993
  * @Date: 2020/9/1
  */
+@Data
 public class ConditionParams {
 
     /**
@@ -18,7 +20,10 @@ public class ConditionParams {
 
     private boolean or;
 
-    private boolean defaultAllowEmpty;
+    /**
+     * 语法上允许值为NULL的规则，如果值为NULL时，默认情况下是否略过
+     */
+    private boolean defaultAllowNull;
 
     /**
      * 两次调用之间的{@link ConditionParams#params}在构建sql时每个条件使用 or 连接，最外层嵌套括号
@@ -39,70 +44,70 @@ public class ConditionParams {
         return this;
     }
 
-    public ConditionParams eq(String key ,Object value ,boolean allowEmpty){
-        if (value != null || allowEmpty) {
+    public ConditionParams eq(String key ,Object value ,boolean allowNull){
+        if (value != null || allowNull) {
             addConditionParam(key,ConditionRule.EQ,value);
         }
         return this;
     }
 
     public ConditionParams eq(String key ,Object value){
-        return eq(key,value ,defaultAllowEmpty);
+        return eq(key,value , defaultAllowNull);
     }
 
-    public ConditionParams notEq(String key ,Object value ,boolean allowEmpty){
-        if (value != null || allowEmpty) {
+    public ConditionParams notEq(String key ,Object value ,boolean allowNull){
+        if (value != null || allowNull) {
             addConditionParam(key,ConditionRule.NOT_EQ,value);
         }
         return this;
     }
 
     public ConditionParams notEq(String key ,Object value){
-        return notEq(key,value ,defaultAllowEmpty);
+        return notEq(key,value , defaultAllowNull);
     }
 
-    public ConditionParams lt(String key ,Object value ,boolean allowEmpty){
-        if (value != null || allowEmpty) {
+    public ConditionParams lt(String key ,Object value ,boolean allowNull){
+        if (value != null || allowNull) {
             addConditionParam(key,ConditionRule.LT,value);
         }
         return this;
     }
 
     public ConditionParams lt(String key ,Object value){
-        return lt(key, value, defaultAllowEmpty);
+        return lt(key, value, defaultAllowNull);
     }
 
-    public ConditionParams gt(String key ,Object value ,boolean allowEmpty){
-        if (value != null || allowEmpty) {
+    public ConditionParams gt(String key ,Object value ,boolean allowNull){
+        if (value != null || allowNull) {
             addConditionParam(key,ConditionRule.GT,value);
         }
         return this;
     }
 
     public ConditionParams gt(String key ,Object value){
-        return gt(key,value,defaultAllowEmpty);
+        return gt(key,value, defaultAllowNull);
     }
 
-    public ConditionParams ltEq(String key ,Object value ,boolean allowEmpty){
-        if (value != null || allowEmpty) {
+    public ConditionParams ltEq(String key ,Object value ,boolean allowNull){
+        if (value != null || allowNull) {
             addConditionParam(key,ConditionRule.LE,value);
         }
         return this;
     }
 
     public ConditionParams ltEq(String key ,Object value){
-        return ltEq(key,value, defaultAllowEmpty);
+        return ltEq(key,value, defaultAllowNull);
     }
 
-    public ConditionParams gtEq(String key ,Object value,boolean allowEmpty){
-        if (value != null || allowEmpty) {
+    public ConditionParams gtEq(String key ,Object value,boolean allowNull){
+        if (value != null || allowNull) {
             addConditionParam(key,ConditionRule.GE,value);
         }
         return this;
     }
 
     public ConditionParams gtEq(String key ,Object value){
-        return gtEq(key,value ,defaultAllowEmpty);
+        return gtEq(key,value , defaultAllowNull);
     }
 
     public ConditionParams ne(String key){
@@ -145,40 +150,29 @@ public class ConditionParams {
         return this;
     }
 
-    public ConditionParams notIn(String key ,Collection<?> collection)
+    public ConditionParams notIn(String key ,Collection collection)
     {
-        if (collection == null || collection.size() == 0){
-            throw new IllegalArgumentException();
+        if (collection != null && collection.size() > 0){
+            this.params.add(new ConditionParam(key, ConditionRule.NOT_IN, collection));
         }
-        for (Object value : collection) {
-            if (value == null){
-                throw new IllegalArgumentException();
-            }
-        }
-        this.params.add(new ConditionParam(key, ConditionRule.NOT_IN, collection));
         return this;
     }
 
     public ConditionParams notIn(String key ,Object ... values){
-        return this.notIn(key ,Arrays.asList(values));
+        return values == null || values.length == 0 ? this : this.notIn(key ,Arrays.asList(values));
     }
 
-    public ConditionParams in(String key ,Iterable iterable)
+    public ConditionParams in(String key ,Collection collection)
     {
-        List list = new ArrayList<>();
-        for (Object value : iterable) {
-            list.add(value);
+        if (collection != null && collection.size() > 0){
+            this.params.add(new ConditionParam(key, ConditionRule.IN, collection));
         }
-        if (list.size() == 0){
-            list.add(null);
-        }
-        this.params.add(new ConditionParam(key, ConditionRule.IN ,list));
         return this;
     }
 
     public ConditionParams in(String key ,Object ... values)
     {
-        return this.in(key ,Arrays.asList(values));
+        return values == null || values.length == 0 ? this : this.in(key ,Arrays.asList(values));
     }
 
     public ConditionParams isNull(String key){
@@ -202,19 +196,6 @@ public class ConditionParams {
     {
         addConditionParam(new ConditionParam(key,rule,value));
         return this;
-    }
-
-    public ConditionParams setDefaultAllowEmpty(boolean defaultAllowEmpty) {
-        this.defaultAllowEmpty = defaultAllowEmpty;
-        return this;
-    }
-
-    public boolean isDefaultAllowEmpty() {
-        return defaultAllowEmpty;
-    }
-
-    public List<ConditionParam> getParams() {
-        return params;
     }
 
     public DynamicParams dynamicParams(){
