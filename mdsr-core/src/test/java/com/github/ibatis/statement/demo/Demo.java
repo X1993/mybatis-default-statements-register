@@ -273,6 +273,7 @@ public class Demo {
     public void selectByDynamicParams(){
         userMapper.selectByDynamicParams(new DynamicParams()
                 .where(new ConditionParams()
+                        .eq("address" ,null ,true)
                         .between("create_time", "2020-08-11", new Date())
                         .likeLeft("`name`", "张")
                         .in("id" ,1 ,2))

@@ -124,21 +124,23 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
         return new IfSqlNode(new MixedSqlNode(Arrays.asList(
                 new VarDeclSqlNode("proCondition" ,"null") ,
                 new ForEachSqlNode(configuration, new MixedSqlNode(Arrays.asList(
+                        //多个过滤条件连接符
                         new ChooseSqlNode(Arrays.asList(new IfSqlNode(new StaticTextSqlNode(" AND ( "),
                                 "(proCondition == null or (proCondition != null and proCondition.isOr() == false)) " +
                                         "and condition.isOr() == true")), new IfSqlNode(new StaticTextSqlNode(" AND "),
                                 "proCondition == null or (proCondition != null and proCondition.isOr() == false)")),
+                        // `column` [rule]
                         new TextSqlNode(" ${condition.key} ${condition.rule.expression} "),
-                        new IfSqlNode(new ChooseSqlNode(Arrays.asList(
-                                new IfSqlNode(new ForEachSqlNode(configuration, new StaticTextSqlNode(" #{data} "),
-                                        "condition.value", null, "data",
-                                        "(", ")", ","),
+                        new ChooseSqlNode(Arrays.asList(
+                            new IfSqlNode(new ForEachSqlNode(configuration, new StaticTextSqlNode(" #{data} "),
+                                "condition.value", null, "data",
+                                "(", ")", ","),
                                 "condition.rule.name()=='IN' || condition.rule.name()=='NOT_IN'"),
-                                new IfSqlNode(new StaticTextSqlNode(" #{condition.value.minVal} AND #{condition.value.maxVal}"),
-                                        "condition.rule.name()=='BETWEEN'"),
-                                new IfSqlNode(new StaticTextSqlNode(""),
-                                        " condition.rule.name()=='NE' || condition.rule.name()=='IS_NULL' || condition.rule.name()=='NOT_NULL'")),
-                                new StaticTextSqlNode(" #{condition.value} ")), "condition.value != null"),
+                            new IfSqlNode(new StaticTextSqlNode(" #{condition.value.minVal} AND #{condition.value.maxVal}"),
+                                "condition.rule.name()=='BETWEEN'"),
+                            new IfSqlNode(new StaticTextSqlNode(""),
+                                " condition.rule.name()=='NE' || condition.rule.name()=='IS_NULL' || condition.rule.name()=='NOT_NULL'")),
+                            new StaticTextSqlNode(" #{condition.value} ")),
                         new IfSqlNode(new StaticTextSqlNode(" OR "), "condition.isOr() == true"),
                         new IfSqlNode(new StaticTextSqlNode(") "),
                                 "condition.isOr() == false and (proCondition != null and proCondition.isOr() ==true)"),

@@ -2,6 +2,7 @@ package com.github.ibatis.statement.mapper.param;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -144,19 +145,17 @@ public class ConditionParams {
         return this;
     }
 
-    public ConditionParams notIn(String key ,Iterable iterable)
+    public ConditionParams notIn(String key ,Collection<?> collection)
     {
-        List list = new ArrayList<>();
-        for (Object value : iterable) {
+        if (collection == null || collection.size() == 0){
+            throw new IllegalArgumentException();
+        }
+        for (Object value : collection) {
             if (value == null){
                 throw new IllegalArgumentException();
             }
-            list.add(value);
         }
-        if (list.size() == 0){
-            throw new IllegalArgumentException();
-        }
-        this.params.add(new ConditionParam(key, ConditionRule.NOT_IN, list));
+        this.params.add(new ConditionParam(key, ConditionRule.NOT_IN, collection));
         return this;
     }
 
