@@ -22,7 +22,7 @@ public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataPa
 
     @Override
     public int order() {
-        return -1000;
+        return Integer.MAX_VALUE - 100;
     }
 
     @Override
