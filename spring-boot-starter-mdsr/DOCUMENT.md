@@ -6,36 +6,44 @@
      * [配置参数](#配置参数)
      * [项目启动](#项目启动)
   * [功能介绍](#功能介绍)
-     * [1.使用自动注册的Mapper方法](#1使用自动注册的mapper方法)
-        * [1.1.演示](#11演示)
+     * [1.通用方法自动注册](#1通用方法自动注册)
+        * [1.1.继承指定接口](#11继承指定接口)
         * [1.2.自定义sql覆盖自动注册的方法](#12自定义sql覆盖自动注册的方法)
         * [1.3.选择性注册](#13选择性注册)
-     * [2.实体类表名自定义解析](#2实体类表名自定义解析)
-        * [2.1.默认Entity类名驼峰转下划线](#21默认entity类名驼峰转下划线)
-        * [2.2.自定义解析规则](#22自定义解析规则)
-     * [3.实体类字段映射的列解析](#3实体类字段映射的列解析)
-        * [3.1 通过yaml配置默认类#属性-&gt;表#列映射规则](#31-通过yaml配置默认类属性-表列映射规则)
-        * [3.2.自定义解析规则](#32自定义解析规则)
+     * [2.表名解析](#2表名解析)
+        * [2.1.注解声明](#21注解声明)
+        * [2.2.自定义解析](#22自定义解析)
+        * [2.3.默认驼峰转下划线](#23默认驼峰转下划线)
+        * [2.4.优先级](#24优先级)
+     * [3.列解析](#3列解析)
+        * [3.1.注解声明](#31注解声明)
+        * [3.2.自定义解析](#32自定义解析)
+        * [3.3.默认规则](#33默认规则)
+        * [3.4.优先级](#34优先级)
      * [4.逻辑列](#4逻辑列)
-        * [4.1.在实体类上使用注解申明逻辑列](#41在实体类上使用注解申明逻辑列)
-        * [4.2.全局配置匹配逻辑列](#42全局配置匹配逻辑列)
+        * [4.1.注解声明](#41注解声明)
+        * [4.2.自定义解析](#42自定义解析)
+        * [4.3.优先级](#43优先级)
      * [5.复合主键](#5复合主键)
      * [6.默认赋值](#6默认赋值)
-        * [6.1 在实体类属性上申明默认赋值规则](#61-在实体类属性上申明默认赋值规则)
-        * [6.2 全局配置解析默认赋值规则](#62-全局配置解析默认赋值规则)
+        * [6.1.注解声明](#61注解声明)
+        * [6.2.自定义解析](#62自定义解析)
+        * [6.3.优先级](#63优先级)
      * [7.默认where条件](#7默认where条件)
-        * [7.1 在实体类属性上申明默认where条件](#71-在实体类属性上申明默认where条件)
-        * [7.2 全局配置解析默认赋值规则](#72-全局配置解析默认赋值规则)
+        * [7.1.注解声明](#71注解声明)
+        * [7.2.自定义解析](#72自定义解析)
+        * [7.3.优先级](#73优先级)
      * [8.禁止特定列查询/修改/新增](#8禁止特定列查询修改新增)
      * [9.动态条件查询](#9动态条件查询)
-     * [10.指定table schema解析策略](#10指定table-schema解析策略)
-        * [10.1.指定实体类配置](#101指定实体类配置)
-        * [10.2全局默认配置](#102全局默认配置)
-     * [11.自定义MappedStatementFactory](#11自定义mappedstatementfactory)
-     * [12.特定规则方法缺省MappedStatement自动注册](#12特定规则方法缺省mappedstatement自动注册)
-        * [12.1 方法命名规则](#121-方法命名规则)
-        * [12.2 If注解](#122-if注解)
-
+     * [10.table schema解析策略](#10table-schema解析策略)
+        * [10.1.注解声明](#101注解声明)
+        * [10.2.默认配置](#102默认配置)
+        * [10.3.优先级](#103优先级)
+     * [11.扩展自动注册方法](#11扩展自动注册方法)
+     * [12.方法名解析自动注册](#12方法名解析自动注册)
+        * [12.1.方法命名规则](#121方法命名规则)
+        * [12.2.If注解](#122if注解)
+            
 >  Directory Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 ## 运行环境:
@@ -164,8 +172,10 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 
 ## 功能介绍
-### 1.使用自动注册的Mapper方法
-#### 1.1.演示
+### 1.通用方法自动注册
+#### 1.1.继承指定接口
+    *com.github.ibatis.statement.mapper*包下的接口方法支持自动注册，！表类型要匹配
+>   效果演示
 -   insert
 ```java
     @RunWith(SpringRunner.class)
@@ -295,7 +305,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
         }
     }
 ``` 
-    will execute the following SQL
+    will execute the following SQL （don't auto register）
 ```sql
   SELECT `note`,`update_time`,`address`,`create_time`,`name`,`id`,`version` FROM `user` WHERE `id` = 2 and removed = 0;
 ```  
@@ -318,14 +328,14 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     public interface CustomUserMapper extends KeyParameterType<Integer> ,EntityType<User>{
     
         /**
-         * 与{@link com.github.ibatis.statement.mapper.KeyTableMapper#selectByPrimaryKey(Object)}方法签名兼容
+         * 与{@link com.github.ibatis.statement.mapper.KeyTableMapper#selectByPrimaryKey(Object)}方法签名兼容，可以自动注册
          * @param key
          * @return
          */
         User selectByPrimaryKey(Integer key);
     
         /**
-         * 与{@link com.github.ibatis.statement.mapper.SelectMapper#selectSelective(Object)}方法签名兼容
+         * 与{@link com.github.ibatis.statement.mapper.SelectMapper#selectSelective(Object)}方法签名兼容，可以自动注册
          * @param condition
          * @param logicalExist
          * @return
@@ -335,8 +345,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     }
 ```
 
-### 2.实体类表名自定义解析
--   将User类上的*@com.github.ibatis.statement.base.core.Entity*注解注释掉
+### 2.表名解析
+#### 2.1.注解声明
 ```java
     package com.github.mdsr.sample.model;
     import com.github.ibatis.statement.base.core.Column;
@@ -344,7 +354,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     import java.util.Date;
     
 
-    //@Entity(tableName = "user")//申明实体映射的表
+    @Entity(tableName = "user")//申明实体映射的表
     public class User {
         
         // columns
@@ -352,20 +362,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
         // ... (ellipsis get/set methods)
     }
 ```
-#### 2.1.默认Entity类名驼峰转下划线
--   映射结果
-
-
-    类名             |     表名 
-    ------          |      -------
-    User            |      user
-    Location        |      location
-    MerchantInfo    |      merchant_info    
-
->   可关闭
-    
-#### 2.2.自定义解析规则 
--   实现*com.github.ibatis.statement.base.core.parse.TableSourceParser*自定义全局解析规则
+#### 2.2.自定义解析
+-   实现*com.github.ibatis.statement.base.core.parse.TableSourceParser*，注册到spring容器即可
 ```java
     package com.github.mdsr.sample.env;
     
@@ -395,8 +393,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
         }
         
     }
-
 ```
+
 -   映射结果
 
 
@@ -405,12 +403,40 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     User              |         act_user
     Location          |         act_location
     MerchantInfo      |         act_merchant_info
-    
-    
->   优先级: @Entity指定 > 自定义TableNameParser实现（多个实现通过order()方法确定优先级）> 默认驼峰转下划线
 
-### 3.实体类字段映射的列解析
--   将User类属性上的*@com.github.ibatis.statement.base.core.Column*注解去掉
+
+#### 2.3.默认驼峰转下划线
+-   映射结果
+
+
+    类名             |     表名 
+    ------          |      -------
+    User            |      user
+    Location        |      location
+    MerchantInfo    |      merchant_info    
+
+>   可关闭或自定义规则
+```yaml
+    mybatis:
+      mapped-statement:
+        auto-register:
+          default-mapping-table: true #默认每个实体类都存在映射的表
+          #table-name-function-class: #默认规则
+```
+
+>   实现
+```java
+    /**
+    * @see com.github.ibatis.statement.base.core.parse.DefaultTableSourceParser
+    * @see com.github.spring.boot.mdsr.MappedStatementProperties
+    */
+```    
+
+#### 2.4.优先级
+   @Entity > 自定义*TableNameParser*实现（多个实现通过order()方法确定优先级）> 默认驼峰转下划线
+
+### 3.列解析
+#### 3.1.注解声明
 ```java
     package com.github.ibatis.statement.demo;
     import com.github.ibatis.statement.base.core.Column;
@@ -419,72 +445,20 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
     public class User {
         
+        @Column(value = "id")
         private Integer id;
-        private String name;
-        private Date createTime;
-        private Date updateTime;
-        private String address;
-        private String note;
-        private int version;
+        
+        @Column(value = "name")
+        private Integer name;
+        
+        // ... other columns
         
         // ... (ellipsis get/set methods)
     }
 ```
 
-#### 3.1 通过yaml配置默认类#属性->表#列映射规则
-```java
-    package com.github.spring.boot.mdsr;
-    
-    import com.github.ibatis.statement.base.core.parse.DefaultPropertyMateDataParser;
-    import com.github.ibatis.statement.base.core.parse.PropertyToColumnNameFunction;
-    import com.github.ibatis.statement.base.core.parse.TryMappingEveryPropertyMateDataParser;
-    import org.springframework.boot.context.properties.ConfigurationProperties;
-    
-    /**
-     * @Author: X1993
-     * @Date: 2020/3/17
-     */
-    @ConfigurationProperties(MappedStatementProperties.PREFIX)
-    public class MappedStatementProperties {
-    
-        static final String PREFIX = "mybatis.mapped-statement.auto-register";
-    
-        /**
-         * 默认为每一个属性需要尝试映射列
-         */
-        private boolean eachPropertyMappingColumn = true;
-    
-        /**
-         * 如果没有指定属性映射的列名，默认通过属性名函数获取对应列名
-         */
-        private Class<? extends PropertyToColumnNameFunction> columnNameFunctionClass;
-    
-        public boolean isEachPropertyMappingColumn() {
-            return eachPropertyMappingColumn;
-        }
-    
-        public void setEachPropertyMappingColumn(boolean eachPropertyMappingColumn) {
-            this.eachPropertyMappingColumn = eachPropertyMappingColumn;
-        }
-    
-        public Class<? extends PropertyToColumnNameFunction> getColumnNameFunctionClass() {
-            return columnNameFunctionClass;
-        }
-    
-        public void setColumnNameFunctionClass(Class<? extends PropertyToColumnNameFunction> columnNameFunctionClass) {
-            this.columnNameFunctionClass = columnNameFunctionClass;
-        }
-    }
-```
-```yaml
-    mybatis:
-      mapped-statement:
-        auto-register:
-          each-property-mapping-column: true #默认为每一个属性需要尝试映射列
-```
-
-#### 3.2.自定义解析规则 
--   实现*com.github.ibatis.statement.base.core.parse.PropertyMateDataParser*自定义全局解析规则，注册到spring容器即可
+#### 3.2.自定义解析
+-   实现*com.github.ibatis.statement.base.core.parse.PropertyMateDataParser*，注册到spring容器即可
 ```java
     package com.github.ibatis.statement.base.core.parse;
     import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
@@ -508,6 +482,26 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     
     }
 ```
+
+#### 3.3.默认规则
+
+>   可关闭或自定义规则
+```yaml
+    mybatis:
+      mapped-statement:
+        auto-register:
+          each-property-mapping-column: true #默认为每一个属性需要尝试映射列
+          #column-name-function-class: #默认规则
+```
+
+>   实现
+```java
+    /**
+    * @see com.github.ibatis.statement.base.core.parse.DefaultPropertyMateDataParser
+    * @see com.github.spring.boot.mdsr.MappedStatementProperties
+    */
+```
+
 -   映射结果
 
 
@@ -519,8 +513,11 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     updateTime       |         update_time
     
 
+#### 3.4.优先级
+   @Column > 自定义*PropertyMateDataParser*实现（多个实现通过order()方法确定优先级）
+
 ### 4.逻辑列
-#### 4.1.在实体类上使用注解申明逻辑列
+#### 4.1.注解声明
 ```java
     package com.github.ibatis.statement.demo;
     import com.github.ibatis.statement.base.core.Column;
@@ -541,8 +538,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     }
 ```
 
-#### 4.2.全局配置匹配逻辑列
--   实现*com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser*自定义全局解析规则
+#### 4.2.自定义解析
+-   实现*com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser*，注册到spring容器即可
 ```java
     package com.github.ibatis.statement.base.logical;
     
@@ -671,6 +668,9 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 >   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
+#### 4.3.优先级
+   @Logical > 自定义*LogicalColumnMateDataParser*实现（多个实现通过order()方法确定优先级）
+
 ### 5.复合主键
 -   schema.sql
 ```sql
@@ -708,8 +708,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 
 ### 6.默认赋值 
->   仅支持新增/修改指令
-#### 6.1 在实体类属性上申明默认赋值规则
+>   仅支持新增/修改指令，各方法注册器*MappedStatementFactory*提供实现，不保证所有方法都支持
+#### 6.1.注解声明
 ```java
     @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列
     public class User {
@@ -770,8 +770,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     }
 ```
 
-#### 6.2 全局配置解析默认赋值规则
--   实现*com.github.ibatis.statement.base.dv.ColumnDefaultValue*自定义全局解析规则
+#### 6.2.自定义解析
+-   实现*com.github.ibatis.statement.base.dv.ColumnDefaultValue*，注册到spring容器即可
 ```java
     /**
      * 解析使用默认赋值的列
@@ -866,10 +866,13 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 >   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
 
+#### 6.3.优先级
+   @DefaultValue > 自定义*ColumnValueParser*实现（多个实现通过order()方法确定优先级）
+   
 ### 7.默认where条件
->   仅支持修改/删除/查询指令
+>   仅支持修改/删除/查询指令，各方法注册器*MappedStatementFactory*提供实现，不保证所有方法都支持
 
-#### 7.1 在实体类属性上申明默认where条件
+#### 7.1.注解声明
 ```java
     //@Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列
     @Entity(tableName = "user")//申明实体映射的表
@@ -937,15 +940,21 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     }
 ```
 
-#### 7.2 全局配置解析默认赋值规则
--   实现*com.github.ibatis.statement.base.dv.ColumnDefaultValue*自定义全局解析规则
+#### 7.2.自定义解析
+-   实现*com.github.ibatis.statement.base.condition.ColumnConditionParser*，注册到spring容器即可
 ```java
+    package com.github.ibatis.statement.base.condition;
+    
+    import com.github.ibatis.statement.base.core.matedata.EntityMateData;
+    import com.github.ibatis.statement.util.Sorter;
+    
     /**
-     * 解析使用默认赋值的列
+     * 解析使用默认条件过滤的列
+     * @see EntityMateData#commandTypeConditionMap
      * @Author: X1993
      * @Date: 2020/7/22
      */
-    public interface ColumnValueParser extends Sorter{
+    public interface ColumnConditionParser extends Sorter {
     
         /**
          * 解析
@@ -1073,6 +1082,9 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 
 >   更多方法请参考接口*com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法注释
+
+#### 7.3.优先级
+   @Condition > 自定义*ColumnConditionParser*实现（多个实现通过order()方法确定优先级）
 
 ### 8.禁止特定列查询/修改/新增
 -   使用@Column#commandTypeMappings属性指定允许的指令
@@ -1209,8 +1221,47 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
      LIMIT 0, 10;
 ```
 
-### 10.指定table schema解析策略
-#### 10.1.指定实体类配置
+### 10.table schema解析策略
+```java
+    package com.github.ibatis.statement.base.core;
+    
+    import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
+    
+    /**
+     * 表结构解析策略
+     * @author X1993
+     * @date 2020/10/6
+     */
+    public enum TableSchemaResolutionStrategy {
+    
+        /**
+         * 查询数据库schema
+         * 不同的数据需要实现各自的{@link com.github.ibatis.statement.register.database.TableSchemaQuery}
+         * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
+         */
+        DATA_BASE,
+    
+        /**
+         * 解析实体类
+         * 类似 hibernate/jpa
+         */
+        ENTITY,
+    
+        /**
+         * {@link TableSchemaResolutionStrategy#DATA_BASE}优先，获取失败使用{@link TableSchemaResolutionStrategy#ENTITY}
+         * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
+         */
+        DATA_BASE_PRIORITY,
+    
+        /**
+         * 默认使用全局配置
+         * @see com.github.ibatis.statement.base.core.parse.DefaultEntityMateDataParser#defaultTableSchemaResolutionStrategy
+         */
+        GLOBAL,
+    
+    }
+```
+#### 10.1.注解声明
 ```java
     /**
      * @author X1993
@@ -1254,16 +1305,18 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 >   java.sql.SQLException: Unknown column 'not_exist_column' in 'field list'
 
-#### 10.2全局默认配置
+#### 10.2.默认配置
 ```yaml
   mybatis:
     mapped-statement:
       auto-register:
-        table-schema-resolution-strategy: entity    
+        table-schema-resolution-strategy: entity #默认解析策略    
 ```
+#### 10.3.优先级
+   @Entity > 全局默认配置
 
-### 11.自定义MappedStatementFactory
--   定义自定义方法
+### 11.扩展自动注册方法
+-   定义方法签名
 ```java
     package com.github.mdsr.sample.mapper;
         
@@ -1280,7 +1333,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     
     }
 ```
--   注册工厂
+
+-   构建工厂对象并注册到Spring容器
 ```java
     package com.github.mdsr.sample.env;
     
@@ -1362,16 +1416,16 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ``` 
     will execute the following SQL
 ```sql
-    select `id` from `user` order by `id` desc limit 1; 
+    select `id` from `user` order by `id` desc limit 1;
 ```
 
-### 12.特定规则方法缺省MappedStatement自动注册
+### 12.方法名解析自动注册
 -   实现类
 ```java
     /** @see  com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory*/
 ```
 
-#### 12.1 方法命名规则 
+#### 12.1.方法命名规则 
        
 -   查询（select/find 开头）：
 
@@ -1427,7 +1481,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     delete(有定义逻辑列)         |      deleteByNameNeOrderByIdAscLimit(int)    |   update `table` set logical_column = 'delVal' where name <> '' order by `id` limit ?
    
    
-#### 12.2 If注解
+#### 12.2.If注解
 ```java
     package com.github.ibatis.statement.register.factory;
     
