@@ -2,6 +2,8 @@ package com.github.ibatis.statement.base.core.parse;
 
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.util.TypeUtils;
+import lombok.Data;
+
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.Optional;
  * @Author: X1993
  * @Date: 2020/2/21
  */
+@Data
 public class DefaultMapperEntityParser implements MapperEntityParser {
 
     /**
@@ -46,14 +49,5 @@ public class DefaultMapperEntityParser implements MapperEntityParser {
         }
 
         return Optional.empty();
-    }
-
-    public List<MapperEntityParser> getCustomParsers() {
-        return customParsers;
-    }
-
-    public void setCustomParsers(List<MapperEntityParser> customParsers) {
-        Collections.sort(customParsers);
-        this.customParsers = customParsers;
     }
 }

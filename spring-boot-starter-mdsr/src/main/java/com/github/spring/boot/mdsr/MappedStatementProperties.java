@@ -7,6 +7,8 @@ import com.github.ibatis.statement.base.core.parse.TryMappingEveryPropertyMateDa
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.function.Function;
+
 /**
  * @Author: X1993
  * @Date: 2020/3/17
@@ -27,6 +29,18 @@ public class MappedStatementProperties {
      * @see DefaultPropertyMateDataParser#defaultNameFunction
      */
     private Class<? extends PropertyToColumnNameFunction> columnNameFunctionClass;
+
+    /**
+     * 默认每个实体类都存在映射的表
+     * @see {@link com.github.ibatis.statement.base.core.parse.DefaultTableSourceParser#defaultMappingTable}
+     */
+    private boolean defaultMappingTable = true;
+
+    /**
+     * 默认实体类解析表名规则
+     * @see com.github.ibatis.statement.base.core.parse.DefaultTableSourceParser#defaultTableNameFunction
+     */
+    private Class<? extends Function<Class<?> ,String>> tableNameFunctionClass;
 
     /**
      * 默认table schema解析策略
@@ -83,5 +97,21 @@ public class MappedStatementProperties {
 
     public void setAddDefaultListeners(boolean addDefaultListeners) {
         this.addDefaultListeners = addDefaultListeners;
+    }
+
+    public boolean isDefaultMappingTable() {
+        return defaultMappingTable;
+    }
+
+    public void setDefaultMappingTable(boolean defaultMappingTable) {
+        this.defaultMappingTable = defaultMappingTable;
+    }
+
+    public Class<? extends Function<Class<?>, String>> getTableNameFunctionClass() {
+        return tableNameFunctionClass;
+    }
+
+    public void setTableNameFunctionClass(Class<? extends Function<Class<?>, String>> tableNameFunctionClass) {
+        this.tableNameFunctionClass = tableNameFunctionClass;
     }
 }

@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 public class DefaultStatementConfiguration implements ApplicationContextAware{
 
     @Autowired
-    private MappedStatementProperties properties;
+    private MappedStatementProperties mappedStatementProperties;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -56,11 +56,15 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
 
     @Bean
     @Primary
-    public TableSourceParser tableNameParser(@Autowired(required = false) List<TableSourceParser> tableSourceParsers){
+    public TableSourceParser tableNameParser(@Autowired(required = false) List<TableSourceParser> tableSourceParsers)
+    {
         DefaultTableSourceParser defaultTableNameParser = new DefaultTableSourceParser();
         if (tableSourceParsers != null && tableSourceParsers.size() > 0) {
             defaultTableNameParser.setCustomParsers(tableSourceParsers);
         }
+        defaultTableNameParser.setDefaultMappingTable(mappedStatementProperties.isDefaultMappingTable());
+        getBean(mappedStatementProperties.getTableNameFunctionClass())
+                .ifPresent(fun -> defaultTableNameParser.setDefaultTableNameFunction(fun));
         return defaultTableNameParser;
     }
 
@@ -82,10 +86,12 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     public TryMappingEveryPropertyMateDataParser tryMappingEveryPropertyMateDataParser()
     {
         final TryMappingEveryPropertyMateDataParser propertyMateDataParser = new TryMappingEveryPropertyMateDataParser();
-        this.getPropertyToColumnNameFunction().ifPresent(columnNameFunction ->
-                propertyMateDataParser.setDefaultNameFunction(columnNameFunction));
+        getBean(mappedStatementProperties.getColumnNameFunctionClass())
+                .ifPresent(fun -> propertyMateDataParser.setDefaultNameFunction(fun));
         return propertyMateDataParser;
     }
+
+
 
     @Bean
     @Primary
@@ -93,8 +99,8 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
             @Autowired(required = false) List<PropertyMateDataParser> propertyMateDataParsers)
     {
         DefaultPropertyMateDataParser propertyMateDataParser = new DefaultPropertyMateDataParser();
-        this.getPropertyToColumnNameFunction().ifPresent(columnNameFunction ->
-                propertyMateDataParser.setDefaultNameFunction(columnNameFunction));
+        getBean(mappedStatementProperties.getColumnNameFunctionClass())
+                .ifPresent(fun -> propertyMateDataParser.setDefaultNameFunction(fun));
 
         if (propertyMateDataParsers != null && propertyMateDataParsers.size() > 0) {
             propertyMateDataParser.setCustomParsers(propertyMateDataParsers);
@@ -102,20 +108,20 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
         return propertyMateDataParser;
     }
 
-    private Optional<PropertyToColumnNameFunction> getPropertyToColumnNameFunction(){
-        Class<? extends PropertyToColumnNameFunction> columnNameFunctionClass = properties.getColumnNameFunctionClass();
-        PropertyToColumnNameFunction columnNameFunction = null;
-        if (columnNameFunctionClass != null){
-            columnNameFunction = Stream.of(applicationContext
-                    .getBeanNamesForType(columnNameFunctionClass))
+    private <T> Optional<T> getBean(Class<? extends T> clazz)
+    {
+        T t = null;
+        if (clazz != null){
+            t = Stream.of(applicationContext
+                    .getBeanNamesForType(clazz))
                     .findFirst()
-                    .map(beanName -> applicationContext.getBean(beanName, columnNameFunctionClass))
+                    .map(beanName -> applicationContext.getBean(beanName, clazz))
                     .orElse(null);
-            if (columnNameFunction == null){
-                columnNameFunction = BeanUtils.instantiate(columnNameFunctionClass);
+            if (t == null){
+                t = BeanUtils.instantiate(clazz);
             }
         }
-        return Optional.ofNullable(columnNameFunction);
+        return Optional.ofNullable(t);
     }
 
     @Bean
@@ -193,7 +199,7 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
                 .setTableSchemaQueryRegister(tableSchemaQueryRegister)
                 .setTableSourceParser(tableSourceParser);
 
-        TableSchemaResolutionStrategy strategy = properties.getTableSchemaResolutionStrategy();
+        TableSchemaResolutionStrategy strategy = mappedStatementProperties.getTableSchemaResolutionStrategy();
         if (strategy != null && !TableSchemaResolutionStrategy.GLOBAL.equals(strategy)){
             builder.setTableSchemaResolutionStrategy(strategy);
         }
@@ -213,7 +219,7 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
                 .setEntityMateDataParser(defaultEntityMateDataParser)
                 .setMapperEntityParser(defaultMapperEntityParser);
 
-        if (properties.isAddDefaultMappedStatementFactories()){
+        if (mappedStatementProperties.isAddDefaultMappedStatementFactories()){
             builder.addDefaultMappedStatementFactories();
         }
 
@@ -223,7 +229,7 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
             }
         }
 
-        if (properties.isAddDefaultListeners()) {
+        if (mappedStatementProperties.isAddDefaultListeners()) {
             builder.addDefaultListeners();
         }
 

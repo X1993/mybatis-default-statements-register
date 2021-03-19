@@ -13,6 +13,7 @@ import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegi
 import com.github.ibatis.statement.register.database.TableSchemaQuery;
 import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
 import com.github.ibatis.statement.util.ClassUtils;
+import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.type.JdbcType;
@@ -26,6 +27,7 @@ import java.util.*;
  * @Author: X1993
  * @Date: 2020/2/24
  */
+@Data
 public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultEntityMateDataParser.class);
@@ -46,11 +48,11 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
     public DefaultEntityMateDataParser() {
         this(new DefaultTableSourceParser() ,
-                new DefaultPropertyMateDataParser() ,
-                new DefaultLogicalColumnMateDataParser(),
-                new DefaultColumnConditionParser() ,
-                new DefaultColumnValueParser() ,
-                new DefaultTableSchemaQueryRegister());
+            new DefaultPropertyMateDataParser() ,
+            new DefaultLogicalColumnMateDataParser(),
+            new DefaultColumnConditionParser() ,
+            new DefaultColumnValueParser() ,
+            new DefaultTableSchemaQueryRegister());
     }
 
     public DefaultEntityMateDataParser(TableSourceParser tableSourceParser,
@@ -270,17 +272,9 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
         return entityMateData;
     }
 
-    public TableSourceParser getTableSourceParser() {
-        return tableSourceParser;
-    }
-
     public void setTableSourceParser(TableSourceParser tableSourceParser) {
         Objects.requireNonNull(tableSourceParser);
         this.tableSourceParser = tableSourceParser;
-    }
-
-    public PropertyMateDataParser getPropertyMateDataParser() {
-        return propertyMateDataParser;
     }
 
     public void setPropertyMateDataParser(PropertyMateDataParser propertyMateDataParser) {
@@ -288,17 +282,9 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
         this.propertyMateDataParser = propertyMateDataParser;
     }
 
-    public LogicalColumnMateDataParser getLogicalColumnMateDataParser() {
-        return logicalColumnMateDataParser;
-    }
-
     public void setLogicalColumnMateDataParser(LogicalColumnMateDataParser logicalColumnMateDataParser) {
         Objects.requireNonNull(logicalColumnMateDataParser);
         this.logicalColumnMateDataParser = logicalColumnMateDataParser;
-    }
-
-    public ColumnConditionParser getColumnConditionParser() {
-        return columnConditionParser;
     }
 
     public void setColumnConditionParser(ColumnConditionParser columnConditionParser) {
@@ -306,26 +292,14 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
         this.columnConditionParser = columnConditionParser;
     }
 
-    public ColumnValueParser getColumnValueParser() {
-        return columnValueParser;
-    }
-
     public void setColumnValueParser(ColumnValueParser columnValueParser) {
         Objects.requireNonNull(columnValueParser);
         this.columnValueParser = columnValueParser;
     }
 
-    public TableSchemaQueryRegister getTableSchemaQueryRegister() {
-        return tableSchemaQueryRegister;
-    }
-
     public void setTableSchemaQueryRegister(TableSchemaQueryRegister tableSchemaQueryRegister) {
         Objects.requireNonNull(columnValueParser);
         this.tableSchemaQueryRegister = tableSchemaQueryRegister;
-    }
-
-    public TableSchemaResolutionStrategy getDefaultTableSchemaResolutionStrategy() {
-        return defaultTableSchemaResolutionStrategy;
     }
 
     public void setDefaultTableSchemaResolutionStrategy(TableSchemaResolutionStrategy defaultTableSchemaResolutionStrategy) {

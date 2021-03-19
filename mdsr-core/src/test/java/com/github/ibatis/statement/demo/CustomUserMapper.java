@@ -13,14 +13,14 @@ import java.util.Collection;
 public interface CustomUserMapper extends KeyParameterType<Integer> ,EntityType<User>{
 
     /**
-     * 与{@link com.github.ibatis.statement.mapper.KeyTableMapper#selectByPrimaryKey(Object)}方法签名兼容
+     * 与{@link com.github.ibatis.statement.mapper.KeyTableMapper#selectByPrimaryKey(Object)}方法签名兼容，可以自动注册
      * @param key
      * @return
      */
     User selectByPrimaryKey(Integer key);
 
     /**
-     * 与{@link com.github.ibatis.statement.mapper.SelectMapper#selectSelective(Object)}方法签名兼容
+     * 与{@link com.github.ibatis.statement.mapper.SelectMapper#selectSelective(Object)}方法签名兼容，可以自动注册
      * @param condition
      * @param logicalExist
      * @return
