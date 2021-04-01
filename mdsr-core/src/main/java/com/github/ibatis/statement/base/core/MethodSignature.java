@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.base.core;
 
+import com.github.ibatis.statement.util.TypeUtils;
 import lombok.Data;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -39,6 +40,32 @@ public class MethodSignature {
         this.methodName = methodName;
         this.genericReturnType = genericReturnType;
         this.genericParameterTypes = genericParameterTypes;
+    }
+
+    /**
+     * 是否匹配指定的方法签名
+     * @param defined 匹配的方法签名
+     * @return
+     */
+    public boolean isMatch(MethodSignature defined)
+    {
+        //方法名相同
+        if (getMethodName().equals(defined.getMethodName())){
+            if (TypeUtils.isAssignableFrom(getGenericReturnType() ,defined.getGenericReturnType())
+                    && getGenericParameterTypes().length == defined.getGenericParameterTypes().length){
+                // 返回类型兼容
+                for (int i = 0; i < getGenericParameterTypes().length; i++) {
+                    Type actualParameterType = getGenericParameterTypes()[i];
+                    Type definedParameterType = defined.getGenericParameterTypes()[i];
+                    if (!TypeUtils.isAssignableFrom(definedParameterType ,actualParameterType)){
+                        // 参数类型不兼容
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

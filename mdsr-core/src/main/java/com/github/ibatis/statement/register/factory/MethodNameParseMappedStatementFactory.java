@@ -5,6 +5,7 @@ import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.param.*;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.register.MappedStatementFactory;
 import com.github.ibatis.statement.util.StringUtils;
 import lombok.Data;
@@ -50,7 +51,8 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
     private boolean supportDelete = true;
 
     @Override
-    public Optional<MappedStatement> tryBuild(MappedStatementMateData mappedStatementMateData) {
+    public Optional<MappedStatement> tryBuild(MappedStatementMateData mappedStatementMateData)
+    {
         SyntaxTable syntaxTable = syntaxTable(mappedStatementMateData.getEntityMateData());
         List<Edge> sentence = expressionParticiple(mappedStatementMateData ,syntaxTable);
         if (sentence == null || sentence.isEmpty()){
@@ -79,6 +81,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         sqlNodes.add(new StaticTextSqlNode(entityMateData.defaultConditionsContent(
                 SqlCommandType.SELECT ,content -> content.insert(0 ," AND ")).toString()));
+
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         if (logicalColumnMateData != null){
             sqlNodes.add(new StaticTextSqlNode(logicalColumnMateData.equalSqlContent(true)
@@ -112,15 +115,8 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
         Configuration configuration = mappedStatementMateData.getConfiguration();
         DynamicSqlSource sqlSource = new DynamicSqlSource(configuration, new MixedSqlNode(sqlNodes));
 
-        return Optional.of(new MappedStatement.Builder(configuration,
-                mappedStatementMateData.getMapperMethodMateData().getMappedStatementId(),
-                sqlSource, dynamicParamsContext.getSqlCommandType())
-                .resource(mappedStatementMateData.resource())
-                .statementType(StatementType.PREPARED)
-                .databaseId(configuration.getDatabaseId())
-                .resultSetType(configuration.getDefaultResultSetType())
-                .resultMaps(Arrays.asList(mappedStatementMateData.resultMapsByReturnType()))
-                .build());
+        return Optional.of(mappedStatementMateData.mappedStatementBuilder(
+                sqlSource ,dynamicParamsContext.getSqlCommandType()).build());
     }
 
     @Override

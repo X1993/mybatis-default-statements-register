@@ -7,8 +7,8 @@ import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.SelectMapper;
 import com.github.ibatis.statement.mapper.param.ConditionRule;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
-import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.*;
@@ -21,7 +21,7 @@ import java.util.function.Function;
  * @Author: X1993
  * @Date: 2020/3/13
  */
-public class SelectSelectiveMappedStatementFactory extends AbstractSelectMappedStatementFactory {
+public class SelectSelectiveMappedStatementFactory extends AbstractMappedStatementFactory {
 
     public final static String SELECT_SELECTIVE = "selectSelective";
 
@@ -34,10 +34,13 @@ public class SelectSelectiveMappedStatementFactory extends AbstractSelectMappedS
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         Class<?> entityClass = entityMateData.getEntityClass();
         ParameterizedTypeImpl returnType = ParameterizedTypeImpl.make(List.class, new Type[]{entityClass}, null);
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(returnType ,
-                SELECT_SELECTIVE ,entityClass ,boolean.class))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                TOTAL_SELECTIVE ,entityClass ,boolean.class));
+        return methodSignature.isMatch(new MethodSignature(returnType ,SELECT_SELECTIVE ,entityClass ,boolean.class))
+                || methodSignature.isMatch(new MethodSignature(int.class ,TOTAL_SELECTIVE ,entityClass ,boolean.class));
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.SELECT;
     }
 
     /**
@@ -48,17 +51,6 @@ public class SelectSelectiveMappedStatementFactory extends AbstractSelectMappedS
     private boolean selectEntity(MappedStatementMateData mappedStatementMateData){
         String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
         return SELECT_SELECTIVE.equals(methodName);
-    }
-
-    @Override
-    protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData)
-    {
-        return selectEntity(mappedStatementMateData) ? mappedStatementMateData.resultMapsByReturnType() :
-                new ResultMap.Builder(mappedStatementMateData.getConfiguration(),
-                        mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
-                        int.class,
-                        Collections.EMPTY_LIST,
-                        null).build();
     }
 
     @Override

@@ -42,9 +42,8 @@ public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
         ParameterizedTypeImpl parameterizedType = ParameterizedTypeImpl.make(Collection.class,
             new Type[]{entityMateData.getReasonableKeyParameterClass()}, null);
 
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                DELETE_BATCH_ON_PHYSICAL, parameterizedType))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
+        return methodSignature.isMatch(new MethodSignature(int.class ,DELETE_BATCH_ON_PHYSICAL, parameterizedType))
+                || methodSignature.isMatch(new MethodSignature(int.class ,
                 PHYSICAL_DELETE_BATCH_METHOD_NAME , parameterizedType))
                 && entityMateData.getPrimaryKeyCount() > 0;
     }

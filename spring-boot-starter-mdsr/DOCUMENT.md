@@ -1366,7 +1366,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
                 return false;
             }
     
-            return super.isMatchMethodSignature(methodSignature ,new MethodSignature(
+            return methodSignature.isMatch(new MethodSignature(
                     entityMateData.getReasonableKeyParameterClass() ,"selectMaxKey"));
         }
     

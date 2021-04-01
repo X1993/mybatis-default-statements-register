@@ -29,11 +29,10 @@ public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStateme
     {
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         Class<?> entityClass = entityMateData.getEntityClass();
+        MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
 
-        return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class , DELETE_SELECTIVE, entityClass))
-                || super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class , DELETE_SELECTIVE_ON_PHYSICAL, entityClass));
+        return methodSignature.isMatch(new MethodSignature(int.class , DELETE_SELECTIVE, entityClass))
+                || methodSignature.isMatch(new MethodSignature(int.class , DELETE_SELECTIVE_ON_PHYSICAL, entityClass));
     }
 
     @Override

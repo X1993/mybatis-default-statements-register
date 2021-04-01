@@ -6,8 +6,9 @@ import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.DynamicSelectMapper;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
-import org.apache.ibatis.mapping.ResultMap;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
@@ -21,7 +22,7 @@ import java.util.*;
  * @Author: X1993
  * @Date: 2020/4/5
  */
-public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedStatementFactory
+public class DynamicParamsSelectStatementFactory extends AbstractMappedStatementFactory
 {
     public static final String SELECT_ALL_METHOD_NAME = "selectByDynamicParams";
 
@@ -31,27 +32,14 @@ public class DynamicParamsSelectStatementFactory extends AbstractSelectMappedSta
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
     {
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                SELECT_COUNT_METHOD_NAME, DynamicParams.class))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(ParameterizedTypeImpl.make(
+        return methodSignature.isMatch(new MethodSignature(int.class , SELECT_COUNT_METHOD_NAME, DynamicParams.class))
+                || methodSignature.isMatch(new MethodSignature(ParameterizedTypeImpl.make(
                 List.class ,new Type[]{mappedStatementMateData.getEntityMateData().getEntityClass()} ,null) ,
                 SELECT_ALL_METHOD_NAME, DynamicParams.class));
     }
-
     @Override
-    protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData)
-    {
-        String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        if (SELECT_ALL_METHOD_NAME.equals(methodName)){
-            return super.resultMaps(mappedStatementMateData);
-        } else {
-            return new ResultMap.Builder(
-                    mappedStatementMateData.getConfiguration(),
-                    mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
-                    int.class,
-                    Collections.EMPTY_LIST,
-                    null).build();
-        }
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.SELECT;
     }
 
     @Override

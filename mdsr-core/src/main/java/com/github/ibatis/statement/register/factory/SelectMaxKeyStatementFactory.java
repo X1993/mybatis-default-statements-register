@@ -4,7 +4,9 @@ import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import org.apache.ibatis.builder.StaticSqlSource;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
@@ -12,7 +14,7 @@ import org.apache.ibatis.mapping.SqlSource;
  * @Author: X1993
  * @Date: 2020/12/18
  */
-public class SelectMaxKeyStatementFactory extends AbstractSelectMappedStatementFactory {
+public class SelectMaxKeyStatementFactory extends AbstractMappedStatementFactory {
 
     public static final String SELECT_MAX_KEY = "selectMaxKey";
 
@@ -22,7 +24,7 @@ public class SelectMaxKeyStatementFactory extends AbstractSelectMappedStatementF
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
 
-        return entityMateData.getPrimaryKeyCount() > 0 && super.isMatchMethodSignature(methodSignature ,
+        return entityMateData.getPrimaryKeyCount() > 0 && methodSignature.isMatch(
                 new MethodSignature(entityMateData.getReasonableKeyParameterClass() ,SELECT_MAX_KEY));
     }
 
@@ -46,6 +48,11 @@ public class SelectMaxKeyStatementFactory extends AbstractSelectMappedStatementF
                 .append(" DESC LIMIT 1");
 
         return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,sqlContext.toString());
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.SELECT;
     }
 
 }

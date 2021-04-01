@@ -91,8 +91,6 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
         return propertyMateDataParser;
     }
 
-
-
     @Bean
     @Primary
     public PropertyMateDataParser propertyMateDataParser(

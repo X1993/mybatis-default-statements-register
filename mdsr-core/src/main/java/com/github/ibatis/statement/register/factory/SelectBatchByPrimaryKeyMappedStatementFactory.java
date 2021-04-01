@@ -4,8 +4,10 @@ import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.*;
 import java.lang.reflect.Type;
@@ -19,7 +21,7 @@ import java.util.*;
  * @Author: X1993
  * @Date: 2020/12/29
  */
-public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractSelectMappedStatementFactory{
+public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory {
 
     /**
      * 批量删除方法
@@ -56,13 +58,13 @@ public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractSelec
         ParameterizedTypeImpl returnType = ParameterizedTypeImpl.make(List.class,
                 new Type[]{entityMateData.getEntityClass()}, null);
 
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
+        return methodSignature.isMatch(new MethodSignature(int.class ,
                 COUNT_BY_PRIMARY_KEYS, parameterizedType))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
+                || methodSignature.isMatch(new MethodSignature(int.class ,
                 COUNT_BY_PRIMARY_KEYS_ON_PHYSICAL, parameterizedType))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(returnType ,
+                || methodSignature.isMatch(new MethodSignature(returnType ,
                 SELECT_BATCH_BY_PRIMARY_KEY, parameterizedType))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(returnType ,
+                || methodSignature.isMatch(new MethodSignature(returnType ,
                 SELECT_BATCH_BY_PRIMARY_KEY_ON_PHYSICAL , parameterizedType));
     }
 
@@ -99,6 +101,11 @@ public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractSelec
         sqlNodes.add(new StaticTextSqlNode(fixedValueConditions.toString()));
 
         return new DynamicSqlSource(mappedStatementMateData.getConfiguration() ,new MixedSqlNode(sqlNodes));
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.SELECT;
     }
 
 }

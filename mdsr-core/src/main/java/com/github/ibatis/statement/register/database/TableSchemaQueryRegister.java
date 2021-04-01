@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.register.database;
 
 import org.apache.ibatis.session.SqlSession;
-import java.util.Collection;
 import java.util.Optional;
 
 /**

@@ -38,10 +38,10 @@ public class UpdateSameBatchMappedStatementFactory extends AbstractMappedStateme
             return false;
         }
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
+        MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
 
-        return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class , UPDATE_BATCH_SAME_VALUE, ParameterizedTypeImpl.make(Collection.class ,
-                        new Type[]{reasonableKeyParameterClass} ,null) ,entityClass))
+        return methodSignature.isMatch(new MethodSignature(int.class , UPDATE_BATCH_SAME_VALUE,
+                ParameterizedTypeImpl.make(Collection.class ,new Type[]{reasonableKeyParameterClass} ,null) ,entityClass))
                 && entityMateData.getPrimaryKeyCount() > 0;
     }
 

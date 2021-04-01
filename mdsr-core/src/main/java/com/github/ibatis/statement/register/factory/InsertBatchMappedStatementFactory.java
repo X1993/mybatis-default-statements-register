@@ -23,8 +23,9 @@ public class InsertBatchMappedStatementFactory extends AbstractMappedStatementFa
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
     {
-        return super.isMatchMethodSignature(mappedStatementMateData.getMapperMethodMateData().getMethodSignature() ,
-                new MethodSignature(int.class , INSERT_BATCH, ParameterizedTypeImpl.make(Collection.class ,
+        MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
+        return methodSignature.isMatch(new MethodSignature(int.class , INSERT_BATCH,
+                ParameterizedTypeImpl.make(Collection.class ,
                 new Type[]{mappedStatementMateData.getEntityMateData().getEntityClass()} ,null)));
     }
 

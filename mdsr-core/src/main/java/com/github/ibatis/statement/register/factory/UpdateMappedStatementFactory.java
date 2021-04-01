@@ -27,10 +27,8 @@ public class UpdateMappedStatementFactory extends AbstractMappedStatementFactory
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
         Class<?> entityClass = entityMateData.getEntityClass();
 
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                UPDATE_BY_PRIMARY_KEY,entityClass))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                UPDATE_BY_PRIMARY_KEY_SELECTIVE,entityClass))
+        return methodSignature.isMatch(new MethodSignature(int.class ,UPDATE_BY_PRIMARY_KEY,entityClass))
+                || methodSignature.isMatch(new MethodSignature(int.class ,UPDATE_BY_PRIMARY_KEY_SELECTIVE,entityClass))
                 && entityMateData.getPrimaryKeyCount() > 0;
     }
 

@@ -6,6 +6,7 @@ import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
+import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import org.apache.ibatis.builder.*;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
@@ -19,7 +20,7 @@ import java.util.*;
  * @author X1993
  * @date 2020/2/22
  */
-public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMappedStatementFactory {
+public class SelectByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory {
 
     public static final String SELECT_BY_PRIMARY_KEY = "selectByPrimaryKey";
 
@@ -41,26 +42,11 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
         }
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(entityClass ,
-                SELECT_BY_PRIMARY_KEY, reasonableKeyParameterClass))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(entityClass ,
-                SELECT_BY_PRIMARY_KEY_ON_PHYSICAL, reasonableKeyParameterClass))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(boolean.class ,
-                EXIST_BY_PRIMARY_KEY, reasonableKeyParameterClass))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(boolean.class ,
-                EXIST_BY_PRIMARY_KEY_ON_PHYSICAL, reasonableKeyParameterClass))
+        return methodSignature.isMatch(new MethodSignature(entityClass ,SELECT_BY_PRIMARY_KEY, reasonableKeyParameterClass))
+                || methodSignature.isMatch(new MethodSignature(entityClass ,SELECT_BY_PRIMARY_KEY_ON_PHYSICAL, reasonableKeyParameterClass))
+                || methodSignature.isMatch(new MethodSignature(boolean.class ,EXIST_BY_PRIMARY_KEY, reasonableKeyParameterClass))
+                || methodSignature.isMatch(new MethodSignature(boolean.class ,EXIST_BY_PRIMARY_KEY_ON_PHYSICAL, reasonableKeyParameterClass))
                 && entityMateData.getPrimaryKeyCount() > 0;
-    }
-
-    @Override
-    protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData)
-    {
-        return selectEntity(mappedStatementMateData) ? mappedStatementMateData.resultMapsByReturnType() :
-                new ResultMap.Builder(mappedStatementMateData.getConfiguration(),
-                mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
-                boolean.class,
-                Collections.EMPTY_LIST,
-                null).build();
     }
 
     /**
@@ -120,6 +106,11 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractSelectMapp
         }
 
         return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,sqlContext.toString() ,parameterMappings);
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.SELECT;
     }
 
 }

@@ -40,10 +40,9 @@ public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
         }
         Class<?> reasonableKeyParameterClass = entityMateData.getReasonableKeyParameterClass();
 
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                DELETE_BY_PRIMARY_KEY,reasonableKeyParameterClass))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(int.class ,
-                DELETE_BY_PRIMARY_KEY_ON_PHYSICAL,reasonableKeyParameterClass))
+        return methodSignature.isMatch(new MethodSignature(int.class , DELETE_BY_PRIMARY_KEY, reasonableKeyParameterClass))
+                || methodSignature.isMatch(new MethodSignature(int.class ,
+                DELETE_BY_PRIMARY_KEY_ON_PHYSICAL, reasonableKeyParameterClass))
                 && entityMateData.getPrimaryKeyCount() > 0;
     }
 

@@ -24,9 +24,9 @@ public class InsertMappedStatementFactory extends AbstractMappedStatementFactory
     {
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
         Class<?> entityClass = mappedStatementMateData.getEntityMateData().getEntityClass();
-        return super.isMatchMethodSignature(methodSignature ,new MethodSignature(
+        return methodSignature.isMatch(new MethodSignature(
                 int.class , INSERT,entityClass))
-                || super.isMatchMethodSignature(methodSignature ,new MethodSignature(
+                || methodSignature.isMatch(new MethodSignature(
                         int.class , INSERT_SELECTIVE, entityClass));
     }
 
