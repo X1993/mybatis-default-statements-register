@@ -1,5 +1,5 @@
 ### 简介：
-[mdsr-core](mdsr-core)基于MyBatis二次开发，
+[mdsr-core](.)基于MyBatis二次开发，
 在MyBatis的基础上只做增强不做改变，提高开发效率。
 
 ### 特征：
@@ -15,14 +15,14 @@
 ### 流程框架:
 <p align="center">
   <a>
-   <img alt="Framework" src="mdsr-core/Framework.jpg">
+   <img alt="Framework" src="Framework.jpg">
   </a>
 </p>
 
 ### [文档](DOCUMENT.md)
->   直接使用基础组件比较繁琐，通常使用spring boot封装版本[spring-boot-starter-mdsr](spring-boot-starter-mdsr)
+>   直接使用基础组件比较繁琐，通常使用spring boot封装版本[spring-boot-starter-mdsr](../spring-boot-starter-mdsr)
 
 ### 快速开始
-[参考单元测试](mdsr-core/src/test/java/com/github/ibatis/statement/demo)
+[参考单元测试](src/test/java/com/github/ibatis/statement/demo)
 
   
