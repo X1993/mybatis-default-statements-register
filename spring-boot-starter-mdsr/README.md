@@ -1,5 +1,5 @@
 ## 简介：
-基于mybatis-spring-boot-starter组装可运行的[mdsr-core](https://github.com/X1993/mybatis-default-statements-register/tree/master/mdsr-core)
+基于mybatis-spring-boot-starter组装可运行的[mdsr-core](../mdsr-core)
 
 ### 特征：
 -   1.无侵入：启动阶段为符合特定规则的mapper方法自动注入，启动成功之后完全委托Mybatis管理，与Mybatis有很好的兼容性。
@@ -26,12 +26,12 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
 ### 流程框架:
 <p align="center">
   <a>
-   <img alt="Framework" src="https://github.com/X1993/mybatis-default-statements-register/blob/master/mdsr-core/Framework.jpg">
+   <img alt="Framework" src="../mdsr-core/Framework.jpg">
   </a>
 </p>
 
-### [文档](https://github.com/X1993/mybatis-default-statements-register/blob/master/spring-boot-starter-mdsr/DOCUMENT.md)
+### [文档](DOCUMENT.md)
 
-### [快速开始](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr-sample)
+### [快速开始](../spring-boot-starter-mdsr-sample)
 
   
