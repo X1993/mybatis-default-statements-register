@@ -15,7 +15,7 @@
 -   核心模块：[mdsr-core](mdsr-core) 
 >   直接使用比较繁琐，很多组件需要组装，建议直接使用spring-boot组装版本
 
--   基于spring-boot组装：[spring-boot-starter-mdsr](https://github.com/X1993/mybatis-default-statements-register/tree/master/spring-boot-starter-mdsr) 
+-   基于spring-boot组装：[spring-boot-starter-mdsr](spring-boot-starter-mdsr) 
 
 
   
