@@ -1,5 +1,5 @@
 ### 简介：
-[Mybatis-Default-Statements-Register](.)基于MyBatis二次开发，
+[Mybatis-Default-Statements-Register](..\..)基于MyBatis二次开发，
 在MyBatis的基础上只做增强不做改变，提高开发效率。
 
 ### 特征：
