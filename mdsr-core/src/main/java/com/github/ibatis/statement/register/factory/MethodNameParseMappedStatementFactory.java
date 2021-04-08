@@ -169,6 +169,7 @@ public class MethodNameParseMappedStatementFactory implements MappedStatementFac
      */
     private List<Edge> reasonableSentence(List<List<Edge>> sentences ,String expression){
         if (sentences.size() > 1){
+            //TODO 暂停不支持歧义
             throw new IllegalArgumentException(MessageFormat.format(
                     "expression [{0}] reasonable word segmentation plan: {1}" ,expression ,
                     sentences.stream()
