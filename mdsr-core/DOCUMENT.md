@@ -444,7 +444,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```  
 
 ####  1.3.选择性注册
--   方法签名与*package com.aseit.ibatis.statement.mapper.KeyTableMapper*及其父接口方法兼容（不包含默认方法）,即支持自动注册
+-   方法签名与*package com.github.ibatis.statement.mapper.KeyTableMapper*及其父接口方法兼容（不包含默认方法）,即支持自动注册
 
 >   方法签名：返回值（兼容泛型实际声明的类型）+方法名+方法参数列表（兼容泛型实际声明的类型）
 ```java
