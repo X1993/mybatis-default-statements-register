@@ -18,6 +18,9 @@ public class ConditionParams {
      */
     private final List<ConditionParam> params = new ArrayList<>();
 
+    /**
+     * 下一个添加的过滤条件 分隔符
+     */
     private boolean or;
 
     /**
