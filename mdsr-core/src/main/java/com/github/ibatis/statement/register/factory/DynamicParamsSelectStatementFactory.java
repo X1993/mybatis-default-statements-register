@@ -73,17 +73,17 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
         LogicalColumnMateData logicalColumnMateData = entityMateData.getLogicalColumnMateData();
         if (logicalColumnMateData != null) {
             //logical
-            sqlNodes.add(new IfSqlNode(new StaticTextSqlNode(new StringBuilder(" AND `")
-                    .append(logicalColumnMateData.getColumnName())
-                    .append("` = ")
+            sqlNodes.add(new IfSqlNode(new StaticTextSqlNode(new StringBuilder(" AND ")
+                    .append(logicalColumnMateData.getEscapeColumnName())
+                    .append(" = ")
                     .append(logicalColumnMateData.getExistValue())
                     .toString()), "logical"));
         }
 
         //group by
         sqlNodes.add(new IfSqlNode(new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(" GROUP BY ") ,
-                new ForEachSqlNode(configuration, new TextSqlNode("${key}") ,
-                "groupColumns", null, "key",
+                new ForEachSqlNode(configuration, new TextSqlNode("`${groupKey}`") ,
+                "groupColumns", null, "groupKey",
                         null, null, ","))),
                 "groupColumns != null && groupColumns.size() > 0"));
 
@@ -95,7 +95,7 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
         if (!selectCount){
             //order by
             sqlNodes.add(new IfSqlNode(new ForEachSqlNode(configuration ,
-                    new TextSqlNode(" ${order.key} ${order.rule} ") ,"orderRules" ,null ,
+                    new TextSqlNode(" `${order.key}` ${order.rule} ") ,"orderRules" ,null ,
                     "order" ,"ORDER BY" ,null ,",") ,
                     "orderRules != null and orderRules.size > 0"));
 
@@ -118,7 +118,7 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
                                         "and condition.isOr() == true")), new IfSqlNode(new StaticTextSqlNode(" AND "),
                                 "proCondition == null or (proCondition != null and proCondition.isOr() == false)")),
                         // `column` [rule]
-                        new TextSqlNode(" ${condition.key} ${condition.rule.expression} "),
+                        new TextSqlNode(" `${condition.key}` ${condition.rule.expression} "),
                         new ChooseSqlNode(Arrays.asList(
                             new IfSqlNode(new ForEachSqlNode(configuration, new StaticTextSqlNode(" #{data} "),
                                 "condition.value", null, "data",

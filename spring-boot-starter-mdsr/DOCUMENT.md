@@ -1204,8 +1204,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
             userMapper.selectByDynamicParams(new DynamicParams()
                 .where(new ConditionParams()
                         .between("create_time", "2020-08-11", new Date())
-                        .likeLeft("`name`", "张"))
-                .groupBy("address", "`name`")
+                        .likeLeft("name", "张"))
+                .groupBy("address", "name")
                 .having(new ConditionParams().notNull("note"))
                 .page(0, 10));
         }
@@ -1342,19 +1342,18 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     import com.github.ibatis.statement.base.core.matedata.EntityMateData;
     import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
     import com.github.ibatis.statement.base.core.matedata.TableMateData;
-    import com.github.ibatis.statement.register.factory.AbstractSelectMappedStatementFactory;
+    import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
     import org.apache.ibatis.builder.StaticSqlSource;
-    import org.apache.ibatis.mapping.ResultMap;
+    import org.apache.ibatis.mapping.SqlCommandType;
     import org.apache.ibatis.mapping.SqlSource;
     import org.springframework.stereotype.Component;
-    import java.util.Collections;
     
     /**
      * @author X1993
      * @date 2020/9/27
      */
     @Component
-    public class SelectMaxIdMappedStatementFactory extends AbstractSelectMappedStatementFactory {
+    public class SelectMaxIdMappedStatementFactory extends AbstractMappedStatementFactory {
     
         @Override
         protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -1388,13 +1387,9 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
         }
     
         @Override
-        protected ResultMap resultMaps(MappedStatementMateData mappedStatementMateData) {
-            return new ResultMap.Builder(mappedStatementMateData.getConfiguration(),
-                    mappedStatementMateData.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
-                    Integer.class,
-                    Collections.EMPTY_LIST,
-                    null).build();
-        }
+        protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+            return SqlCommandType.SELECT;
+        } 
     }
 ```
 

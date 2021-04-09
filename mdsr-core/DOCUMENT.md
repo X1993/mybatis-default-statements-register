@@ -1661,8 +1661,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
             userMapper.selectByDynamicParams(new DynamicParams()
                 .where(new ConditionParams()
                         .between("create_time", "2020-08-11", new Date())
-                        .likeLeft("`name`", "张"))
-                .groupBy("address", "`name`")
+                        .likeLeft("name", "张"))
+                .groupBy("address", "name")
                 .having(new ConditionParams().notNull("note"))
                 .limit(10));
         }
@@ -1840,15 +1840,16 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     import com.github.ibatis.statement.base.core.matedata.EntityMateData;
     import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
     import com.github.ibatis.statement.base.core.matedata.TableMateData;
-    import com.github.ibatis.statement.register.factory.AbstractSelectMappedStatementFactory;
+    import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
     import org.apache.ibatis.builder.StaticSqlSource;
+    import org.apache.ibatis.mapping.SqlCommandType;
     import org.apache.ibatis.mapping.SqlSource;
     
     /**
      * @author X1993
      * @date 2020/9/27
      */
-    public class SelectMaxIdMappedStatementFactory extends AbstractSelectMappedStatementFactory {
+    public class SelectMaxIdMappedStatementFactory extends AbstractMappedStatementFactory {
     
         @Override
         protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -1877,8 +1878,13 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
                     .append(" from ")
                     .append(tableMateData.getEscapeTableName()).append(" order by ")
                     .append(keyName)
-                    .append(" limit 1");
+                    .append(" desc limit 1");
             return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,content.toString());
+        }
+    
+        @Override
+        protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+            return SqlCommandType.SELECT;
         }
     
     }

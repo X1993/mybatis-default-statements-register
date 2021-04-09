@@ -9,6 +9,7 @@ import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
 import com.github.ibatis.statement.mapper.param.ConditionParams;
 import com.github.ibatis.statement.mapper.param.ConditionRule;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
+import com.github.ibatis.statement.mapper.param.OrderRule;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.StatementAutoRegister;
 import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
@@ -273,13 +274,11 @@ public class Demo {
     public void selectByDynamicParams(){
         userMapper.selectByDynamicParams(new DynamicParams()
                 .where(new ConditionParams()
-                        .eq("address" ,null ,true)
                         .between("create_time", "2020-08-11", new Date())
-                        .likeLeft("`name`", "张")
-                        .in("id" ,1 ,2))
-                .groupBy("address", "`name`")
-                .having(new ConditionParams().notNull("address"))
-                .limit(10));
+                        .likeLeft("name", "张"))
+                .groupBy("address", "name")
+                .having(new ConditionParams().notNull("create_time"))
+                .page0(0, 10));
     }
 
     @Test

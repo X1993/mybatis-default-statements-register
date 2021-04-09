@@ -52,7 +52,7 @@ public class ConditionParams {
     }
 
     public ConditionParams eq(String key ,Object value){
-        return eq(key,value , defaultAllowNull);
+        return eq(key ,value ,defaultAllowNull);
     }
 
     public ConditionParams notEq(String key ,Object value ,boolean allowNull){
@@ -194,7 +194,7 @@ public class ConditionParams {
 
     public ConditionParams addConditionParam(String key ,ConditionRule rule ,Object value)
     {
-        addConditionParam(new ConditionParam(key,rule,value));
+        addConditionParam(new ConditionParam(key, rule, value));
         return this;
     }
 

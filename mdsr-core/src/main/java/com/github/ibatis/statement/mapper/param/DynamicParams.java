@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper.param;
 
+import lombok.Data;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.function.Consumer;
  * @Author: X1993
  * @Date: 2020/8/31
  */
+@Data
 public class DynamicParams {
 
     /**
@@ -71,14 +73,6 @@ public class DynamicParams {
         return this;
     }
 
-    public DynamicParams asc(String key){
-        return addOrderRule(key ,OrderRule.Rule.ASC);
-    }
-
-    public DynamicParams desc(String key){
-        return addOrderRule(key ,OrderRule.Rule.DESC);
-    }
-
     public DynamicParams addOrderRule(OrderRule ... orderRules){
         if (orderRules != null){
             for (OrderRule orderRule : orderRules) {
@@ -109,13 +103,12 @@ public class DynamicParams {
         return this;
     }
 
-    public DynamicParams addOrderRules(Iterable<OrderRule> orderRules){
-        if (orderRules != null){
-            for (OrderRule orderRule : orderRules) {
-                this.orderRules.add(orderRule);
-            }
-        }
-        return this;
+    public DynamicParams asc(String ... keys){
+        return addOrderRule(OrderRule.Rule.ASC ,keys);
+    }
+
+    public DynamicParams desc(String ... keys){
+        return addOrderRule(OrderRule.Rule.DESC ,keys);
     }
 
     /**
@@ -161,29 +154,9 @@ public class DynamicParams {
         return this;
     }
 
-    public ConditionParams getWhereConditions() {
-        return whereConditions;
-    }
-
-    public ConditionParams getHavingConditions() {
-        return havingConditions;
-    }
-
-    public List<String> getGroupColumns() {
-        return groupColumns;
-    }
-
     public DynamicParams logical(boolean logical) {
         this.logical = logical;
         return this;
-    }
-
-    public List<OrderRule> getOrderRules() {
-        return orderRules;
-    }
-
-    public LimitParam getLimitParam() {
-        return limitParam;
     }
 
     public boolean isLogical() {
