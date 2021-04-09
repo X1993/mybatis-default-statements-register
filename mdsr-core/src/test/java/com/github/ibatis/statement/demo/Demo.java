@@ -278,6 +278,9 @@ public class Demo {
                         .likeLeft("name", "张"))
                 .groupBy("address", "name")
                 .having(new ConditionParams().notNull("create_time"))
+                .asc("name","address")
+                .addOrderRule(OrderRule.Rule.ASC ,"create_time","name")
+                .addOrderRule(new OrderRule[]{new OrderRule("name" , OrderRule.Rule.DESC)})
                 .page0(0, 10));
     }
 

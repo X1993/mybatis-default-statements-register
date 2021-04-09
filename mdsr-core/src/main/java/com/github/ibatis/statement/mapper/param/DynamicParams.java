@@ -2,9 +2,10 @@ package com.github.ibatis.statement.mapper.param;
 
 import lombok.Data;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 动态参数
@@ -73,32 +74,31 @@ public class DynamicParams {
         return this;
     }
 
+    public DynamicParams addOrderRule(OrderRule orderRule)
+    {
+        getOrderRules().add(orderRule);
+        return this;
+    }
+
+    public DynamicParams addOrderRule(List<? extends OrderRule> orderRules)
+    {
+        getOrderRules().addAll(orderRules);
+        return this;
+    }
+
     public DynamicParams addOrderRule(OrderRule ... orderRules){
         if (orderRules != null){
-            for (OrderRule orderRule : orderRules) {
-                this.orderRules.add(orderRule);
-            }
+            addOrderRule(Stream.of(orderRules)
+                    .collect(Collectors.toList()));
         }
-        return this;
-    }
-
-    public DynamicParams addOrderRule(Collection<? extends OrderRule> orderRules){
-        if (orderRules != null){
-            for (OrderRule orderRule : orderRules) {
-                this.orderRules.add(orderRule);
-            }
-        }
-        return this;
-    }
-
-    public DynamicParams addOrderRule(String key ,OrderRule.Rule rule){
-        this.orderRules.add(new OrderRule(key ,rule));
         return this;
     }
 
     public DynamicParams addOrderRule(OrderRule.Rule rule ,String ... keys){
-        for (String key : keys) {
-            this.orderRules.add(new OrderRule(key ,rule));
+        if (keys != null){
+            addOrderRule(Stream.of(keys)
+                    .map(column -> new OrderRule(column ,rule))
+                    .collect(Collectors.toList()));
         }
         return this;
     }
