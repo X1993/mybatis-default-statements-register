@@ -10,6 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE ,ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@Inherited
 public @interface Logical {
 
     /**
