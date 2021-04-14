@@ -32,6 +32,8 @@ public class Entity4Test {
 
         private String valueOne;
 
+        private String removed;
+
         public Entity4() {
         }
 
@@ -69,6 +71,8 @@ public class Entity4Test {
         mapper.insert(entity4);
         Assert.assertTrue(mapper.existByPrimaryKey(entity4.getId()));
         Entity4 entity42 = new Entity4("2" ,"value1" ,null);
+        //测试逻辑列是否会覆盖
+        entity42.setRemoved("12");
         mapper.insertSelective(entity42);
         Assert.assertEquals(mapper.total() ,2);
 
