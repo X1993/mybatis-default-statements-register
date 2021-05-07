@@ -4,6 +4,7 @@ import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.register.MappedStatementFactory;
 import lombok.Data;
 import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -39,6 +40,11 @@ public class PropertyMateData implements Cloneable{
      * 类型转换器
      */
     private Class<? extends TypeHandler<?>> typeHandlerClass;
+
+    /**
+     * 映射的列jdbcType
+     */
+    private JdbcType jdbcType;
 
     /**
      * 列映射策略

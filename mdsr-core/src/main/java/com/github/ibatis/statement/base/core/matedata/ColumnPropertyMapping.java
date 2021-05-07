@@ -6,7 +6,9 @@ import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.scripting.xmltags.IfSqlNode;
 import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
 import java.lang.reflect.Field;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -51,6 +53,18 @@ public class ColumnPropertyMapping implements Cloneable{
         return columnMateData.isPrimaryKey();
     }
 
+    public JdbcType getJdbcType()
+    {
+        JdbcType jdbcType = getPropertyMateData().getJdbcType();
+        if (jdbcType == null || jdbcType == JdbcType.NULL){
+            jdbcType = getColumnMateData().getJdbcType();
+            if (jdbcType == JdbcType.NULL){
+                jdbcType = null;
+            }
+        }
+        return jdbcType;
+    }
+
     @Override
     public ColumnPropertyMapping clone() throws CloneNotSupportedException {
         ColumnPropertyMapping cloneColumnPropertyMapping = (ColumnPropertyMapping) super.clone();
@@ -71,11 +85,12 @@ public class ColumnPropertyMapping implements Cloneable{
     {
         PropertyMateData propertyMateData = this.getPropertyMateData();
         return new StringBuilder("#{")
-                .append(propertyNameFunction.apply(propertyMateData.getField().getName()))
-                .append(getColumnMateData().getJdbcType() == null ? "" : ",jdbcType="
-                        + getColumnMateData().getJdbcType())
-                .append(propertyMateData.getTypeHandlerClass() == null ? "" : ",typeHandler="
-                        + propertyMateData.getTypeHandlerClass().getName())
+                .append(propertyNameFunction.apply(propertyMateData.getPropertyName()))
+                .append(Optional.ofNullable(getJdbcType())
+                        .filter(jdbcType -> jdbcType != JdbcType.NULL)
+                        .map(jdbcType -> ",jdbcType=" + jdbcType).orElse(""))
+                .append(Optional.ofNullable(propertyMateData.getTypeHandlerClass())
+                        .map(typeHandlerClass -> ",typeHandler=" + typeHandlerClass).orElse(""))
                 .append("} ");
     }
 

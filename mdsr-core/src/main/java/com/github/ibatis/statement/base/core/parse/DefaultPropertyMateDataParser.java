@@ -5,6 +5,7 @@ import com.github.ibatis.statement.base.core.MappingStrategy;
 import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
 import com.github.ibatis.statement.util.StringUtils;
 import lombok.Data;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 import java.lang.reflect.Field;
@@ -53,12 +54,19 @@ public class DefaultPropertyMateDataParser implements PropertyMateDataParser {
                 PropertyMateData propertyMateData = new PropertyMateData(columnName, field);
                 propertyMateData.setMappingStrategy(strategy);
                 propertyMateData.setCommandTypeMappings(columnAnnotation.commandTypeMappings());
+
                 Class<? extends TypeHandler<?>> typeHandlerClass = columnAnnotation.typeHandler();
                 if (!typeHandlerClass.isInterface() && !Modifier.isAbstract(typeHandlerClass.getModifiers())
                         && !UnknownTypeHandler.class.equals(typeHandlerClass))
                 {
                     propertyMateData.setTypeHandlerClass(typeHandlerClass);
                 }
+
+                JdbcType jdbcType = columnAnnotation.jdbcType();
+                if (!JdbcType.NULL.equals(jdbcType)){
+                    propertyMateData.setJdbcType(jdbcType);
+                }
+
                 return Optional.of(propertyMateData);
             }
         }else {

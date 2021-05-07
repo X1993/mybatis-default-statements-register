@@ -133,7 +133,7 @@ public class MappedStatementMateData implements Cloneable{
     public SqlSource updateSqlSource(Function<String ,String> propertyNameFunction ,boolean isSelective)
     {
         Configuration configuration = this.getConfiguration();
-        return new DynamicSqlSource(configuration , updateSqlNode(propertyNameFunction ,isSelective));
+        return new DynamicSqlSource(configuration ,updateSqlNode(propertyNameFunction ,isSelective));
     }
 
     public SqlNode updateSetSqlNode(Function<String ,String> propertyNameFunction , boolean isSelective)

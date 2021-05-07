@@ -16,7 +16,6 @@ import com.github.ibatis.statement.util.ClassUtils;
 import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.type.JdbcType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
@@ -216,7 +215,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
             ColumnMateData columnMateData = new ColumnMateData();
             columnMateData.setColumnName(propertyMateData.getMappingColumnName());
-            columnMateData.setJdbcType(JdbcType.NULL);
+            columnMateData.setJdbcType(propertyMateData.getJdbcType());
             columnMateData.setPrimaryKey(propertyMateData.isPrimaryKey());
 
             columnPropertyMappings.put(mappingColumnName, new ColumnPropertyMapping(propertyMateData, columnMateData));
