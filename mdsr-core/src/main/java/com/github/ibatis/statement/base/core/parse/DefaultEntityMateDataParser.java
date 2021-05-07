@@ -216,7 +216,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
             ColumnMateData columnMateData = new ColumnMateData();
             columnMateData.setColumnName(propertyMateData.getMappingColumnName());
-            columnMateData.setJdbcType(JdbcType.UNDEFINED);
+            columnMateData.setJdbcType(JdbcType.NULL);
             columnMateData.setPrimaryKey(propertyMateData.isPrimaryKey());
 
             columnPropertyMappings.put(mappingColumnName, new ColumnPropertyMapping(propertyMateData, columnMateData));

@@ -15,7 +15,7 @@ public abstract class AbstractTableSchemaQuery implements TableSchemaQuery {
     @Override
     public JdbcType mappingJdbcType(String dataType) {
         if (dataType == null || "".equals(dataType)){
-            return JdbcType.UNDEFINED;
+            return JdbcType.NULL;
         }
         dataType = dataType.toUpperCase();
         switch (dataType){
@@ -36,7 +36,7 @@ public abstract class AbstractTableSchemaQuery implements TableSchemaQuery {
                     return JdbcType.valueOf(dataType);
                 }catch (IllegalArgumentException e){
                     LOGGER.warn("can't mapping JdbcType for dataType {}" ,dataType);
-                    return JdbcType.UNDEFINED;
+                    return JdbcType.NULL;
                 }
         }
     }

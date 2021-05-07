@@ -52,7 +52,7 @@ public class DefaultLogicalColumnMateDataParser implements LogicalColumnMateData
                             .append("]").toString());
                 } else if (TableSchemaResolutionStrategy.ENTITY.equals(schemaResolutionStrategy)){
                     logicalColumnMateData = new ColumnMateData();
-                    logicalColumnMateData.setJdbcType(JdbcType.UNDEFINED);
+                    logicalColumnMateData.setJdbcType(JdbcType.NULL);
                     logicalColumnMateData.setPrimaryKey(false);
                     logicalColumnMateData.setColumnName(logicalColumnName);
                     tableMateData.addColumnMateData(logicalColumnMateData);

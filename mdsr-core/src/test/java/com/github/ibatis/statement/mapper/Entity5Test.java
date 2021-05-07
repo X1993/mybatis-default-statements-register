@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import static com.github.ibatis.statement.mapper.Entity5Test.Entity5.Value2.V1;
+import static com.github.ibatis.statement.mapper.Entity5Test.Entity5.Value2.V2;
 
 /**
  * 测试 定义 联合主键、逻辑列、默认排序的实体注册的MappedStatement是否符合预期
@@ -36,7 +38,7 @@ public class Entity5Test {
 
         private String valueOne;
 
-        private String value2;
+        private Value2 value2;
 
         public Entity5(String id, String id2) {
             this.id = id;
@@ -46,12 +48,18 @@ public class Entity5Test {
         public Entity5() {
         }
 
-        public Entity5(String id, String id2, String valueOne, String value2) {
+        public Entity5(String id, String id2, String valueOne, Value2 value2) {
             this.id = id;
             this.id2 = id2;
             this.valueOne = valueOne;
             this.value2 = value2;
         }
+
+        enum Value2{
+            V1,
+            V2
+        }
+
     }
 
     interface Entity5Mapper extends KeyTableMapper<Entity5,Entity5> {}
@@ -61,7 +69,7 @@ public class Entity5Test {
             "  `id` varchar(50) ,\n" +
             "  `id2` varchar(50) ,\n" +
             "  `value_one` varchar(255) DEFAULT NULL,\n" +
-            "  `value2` varchar(30) DEFAULT NULL,\n" +
+            "  `value2` enum('V1','V2') DEFAULT NULL,\n" +
             "  `value3` varchar(30) DEFAULT NULL,\n" +
             "  `removed` char(1) ,\n" +
             "  CONSTRAINT table_entity5_pk PRIMARY KEY (id, id2) \n" +
@@ -95,7 +103,7 @@ public class Entity5Test {
 
         entity51.setValueOne("1");
         mapper.updateByPrimaryKey(entity51);
-        entity52.setValue2("2");
+        entity52.setValue2(V2);
         mapper.updateByPrimaryKeySelective(entity52);
         List<Entity5> entity5s = Arrays.asList(entity51, entity52);
 
@@ -158,7 +166,7 @@ public class Entity5Test {
         Assert.assertEquals(mapper.selectAll().size() ,10);
         Entity5 condition = new Entity5();
         condition.setId("12");
-        condition.setValue2("value");
+        condition.setValue2(V1);
         Assert.assertEquals(mapper.selectSelective(condition).size() ,0);
 
         mapper.deleteSelective(entity51);

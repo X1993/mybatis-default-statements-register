@@ -26,7 +26,7 @@ public class Entity4Test {
 
         private String id;
 
-        private String value;
+        private Value2 value;
 
         private String remark;
 
@@ -37,10 +37,15 @@ public class Entity4Test {
         public Entity4() {
         }
 
-        public Entity4(String id, String value, String remark) {
+        public Entity4(String id, Value2 value, String remark) {
             this.id = id;
             this.value = value;
             this.remark = remark;
+        }
+
+        enum Value2{
+            V1,
+            V2
         }
     }
 
@@ -49,7 +54,7 @@ public class Entity4Test {
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity4`;\n" +
             "CREATE TABLE `entity4` (\n" +
             "  `id` varchar(255) PRIMARY KEY NOT NULL,\n" +
-            "  `value` varchar(255) DEFAULT NULL,\n" +
+            "  `value` enum('V1','V2') DEFAULT NULL,\n" +
             "  `removed` char(1) \n" +
             ") DEFAULT CHARSET=utf8;";
 
@@ -66,17 +71,17 @@ public class Entity4Test {
         String environmentId = environment.getSqlSession().getConfiguration().getEnvironment().getId();
         SqlSession sqlSession = environment.getSqlSession();
         Entity4Mapper mapper = sqlSession.getMapper(Entity4Mapper.class);
-        Entity4 entity4 = new Entity4("1" ,"value1" ,"rx");
+        Entity4 entity4 = new Entity4("1" , Entity4.Value2.V1 ,"rx");
         Assert.assertFalse(mapper.existByPrimaryKey(entity4.getId()));
         mapper.insert(entity4);
         Assert.assertTrue(mapper.existByPrimaryKey(entity4.getId()));
-        Entity4 entity42 = new Entity4("2" ,"value1" ,null);
+        Entity4 entity42 = new Entity4("2" ,Entity4.Value2.V1 ,null);
         //测试逻辑列是否会覆盖
         entity42.setRemoved("12");
         mapper.insertSelective(entity42);
         Assert.assertEquals(mapper.total() ,2);
 
-        Entity4 selective = new Entity4(null ,"value1" ,null);
+        Entity4 selective = new Entity4(null ,Entity4.Value2.V1 ,null);
         Assert.assertEquals(mapper.selectSelective(selective).size() ,2);
         Assert.assertNotNull(mapper.selectByPrimaryKey(entity4.getId()));
 
@@ -107,8 +112,8 @@ public class Entity4Test {
         Assert.assertEquals(mapper.selectSelective(selective).size() ,0);
         Assert.assertEquals(mapper.selectSelective(selective ,false).size() ,1);
 
-        Entity4 entity43 = new Entity4("3" ,"value1" ,null);
-        Entity4 entity44 = new Entity4("4" ,"value1" ,null);
+        Entity4 entity43 = new Entity4("3" ,Entity4.Value2.V1 ,null);
+        Entity4 entity44 = new Entity4("4" ,Entity4.Value2.V1 ,null);
         entity4s = Arrays.asList(entity43, entity44);
 
         Assert.assertEquals(2, mapper.insertBatch(entity4s));
@@ -122,7 +127,7 @@ public class Entity4Test {
         Assert.assertEquals(mapper.selectSelective(selective ,false).size() ,1);
 
         List<Entity4> list = IntStream.range(10, 20)
-                .mapToObj(i -> new Entity4(String.valueOf(i) ,String.valueOf(i) ,String.valueOf(i)))
+                .mapToObj(i -> new Entity4(String.valueOf(i) ,Entity4.Value2.V1 ,String.valueOf(i)))
                 .collect(Collectors.toList());
         mapper.insertBatch(list);
         Assert.assertEquals(mapper.selectAll().size() ,10);
