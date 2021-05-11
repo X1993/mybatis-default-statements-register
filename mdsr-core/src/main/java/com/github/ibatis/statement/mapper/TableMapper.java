@@ -1,6 +1,8 @@
 package com.github.ibatis.statement.mapper;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import com.github.ibatis.statement.register.factory.*;
 
 /**
@@ -33,6 +35,10 @@ public interface TableMapper<T> extends SelectMapper<T> {
      * @see InsertBatchMappedStatementFactory#INSERT_BATCH
      */
     int insertBatch(Collection<? extends T> list);
+
+    default int insertBatch(T[] array){
+        return insertBatch(Arrays.stream(array).collect(Collectors.toList()));
+    }
 
     /**
      * 批量删除（根据有无逻辑列执行逻辑删除或物理删除）

@@ -1,8 +1,9 @@
 package com.github.ibatis.statement.mapper;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
+import java.util.stream.Collectors;
 import com.github.ibatis.statement.register.factory.*;
 
 /**
@@ -53,12 +54,20 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      */
     int countByPrimaryKeys(Collection<? extends K> keys);
 
+    default int countByPrimaryKeys(K[] keys){
+        return countByPrimaryKeys(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
+
     /**
      * 根据主键集查询匹配的行数（包含逻辑删除的行）
      * @param keys
      * @return
      */
     int countByPrimaryKeysOnPhysical(Collection<? extends K> keys);
+
+    default int countByPrimaryKeysOnPhysical(K[] keys){
+        return countByPrimaryKeysOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
 
     /**
      * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
@@ -67,12 +76,20 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      */
     List<T> selectBatchByPrimaryKey(Collection<? extends K> keys);
 
+    default List<T> selectBatchByPrimaryKey(K[] keys){
+        return selectBatchByPrimaryKey(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
+
     /**
      * 根据主键集批量物理查询
      * @param keys
      * @return
      */
     List<T> selectBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
+
+    default List<T> selectBatchByPrimaryKeyOnPhysical(K[] keys){
+        return selectBatchByPrimaryKeyOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
 
     /**
      * 修改属性不为空的数据
@@ -103,12 +120,16 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
 
     /**
      * 对多个主键匹配的数据使用相同的值做修改
-     * @param list 主键列表
+     * @param keys 主键列表
      * @param updateValue 以为非空属性作为修改的值
      * @see UpdateSameBatchMappedStatementFactory#UPDATE_BATCH_SAME_VALUE
      * @return
      */
-    int updateBatchSameValue(Collection<? extends K> list ,T updateValue);
+    int updateBatchSameValue(Collection<? extends K> keys ,T updateValue);
+
+    default int updateBatchSameValue(K[] keys ,T updateValue){
+        return updateBatchSameValue(Arrays.stream(keys).collect(Collectors.toSet()) ,updateValue);
+    }
 
     /**
      * 根据主键删除（如果定义了逻辑列则为逻辑删除，否则物理删除）
@@ -126,6 +147,10 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      */
     int deleteBatchByPrimaryKey(Collection<? extends K> keys);
 
+    default int deleteBatchByPrimaryKey(K[] keys){
+        return deleteBatchByPrimaryKey(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
+
     /**
      * 根据主键物理删除
      * @param key
@@ -141,6 +166,10 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @see DeleteBatchByPrimaryKeyMappedStatementFactory#DELETE_BATCH_ON_PHYSICAL
      */
     int deleteBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
+
+    default int deleteBatchByPrimaryKeyOnPhysical(K[] keys){
+        return deleteBatchByPrimaryKeyOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
 
     /**
      * 查询最大的主键
