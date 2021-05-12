@@ -90,7 +90,7 @@ public class ColumnPropertyMapping implements Cloneable{
                         .filter(jdbcType -> jdbcType != JdbcType.NULL)
                         .map(jdbcType -> ",jdbcType=" + jdbcType).orElse(""))
                 .append(Optional.ofNullable(propertyMateData.getTypeHandlerClass())
-                        .map(typeHandlerClass -> ",typeHandler=" + typeHandlerClass).orElse(""))
+                        .map(typeHandlerClass -> ",typeHandler=" + typeHandlerClass.getName()).orElse(""))
                 .append("} ");
     }
 

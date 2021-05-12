@@ -1,8 +1,13 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.DataSourceEnvironment;
+import com.github.ibatis.statement.base.core.Column;
 import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.type.ArrayTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.StringTypeHandler;
+import org.apache.ibatis.type.TypeHandler;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,6 +30,7 @@ public class Entity3Test {
 
         private int id2;
 
+        @Column(typeHandler = StringTypeHandler.class)
         private String value;
 
         private String value2;
