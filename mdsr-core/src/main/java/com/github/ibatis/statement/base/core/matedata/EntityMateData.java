@@ -91,7 +91,7 @@ public class EntityMateData implements Cloneable{
                             columnPropertyMapping.getPropertyName(),
                             columnPropertyMapping.getColumnName(),
                             columnPropertyMapping.getPropertyMateData().getType())
-                            .jdbcType(columnPropertyMapping.getColumnMateData().getJdbcType())
+                            .jdbcType(columnPropertyMapping.getJdbcType())
                             .flags(keyPrimaryPropertyNameSet.contains(columnPropertyMapping.getPropertyMateData()
                                     .getField().getName()) ? Arrays.asList(ResultFlag.ID) : new ArrayList<>())
                             .typeHandler(resolveTypeHandler(configuration ,
