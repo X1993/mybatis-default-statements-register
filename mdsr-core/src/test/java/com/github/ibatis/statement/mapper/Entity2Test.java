@@ -128,6 +128,11 @@ public class Entity2Test {
         List<Entity2> entity2s = Arrays.asList(entity21, entity22, entity23);
         mapper.insertBatch(entity2s);
 
+        List<Entity2> getExistPrimaryKeys = mapper.getExistPrimaryKeys(Arrays.asList(entity21, entity22));
+        getExistPrimaryKeys.sort((e1 ,e2) -> e1.getId2().compareTo(e1.getId2()));
+        Assert.assertEquals(getExistPrimaryKeys.get(0).getId2() ,"2");
+        Assert.assertEquals(getExistPrimaryKeys.get(1).getId2() ,"3");
+
         Assert.assertEquals(mapper.selectBatchByPrimaryKey(entity2s).size() ,3);
         Assert.assertEquals(mapper.countByPrimaryKeys(entity2s) ,3);
         Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(entity2s).size() ,3);

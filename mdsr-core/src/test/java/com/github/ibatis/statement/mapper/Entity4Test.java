@@ -117,7 +117,10 @@ public class Entity4Test {
 
         Assert.assertEquals(2, mapper.insertBatch(entity4s));
         List<String> ids = entity4s.stream().map(obj -> obj.getId()).collect(Collectors.toList());
+        Assert.assertEquals(mapper.getExistPrimaryKeys(ids).size() ,2);
         Assert.assertEquals(2, mapper.deleteBatchByPrimaryKey(ids));
+        Assert.assertEquals(mapper.getExistPrimaryKeys(ids).size() ,0);
+        Assert.assertEquals(mapper.getExistPrimaryKeysOnPhysical(ids).size() ,2);
 
         Assert.assertEquals(mapper.selectSelective(selective).size() ,0);
         Assert.assertEquals(mapper.selectSelective(selective ,false).size() ,3);

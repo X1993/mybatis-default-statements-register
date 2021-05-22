@@ -36,7 +36,7 @@ public interface TableMapper<T> extends SelectMapper<T> {
      */
     int insertBatch(Collection<? extends T> list);
 
-    default int insertBatch(T[] array){
+    default int insertBatch(T ... array){
         return insertBatch(Arrays.stream(array).collect(Collectors.toList()));
     }
 

@@ -10,6 +10,7 @@ import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.*;
@@ -243,20 +244,28 @@ public class MappedStatementMateData implements Cloneable{
         MapperMethodMateData mapperMethodMateData = getMapperMethodMateData();
         Type genericReturnType = mapperMethodMateData.getMethodSignature().getGenericReturnType();
         Class<?> returnType = mapperMethodMateData.getMappedMethod().getReturnType();
-
         Class<?> entityClass = getEntityMateData().getEntityClass();
-        if (TypeUtils.isAssignableFrom(entityClass ,genericReturnType)){
-            return getDefaultMappingResultMap();
-        }else if (TypeUtils.isAssignableFrom(
-                ParameterizedTypeImpl.make(Collection.class ,new Type[]{entityClass} ,null) ,genericReturnType)){
-            return getDefaultMappingResultMap();
-        }else if (returnType.isArray() && TypeUtils.isAssignableFrom(entityClass ,returnType.getComponentType())){
-            return getDefaultMappingResultMap();
-        }else if (genericReturnType instanceof GenericArrayType && TypeUtils.isAssignableFrom(entityClass ,
-                ((GenericArrayType) genericReturnType).getGenericComponentType()))
+        Type resultMapType = genericReturnType;
+
+        if (resultMapType instanceof ParameterizedType){
+            ParameterizedType parameterizedType = (ParameterizedType) resultMapType;
+            Type rawType = parameterizedType.getRawType();
+            if (rawType instanceof Class){
+                Class<?> rawClass = (Class<?>) rawType;
+                if (Collection.class.isAssignableFrom(rawClass)){
+                    resultMapType = parameterizedType.getActualTypeArguments()[0];
+                }
+            }
+        }else if (returnType.isArray()){
+            resultMapType = returnType.getComponentType();
+        }else if (genericReturnType instanceof GenericArrayType)
         {
-            return this.getDefaultMappingResultMap();
-        } else if (genericReturnType instanceof Class){
+            resultMapType = ((GenericArrayType) genericReturnType).getGenericComponentType();
+        }
+
+        if (TypeUtils.isAssignableFrom(entityClass ,resultMapType)){
+            return getDefaultMappingResultMap();
+        }else if (resultMapType instanceof Class){
             return new ResultMap.Builder(
                     getConfiguration(),
                     this.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",

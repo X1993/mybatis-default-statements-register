@@ -20,14 +20,8 @@ import java.util.*;
  */
 public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory
 {
-    /**
-     * 批量删除方法
-     */
     public final static String DELETE_BATCH_ON_PHYSICAL = "deleteBatchByPrimaryKey";
 
-    /**
-     * 批量物理删除方法
-     */
     public final static String PHYSICAL_DELETE_BATCH_METHOD_NAME = "deleteBatchByPrimaryKeyOnPhysical";
 
     @Override

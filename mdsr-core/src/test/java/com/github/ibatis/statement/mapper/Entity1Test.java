@@ -1,11 +1,11 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.register.factory.SelectBatchByPrimaryKeyMappedStatementFactory;
 import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -143,7 +143,7 @@ public class Entity1Test {
          * 查询最大的主键
          * @return
          */
-        K selectMaxKey();
+        K selectMaxPrimaryKey();
 
     }
 
@@ -204,6 +204,20 @@ public class Entity1Test {
          * @return
          */
         int countByPrimaryKeysOnPhysical(Collection<String> keys);
+
+        /**
+         * 返回已存在的主键 (如果有逻辑列，只统计逻辑存在的)
+         * @param keys
+         * @return
+         */
+        List<String> getExistPrimaryKeys(Collection<? extends String> keys);
+
+        /**
+         * 返回已存在的主键（包含逻辑删除的行）
+         * @param keys
+         * @return
+         */
+        List<String> getExistPrimaryKeysOnPhysical(Collection<? extends String> keys);
 
         /**
          * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
@@ -277,6 +291,8 @@ public class Entity1Test {
         Assert.assertTrue(mapper.existByPrimaryKey(entity1.getId()));
 
         Assert.assertEquals(mapper.selectBatchByPrimaryKey(Arrays.asList("1" ,"2")).size() ,2);
+        Assert.assertEquals(mapper.getExistPrimaryKeys(Arrays.asList("1","4")).stream().findFirst().get() ,"1");
+        Assert.assertEquals(mapper.getExistPrimaryKeysOnPhysical(Arrays.asList("1","4")).stream().findFirst().get() ,"1");
         Assert.assertEquals(mapper.countByPrimaryKeys(Arrays.asList("1" ,"2")) ,2);
         Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(Arrays.asList("1" ,"4")).size() ,1);
         Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(Arrays.asList("3" ,"2")) ,1);
@@ -284,7 +300,7 @@ public class Entity1Test {
         Assert.assertNotNull(mapper.selectByPrimaryKey(entity1.getId()));
         Assert.assertEquals(mapper.total() ,2);
 
-        Assert.assertEquals(mapper.selectMaxKey() ,"2");
+        Assert.assertEquals(mapper.selectMaxPrimaryKey() ,"2");
 
         entity1.setValue1("12");
         mapper.updateByPrimaryKey(entity1);

@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface UserMapper extends KeyTableMapper<Integer ,User> {
 
-    Integer selectMaxKey();
+    Integer selectMaxPrimaryKey();
 
     User selectByIdEqAndAddressNotNullOrCreateTimeBetweenOrderByNameCreateTimeDesc(Integer id , Date startDate , Date endDate);
 

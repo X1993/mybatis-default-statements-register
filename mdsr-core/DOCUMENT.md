@@ -1827,7 +1827,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
      */
     public interface UserMapper extends KeyTableMapper<Integer ,User> {
     
-        Integer selectMaxKey();
+        Integer selectMaxPrimaryKey();
     
     }
 ```
@@ -1862,7 +1862,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
             }
     
             return methodSignature.isMatch(new MethodSignature(
-                    entityMateData.getReasonableKeyParameterClass() ,"selectMaxKey"));
+                    entityMateData.getReasonableKeyParameterClass() ,selectMaxPrimaryKey));
         }
     
         @Override
@@ -1946,8 +1946,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     public class Demo{
       
         @Test
-        public void selectMaxKey(){
-            userMapper.selectMaxKey();
+        public void selectMaxPrimaryKey(){
+            userMapper.selectMaxPrimaryKey();
         }
     }
 ``` 

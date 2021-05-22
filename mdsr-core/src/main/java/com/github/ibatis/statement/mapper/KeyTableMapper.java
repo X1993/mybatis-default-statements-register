@@ -51,10 +51,11 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * 根据主键集查询匹配的行数(如果有逻辑列，只统计逻辑存在的)
      * @param keys
      * @return
+     * @see SelectBatchByPrimaryKeyMappedStatementFactory#COUNT_BY_PRIMARY_KEYS
      */
     int countByPrimaryKeys(Collection<? extends K> keys);
 
-    default int countByPrimaryKeys(K[] keys){
+    default int countByPrimaryKeys(K ... keys){
         return countByPrimaryKeys(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
@@ -62,21 +63,47 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * 根据主键集查询匹配的行数（包含逻辑删除的行）
      * @param keys
      * @return
+     * @see SelectBatchByPrimaryKeyMappedStatementFactory#COUNT_BY_PRIMARY_KEYS_ON_PHYSICAL
      */
     int countByPrimaryKeysOnPhysical(Collection<? extends K> keys);
 
-    default int countByPrimaryKeysOnPhysical(K[] keys){
+    default int countByPrimaryKeysOnPhysical(K ... keys){
         return countByPrimaryKeysOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
+
+    /**
+     * 返回已存在的主键 (如果有逻辑列，只统计逻辑存在的)
+     * @param keys
+     * @return
+     * @see SelectBatchByPrimaryKeyMappedStatementFactory#GET_EXIST_PRIMARY_KEYS
+     */
+    List<K> getExistPrimaryKeys(Collection<? extends K> keys);
+
+    default List<K> getExistPrimaryKeys(K ... keys){
+        return getExistPrimaryKeys(Arrays.stream(keys).collect(Collectors.toSet()));
+    }
+
+    /**
+     * 返回已存在的主键（包含逻辑删除的行）
+     * @param keys
+     * @return
+     * @see SelectBatchByPrimaryKeyMappedStatementFactory#GET_EXIST_PRIMARY_KEYS_ON_PHYSICAL
+     */
+    List<K> getExistPrimaryKeysOnPhysical(Collection<? extends K> keys);
+
+    default List<K> getExistPrimaryKeysOnPhysical(K ... keys){
+        return getExistPrimaryKeysOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
     /**
      * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
      * @param keys
      * @return
+     * @see SelectBatchByPrimaryKeyMappedStatementFactory#SELECT_BATCH_BY_PRIMARY_KEY
      */
     List<T> selectBatchByPrimaryKey(Collection<? extends K> keys);
 
-    default List<T> selectBatchByPrimaryKey(K[] keys){
+    default List<T> selectBatchByPrimaryKey(K ... keys){
         return selectBatchByPrimaryKey(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
@@ -84,10 +111,11 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * 根据主键集批量物理查询
      * @param keys
      * @return
+     * @see SelectBatchByPrimaryKeyMappedStatementFactory#SELECT_BATCH_BY_PRIMARY_KEY_ON_PHYSICAL
      */
     List<T> selectBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
 
-    default List<T> selectBatchByPrimaryKeyOnPhysical(K[] keys){
+    default List<T> selectBatchByPrimaryKeyOnPhysical(K ... keys){
         return selectBatchByPrimaryKeyOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
@@ -147,7 +175,7 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      */
     int deleteBatchByPrimaryKey(Collection<? extends K> keys);
 
-    default int deleteBatchByPrimaryKey(K[] keys){
+    default int deleteBatchByPrimaryKey(K ... keys){
         return deleteBatchByPrimaryKey(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
@@ -167,15 +195,15 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      */
     int deleteBatchByPrimaryKeyOnPhysical(Collection<? extends K> keys);
 
-    default int deleteBatchByPrimaryKeyOnPhysical(K[] keys){
+    default int deleteBatchByPrimaryKeyOnPhysical(K ... keys){
         return deleteBatchByPrimaryKeyOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
     /**
      * 查询最大的主键
      * @return
-     * @see SelectMaxKeyStatementFactory#SELECT_MAX_KEY
+     * @see SelectMaxKeyStatementFactory#SELECT_MAX_PRIMARY_KEY
      */
-    K selectMaxKey();
+    K selectMaxPrimaryKey();
 
 }

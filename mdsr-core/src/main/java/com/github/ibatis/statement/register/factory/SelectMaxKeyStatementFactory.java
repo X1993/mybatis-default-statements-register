@@ -10,13 +10,13 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
- * @see KeyTableMapper#selectMaxKey()
+ * @see KeyTableMapper#selectMaxPrimaryKey()
  * @Author: X1993
  * @Date: 2020/12/18
  */
 public class SelectMaxKeyStatementFactory extends AbstractMappedStatementFactory {
 
-    public static final String SELECT_MAX_KEY = "selectMaxKey";
+    public static final String SELECT_MAX_PRIMARY_KEY = "selectMaxPrimaryKey";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
@@ -25,7 +25,7 @@ public class SelectMaxKeyStatementFactory extends AbstractMappedStatementFactory
         EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
 
         return entityMateData.getPrimaryKeyCount() > 0 && methodSignature.isMatch(
-                new MethodSignature(entityMateData.getReasonableKeyParameterClass() ,SELECT_MAX_KEY));
+                new MethodSignature(entityMateData.getReasonableKeyParameterClass() , SELECT_MAX_PRIMARY_KEY));
     }
 
     @Override

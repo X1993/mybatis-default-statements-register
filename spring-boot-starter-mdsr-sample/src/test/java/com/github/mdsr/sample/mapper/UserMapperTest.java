@@ -98,8 +98,8 @@ public class UserMapperTest{
     }
 
     @Test
-    public void selectMaxKey(){
-        userMapper.selectMaxKey();
+    public void selectMaxPrimaryKey(){
+        userMapper.selectMaxPrimaryKey();
     }
 
 }

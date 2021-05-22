@@ -179,6 +179,11 @@ public class Demo {
     }
 
     @Test
+    public void selectExistPrimaryKeys(){
+        userMapper.getExistPrimaryKeys(13 ,14);
+    }
+
+    @Test
     public void selectSelective(){
         User user = new User();
         user.setName("ha");
@@ -193,8 +198,8 @@ public class Demo {
     }
 
     @Test
-    public void selectMaxKey(){
-        userMapper.selectMaxKey();
+    public void selectMaxPrimaryKey(){
+        userMapper.selectMaxPrimaryKey();
     }
 
     @Test

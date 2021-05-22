@@ -14,7 +14,7 @@ public interface UserMapper extends KeyTableMapper<Integer ,User> {
     @Select("select * from user where id = #{param1} and removed = 0")
     User selectByPrimaryKey(Integer key);
 
-    Integer selectMaxKey();
+    Integer selectMaxPrimaryKey();
 
 //    Integer cannotRegisterMethod();
 

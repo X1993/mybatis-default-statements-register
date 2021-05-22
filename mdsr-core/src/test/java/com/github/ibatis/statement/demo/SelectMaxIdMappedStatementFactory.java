@@ -26,7 +26,7 @@ public class SelectMaxIdMappedStatementFactory extends AbstractMappedStatementFa
         }
 
         return methodSignature.isMatch(new MethodSignature(
-                entityMateData.getReasonableKeyParameterClass() ,"selectMaxKey"));
+                entityMateData.getReasonableKeyParameterClass() ,"selectMaxPrimaryKey"));
     }
 
     @Override
