@@ -3,7 +3,6 @@ package com.github.ibatis.statement.base.core.matedata;
 import com.github.ibatis.statement.base.dv.ColumnDefaultValue;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.util.TypeUtils;
-import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import lombok.Data;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
