@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -24,22 +24,34 @@ public interface StrengthenKeyTableMapper<K ,T> extends KeyTableMapper<K ,T> {
      * @param keyFunction 主键获取函数
      * @return
      */
-    default int safeInsert(Collection<T> collection ,Function<T ,K> keyFunction)
+    default int safeInsert(Collection<T> collection, Function<T, K> keyFunction)
     {
-        while (!collection.isEmpty()) {
-            List<K> existKeys = getExistPrimaryKeysOnPhysical(collection.stream()
+        boolean duplicateKey = false;
+        while (!collection.isEmpty())
+        {
+            Set<K> existKeys = getExistPrimaryKeysOnPhysical(collection.stream()
                     .map(t -> keyFunction.apply(t))
                     .collect(Collectors.toSet()));
 
+            int count = collection.size();
             collection = collection.stream()
                     .filter(t -> !existKeys.contains(keyFunction.apply(t)))
                     .collect(Collectors.toList());
+
+            if (duplicateKey && count == collection.size()){
+                //没有过滤出重复数据,请检查是否合理的重写了主键类的equals和hashCode方法
+                throw new IllegalStateException("Duplicate data is not filtered out, please check whether the" +
+                        " [equals] and [hashCode] methods of the primary key class are reasonably rewritten");
+            }else {
+                duplicateKey = false;
+            }
 
             if (collection.size() > 0) {
                 try {
                     return insertBatch(collection);
                 } catch (DuplicateKeyException e) {
                     LOGGER.warn("{} ,filter and retry", e.getMessage());
+                    duplicateKey = true;
                 }
             }
         }

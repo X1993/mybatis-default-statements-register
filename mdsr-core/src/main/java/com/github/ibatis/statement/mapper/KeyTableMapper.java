@@ -3,6 +3,7 @@ package com.github.ibatis.statement.mapper;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import com.github.ibatis.statement.register.factory.*;
 
@@ -77,9 +78,9 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @return
      * @see SelectBatchByPrimaryKeyMappedStatementFactory#GET_EXIST_PRIMARY_KEYS
      */
-    List<K> getExistPrimaryKeys(Collection<? extends K> keys);
+    Set<K> getExistPrimaryKeys(Collection<? extends K> keys);
 
-    default List<K> getExistPrimaryKeys(K ... keys){
+    default Set<K> getExistPrimaryKeys(K ... keys){
         return getExistPrimaryKeys(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 
@@ -89,9 +90,9 @@ public interface KeyTableMapper<K ,T> extends KeyParameterType<K>, TableMapper<T
      * @return
      * @see SelectBatchByPrimaryKeyMappedStatementFactory#GET_EXIST_PRIMARY_KEYS_ON_PHYSICAL
      */
-    List<K> getExistPrimaryKeysOnPhysical(Collection<? extends K> keys);
+    Set<K> getExistPrimaryKeysOnPhysical(Collection<? extends K> keys);
 
-    default List<K> getExistPrimaryKeysOnPhysical(K ... keys){
+    default Set<K> getExistPrimaryKeysOnPhysical(K ... keys){
         return getExistPrimaryKeysOnPhysical(Arrays.stream(keys).collect(Collectors.toSet()));
     }
 

@@ -54,7 +54,7 @@ public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
         ParameterizedTypeImpl returnEntityListType = ParameterizedTypeImpl.make(List.class,
                 new Type[]{entityMateData.getEntityClass()}, null);
 
-        ParameterizedTypeImpl returnKeyListType = ParameterizedTypeImpl.make(List.class,
+        ParameterizedTypeImpl returnKeySetType = ParameterizedTypeImpl.make(Set.class,
                 new Type[]{entityMateData.getReasonableKeyParameterClass()}, null);
 
         return methodSignature.isMatch(new MethodSignature(int.class ,
@@ -65,9 +65,9 @@ public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
                 SELECT_BATCH_BY_PRIMARY_KEY, parameterizedType))
                 || methodSignature.isMatch(new MethodSignature(returnEntityListType ,
                 SELECT_BATCH_BY_PRIMARY_KEY_ON_PHYSICAL , parameterizedType))
-                || methodSignature.isMatch(new MethodSignature(returnKeyListType ,
+                || methodSignature.isMatch(new MethodSignature(returnKeySetType ,
                 GET_EXIST_PRIMARY_KEYS, parameterizedType))
-                || methodSignature.isMatch(new MethodSignature(returnKeyListType ,
+                || methodSignature.isMatch(new MethodSignature(returnKeySetType ,
                 GET_EXIST_PRIMARY_KEYS_ON_PHYSICAL, parameterizedType));
     }
 
