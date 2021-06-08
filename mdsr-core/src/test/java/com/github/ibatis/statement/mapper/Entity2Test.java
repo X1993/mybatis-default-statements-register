@@ -9,6 +9,8 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -128,7 +130,7 @@ public class Entity2Test {
         List<Entity2> entity2s = Arrays.asList(entity21, entity22, entity23);
         mapper.insertBatch(entity2s);
 
-        List<Entity2> getExistPrimaryKeys = mapper.getExistPrimaryKeys(Arrays.asList(entity21, entity22));
+        List<Entity2> getExistPrimaryKeys = new ArrayList<>(mapper.getExistPrimaryKeys(Arrays.asList(entity21, entity22)));
         getExistPrimaryKeys.sort((e1 ,e2) -> e1.getId2().compareTo(e1.getId2()));
         Assert.assertEquals(getExistPrimaryKeys.get(0).getId2() ,"2");
         Assert.assertEquals(getExistPrimaryKeys.get(1).getId2() ,"3");

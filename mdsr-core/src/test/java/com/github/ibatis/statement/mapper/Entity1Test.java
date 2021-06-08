@@ -1,7 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
 import com.github.ibatis.statement.base.core.Column;
-import com.github.ibatis.statement.register.factory.SelectBatchByPrimaryKeyMappedStatementFactory;
 import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
@@ -9,6 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -210,14 +210,14 @@ public class Entity1Test {
          * @param keys
          * @return
          */
-        List<String> getExistPrimaryKeys(Collection<? extends String> keys);
+        Set<String> getExistPrimaryKeys(Collection<? extends String> keys);
 
         /**
          * 返回已存在的主键（包含逻辑删除的行）
          * @param keys
          * @return
          */
-        List<String> getExistPrimaryKeysOnPhysical(Collection<? extends String> keys);
+        Set<String> getExistPrimaryKeysOnPhysical(Collection<? extends String> keys);
 
         /**
          * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
