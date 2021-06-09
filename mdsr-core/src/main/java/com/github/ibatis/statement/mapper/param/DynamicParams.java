@@ -66,7 +66,8 @@ public class DynamicParams {
 
     /**
      * 添加查询的列
-     * @param elements 为了支持更多的语法，不会为每个element添加``，如果是关键字需要自己维护转义符
+     * @param elements 为了支持更多的语法，不会为每个element添加``，如果是关键字需要自己维护转义符，
+     *                 或者直接使用{@link #addSelectColumnss(String...)}
      * @return
      */
     public DynamicParams addSelectElements(String ... elements){
@@ -79,6 +80,13 @@ public class DynamicParams {
             setSelectElements(getSelectElements() == null ? selectContext : (getSelectElements() + ", " + selectContext));
         }
         return this;
+    }
+
+    public DynamicParams addSelectColumnss(String ... columns){
+        for (int i = 0; i < columns.length; i++) {
+            columns[i] = formatColumn(columns[i]);
+        }
+        return addSelectElements(columns);
     }
 
     public DynamicParams where(ConditionParams conditionParams) {
