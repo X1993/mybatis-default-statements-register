@@ -52,15 +52,18 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
         boolean selectCount = SELECT_COUNT_METHOD_NAME.equals(methodName);
         List<SqlNode> sqlNodes = new ArrayList<>();
 
-        SqlNode baseSqlNode = new StaticTextSqlNode(new StringBuilder("SELECT ")
-                .append(selectCount ? "COUNT(0) " : entityMateData.getBaseColumnListSqlContent())
-                .append(" FROM `")
+        sqlNodes.add(new StaticTextSqlNode("SELECT "));
+        if (selectCount){
+            sqlNodes.add(new StaticTextSqlNode("COUNT(0)"));
+        }else {
+            sqlNodes.add(new ChooseSqlNode(Arrays.asList(new IfSqlNode(
+                    new TextSqlNode("${selectElements}") ,"selectElements != null")) ,
+                    new StaticTextSqlNode(entityMateData.getBaseColumnListSqlContent())));
+        }
+        sqlNodes.add(new StaticTextSqlNode(new StringBuilder(" FROM `")
                 .append(entityMateData.getTableMateData().getTableName())
-                .append("` ")
-                .toString());
-        sqlNodes.add(baseSqlNode);
-
-        sqlNodes.add(new StaticTextSqlNode(" WHERE 1 = 1 "));
+                .append("` WHERE 1 = 1 ")
+                .toString()));
 
         //默认查询条件
         sqlNodes.add(entityMateData.defaultConditionsSqlNode(

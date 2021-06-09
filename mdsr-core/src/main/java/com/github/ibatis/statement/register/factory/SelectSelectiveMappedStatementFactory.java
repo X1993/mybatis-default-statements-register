@@ -60,7 +60,7 @@ public class SelectSelectiveMappedStatementFactory extends AbstractMappedStateme
         List<SqlNode> sqlNodes = new LinkedList<>();
 
         String selectContent = selectEntity(mappedStatementMateData)
-                ? entityMateData.getBaseColumnListSqlContent().toString() : " COUNT(0) ";
+                ? entityMateData.getBaseColumnListSqlContent() : " COUNT(0) ";
 
         sqlNodes.add(new StaticTextSqlNode(new StringBuilder("SELECT ")
                 .append(selectContent)

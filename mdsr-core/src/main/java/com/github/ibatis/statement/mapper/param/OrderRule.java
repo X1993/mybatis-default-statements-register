@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class OrderRule {
 
     /**
-     * 列名 or 列映射的属性名 ，优先级 列名 > 列映射的属性名
+     * 列名
      */
     private String key;
 

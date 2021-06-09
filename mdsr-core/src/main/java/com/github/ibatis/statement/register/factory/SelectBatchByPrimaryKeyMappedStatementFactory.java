@@ -91,7 +91,7 @@ public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractMappe
                     .reduce((keyCol1 ,keyCol2) -> keyCol1 + "," + keyCol2)
                     .get();
         } else {
-            selectColumnSql = entityMateData.getBaseColumnListSqlContent().toString();
+            selectColumnSql = entityMateData.getBaseColumnListSqlContent();
         }
 
         List<SqlNode> sqlNodes = new LinkedList<>();

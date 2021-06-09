@@ -71,7 +71,7 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
         Configuration configuration = mappedStatementMateData.getConfiguration();
 
         StringBuilder sqlContext = new StringBuilder("SELECT ")
-                .append(selectEntity ? entityMateData.getBaseColumnListSqlContent().toString() : "COUNT(0)")
+                .append(selectEntity ? entityMateData.getBaseColumnListSqlContent() : "COUNT(0)")
                 .append(" FROM `")
                 .append(entityMateData.getTableName())
                 .append("` WHERE ");

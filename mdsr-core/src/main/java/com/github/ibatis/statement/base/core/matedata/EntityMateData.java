@@ -268,7 +268,7 @@ public class EntityMateData implements Cloneable{
      * 构建查询的列
      * @return
      */
-    public StringBuilder getBaseColumnListSqlContent()
+    public String getBaseColumnListSqlContent()
     {
         StringBuilder sqlContext = new StringBuilder();
         for (String columnName : getSelectColumnPropertyMapping().keySet())
@@ -281,7 +281,7 @@ public class EntityMateData implements Cloneable{
         if (sqlContext.length() > 0) {
             sqlContext.delete(sqlContext.length() - 1, sqlContext.length());
         }
-        return sqlContext;
+        return sqlContext.toString();
     }
 
     /**
