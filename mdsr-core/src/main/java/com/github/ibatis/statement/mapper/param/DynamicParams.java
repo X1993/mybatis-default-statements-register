@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 @Data
 public class DynamicParams {
 
+    public static final char ESCAPE = '`';
+
     /**
      * 查询的列
      * 默认值{@link EntityMateData#getBaseColumnListSqlContent()}
@@ -52,6 +54,11 @@ public class DynamicParams {
      */
     private boolean logical = true;
 
+    /**
+     * 添加查询的列
+     * @param elements 为了支持更多的语法，不会为每个element添加``，如果是关键字需要自己维护转义符
+     * @return
+     */
     public DynamicParams selectElements(String elements){
         setSelectElements(elements);
         return this;
@@ -98,19 +105,23 @@ public class DynamicParams {
 
     public DynamicParams groupBy(String ... keys){
         for (String key : keys) {
-            groupColumns.add(key);
+            groupColumns.add(formatColumn(key));
         }
         return this;
     }
 
     public DynamicParams addOrderRule(OrderRule orderRule)
     {
+        orderRule.setKey(formatColumn(orderRule.getKey()));
         getOrderRules().add(orderRule);
         return this;
     }
 
     public DynamicParams addOrderRule(List<? extends OrderRule> orderRules)
     {
+        for (OrderRule orderRule : orderRules) {
+            orderRule.setKey(formatColumn(orderRule.getKey()));
+        }
         getOrderRules().addAll(orderRules);
         return this;
     }
@@ -199,6 +210,38 @@ public class DynamicParams {
     public DynamicParams logical(boolean logical) {
         setLogical(logical);
         return this;
+    }
+
+    public void setWhereConditions(ConditionParams whereConditions) {
+        for (ConditionParam conditionParam : whereConditions.getParams()) {
+            conditionParam.setKey(formatColumn(conditionParam.getKey()));
+        }
+        this.whereConditions = whereConditions;
+    }
+
+    public void setHavingConditions(ConditionParams havingConditions) {
+        for (ConditionParam conditionParam : havingConditions.getParams()) {
+            conditionParam.setKey(formatColumn(conditionParam.getKey()));
+        }
+        this.havingConditions = havingConditions;
+    }
+
+    /**
+     * 老版本如果列名与关键字冲突，需要在传参时使用反单引号`column`，兼容老版本
+     * @param column
+     * @return
+     */
+    String formatColumn(String column)
+    {
+        if (column.length() > 0){
+            if (column.charAt(0) != ESCAPE){
+                column = '`' + column;
+            }
+            if (column.charAt(column.length() - 1) != ESCAPE){
+                column = column + ESCAPE;
+            }
+        }
+        return column;
     }
 
 }

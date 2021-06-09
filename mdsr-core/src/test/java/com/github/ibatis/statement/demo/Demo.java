@@ -278,14 +278,14 @@ public class Demo {
     @Test
     public void selectByDynamicParams(){
         userMapper.selectByDynamicParams(new DynamicParams()
-                .addSelectElements("id" ,"name")
+                .addSelectElements("id" ,"`name`")
                 .where(new ConditionParams()
                         .between("create_time", "2020-08-11", new Date())
-                        .likeLeft("name", "张"))
-                .groupBy("address", "name")
+                        .likeLeft("`name`", "张"))
+                .groupBy("`address`", "name")
                 .having(new ConditionParams().notNull("create_time"))
-                .asc("name","address")
-                .addOrderRule(OrderRule.Rule.ASC ,"create_time","name")
+                .asc("name","`address`")
+                .addOrderRule(OrderRule.Rule.ASC ,"`create_time`","name")
                 .addOrderRule(new OrderRule[]{new OrderRule("name" , OrderRule.Rule.DESC)})
                 .page0(0, 10));
     }

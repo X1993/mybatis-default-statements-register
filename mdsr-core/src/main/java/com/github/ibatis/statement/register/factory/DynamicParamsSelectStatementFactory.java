@@ -85,7 +85,7 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
 
         //group by
         sqlNodes.add(new IfSqlNode(new MixedSqlNode(Arrays.asList(new StaticTextSqlNode(" GROUP BY ") ,
-                new ForEachSqlNode(configuration, new TextSqlNode("`${groupKey}`") ,
+                new ForEachSqlNode(configuration, new TextSqlNode("${groupKey}") ,
                 "groupColumns", null, "groupKey",
                         null, null, ","))),
                 "groupColumns != null && groupColumns.size() > 0"));
@@ -98,7 +98,7 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
         if (!selectCount){
             //order by
             sqlNodes.add(new IfSqlNode(new ForEachSqlNode(configuration ,
-                    new TextSqlNode(" `${order.key}` ${order.rule} ") ,"orderRules" ,null ,
+                    new TextSqlNode(" ${order.key} ${order.rule} ") ,"orderRules" ,null ,
                     "order" ,"ORDER BY" ,null ,",") ,
                     "orderRules != null and orderRules.size > 0"));
 
@@ -120,8 +120,8 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
                                 "(proCondition == null or (proCondition != null and proCondition.isOr() == false)) " +
                                         "and condition.isOr() == true")), new IfSqlNode(new StaticTextSqlNode(" AND "),
                                 "proCondition == null or (proCondition != null and proCondition.isOr() == false)")),
-                        // `column` [rule]
-                        new TextSqlNode(" `${condition.key}` ${condition.rule.expression} "),
+                        // column [rule]
+                        new TextSqlNode(" ${condition.key} ${condition.rule.expression} "),
                         new ChooseSqlNode(Arrays.asList(
                             new IfSqlNode(new ForEachSqlNode(configuration, new StaticTextSqlNode(" #{data} "),
                                 "condition.value", null, "data",
