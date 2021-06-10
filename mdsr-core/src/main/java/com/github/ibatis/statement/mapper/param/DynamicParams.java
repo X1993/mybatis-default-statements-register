@@ -67,7 +67,7 @@ public class DynamicParams {
     /**
      * 添加查询的列
      * @param elements 为了支持更多的语法，不会为每个element添加``，如果是关键字需要自己维护转义符，
-     *                 或者直接使用{@link #addSelectColumnss(String...)}
+     *                 或者直接使用{@link #addSelectColumns(String...)}
      * @return
      */
     public DynamicParams addSelectElements(String ... elements){
@@ -82,7 +82,7 @@ public class DynamicParams {
         return this;
     }
 
-    public DynamicParams addSelectColumnss(String ... columns){
+    public DynamicParams addSelectColumns(String ... columns){
         for (int i = 0; i < columns.length; i++) {
             columns[i] = formatColumn(columns[i]);
         }

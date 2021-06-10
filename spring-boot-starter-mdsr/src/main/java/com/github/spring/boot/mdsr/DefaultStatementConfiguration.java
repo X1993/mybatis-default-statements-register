@@ -17,7 +17,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -81,13 +80,11 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     }
 
     @Bean
-    @ConditionalOnProperty(matchIfMissing = true ,prefix = MappedStatementProperties.PREFIX ,
-            name = "each-property-mapping-column" ,havingValue = "true")
     public TryMappingEveryPropertyMateDataParser tryMappingEveryPropertyMateDataParser()
     {
-        final TryMappingEveryPropertyMateDataParser propertyMateDataParser = new TryMappingEveryPropertyMateDataParser();
-        getBean(mappedStatementProperties.getColumnNameFunctionClass())
-                .ifPresent(fun -> propertyMateDataParser.setDefaultNameFunction(fun));
+        TryMappingEveryPropertyMateDataParser propertyMateDataParser = new TryMappingEveryPropertyMateDataParser();
+        propertyMateDataParser.setEachPropertyMappingColumn(mappedStatementProperties.isEachPropertyMappingColumn());
+        getBean(mappedStatementProperties.getColumnNameFunctionClass()).ifPresent(fun -> propertyMateDataParser.setDefaultNameFunction(fun));
         return propertyMateDataParser;
     }
 

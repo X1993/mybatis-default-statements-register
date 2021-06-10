@@ -4,13 +4,9 @@ import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.core.Column;
 import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.type.ArrayTypeHandler;
-import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.StringTypeHandler;
-import org.apache.ibatis.type.TypeHandler;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

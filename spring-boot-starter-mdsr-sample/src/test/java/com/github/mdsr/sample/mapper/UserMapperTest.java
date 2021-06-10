@@ -90,7 +90,7 @@ public class UserMapperTest{
     public void selectByDynamicParams(){
         userMapper.selectByDynamicParams(new DynamicParams()
                 .where(new ConditionParams()
-                        .between("create_time", "2020-08-11", new Date())
+                        .between("`create_time`", "2020-08-11", new Date())
                         .likeLeft("name", "张"))
                 .groupBy("address", "name")
                 .having(new ConditionParams().notNull("note"))

@@ -6,7 +6,6 @@ import com.github.ibatis.statement.base.core.parse.PropertyToColumnNameFunction;
 import com.github.ibatis.statement.base.core.parse.TryMappingEveryPropertyMateDataParser;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import java.util.function.Function;
 
 /**
