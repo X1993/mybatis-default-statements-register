@@ -435,6 +435,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 #### 2.4.优先级
    @Entity > 自定义*TableNameParser*实现（多个实现通过order()方法确定优先级）> 默认驼峰转下划线
 
+>   原则：粒度越小，优先级越高
+
 ### 3.列解析
 #### 3.1.注解声明
 ```java
@@ -485,7 +487,33 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 #### 3.3.默认规则
 
->   可关闭或自定义规则
+>   指定某个类开启自动映射
+```java
+    package com.github.ibatis.statement.base.core.parse;
+    
+    import java.lang.annotation.*;
+    
+    /**
+     * 默认所有属性都有映射的列
+     * @see TryMappingEveryPropertyMateDataParser
+     * @Author: X1993
+     * @Date: 2021/6/10
+     */
+    @Target({ElementType.TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    public @interface AutoMappingColumns {
+    
+        /**
+         * 是否启用
+         * @return
+         */
+        boolean enable() default true;
+    
+    }
+```
+
+>   可关闭或自定义全局映射规则
 ```yaml
     mybatis:
       mapped-statement:
@@ -515,6 +543,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 #### 3.4.优先级
    @Column > 自定义*PropertyMateDataParser*实现（多个实现通过order()方法确定优先级）
+  
+>   原则：粒度越小，优先级越高
 
 ### 4.逻辑列
 #### 4.1.注解声明
@@ -670,6 +700,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 #### 4.3.优先级
    @Logical > 自定义*LogicalColumnMateDataParser*实现（多个实现通过order()方法确定优先级）
+
+>   原则：粒度越小，优先级越高
 
 ### 5.复合主键
 -   schema.sql
@@ -869,6 +901,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 #### 6.3.优先级
    @DefaultValue > 自定义*ColumnValueParser*实现（多个实现通过order()方法确定优先级）
    
+>   原则：粒度越小，优先级越高
+
 ### 7.默认where条件
 >   仅支持修改/删除/查询指令，各方法注册器*MappedStatementFactory*提供实现，不保证所有方法都支持
 
@@ -1085,6 +1119,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 #### 7.3.优先级
    @Condition > 自定义*ColumnConditionParser*实现（多个实现通过order()方法确定优先级）
+
+>   原则：粒度越小，优先级越高
 
 ### 8.禁止特定列查询/修改/新增
 -   使用@Column#commandTypeMappings属性指定允许的指令
@@ -1314,6 +1350,8 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 #### 10.3.优先级
    @Entity > 全局默认配置
+
+>   原则：粒度越小，优先级越高
 
 ### 11.扩展自动注册方法
 -   定义方法签名
