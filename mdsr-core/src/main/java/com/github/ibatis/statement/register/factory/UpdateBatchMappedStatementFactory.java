@@ -4,9 +4,10 @@ import com.github.ibatis.statement.base.core.MethodSignature;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
 import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
-import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+
 import java.lang.reflect.Type;
 import java.util.Collection;
 

@@ -7,7 +7,7 @@ import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.DynamicSelectMapper;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
 import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
-import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.*;

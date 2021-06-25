@@ -6,7 +6,7 @@ import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
-import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
 import java.lang.reflect.Type;

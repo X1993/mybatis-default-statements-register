@@ -3,10 +3,11 @@ package com.github.ibatis.statement.util;
 import com.github.ibatis.statement.mapper.KeyTableMapper;
 import com.github.ibatis.statement.base.core.matedata.MapperMethodMateData;
 import com.github.ibatis.statement.mapper.EntityType;
-import com.github.ibatis.statement.util.reflect.GenericArrayTypeImpl;
-import com.github.ibatis.statement.util.reflect.ParameterizedTypeImpl;
 import org.junit.Assert;
 import org.junit.Test;
+import sun.reflect.generics.reflectiveObjects.GenericArrayTypeImpl;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+
 import java.lang.reflect.*;
 import java.util.*;
 
