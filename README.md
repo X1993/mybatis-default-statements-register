@@ -1,5 +1,5 @@
 ### 简介：
-[Mybatis-Default-Statements-Register](.)基于MyBatis二次开发，在MyBatis的基础上只做增强不做改变，提高开发效率。
+[Mybatis-Default-Statements-Register]基于MyBatis二次开发，在MyBatis的基础上只做增强不做改变，提高开发效率。
 
 ### 特征：
 -   1.无侵入：启动阶段为符合特定规则的mapper方法自动注入，启动成功之后完全委托Mybatis管理，与Mybatis有很好的兼容性。
@@ -18,3 +18,22 @@
 |-- spring-boot-starter-mdsr-sample    ➜ 演示服务
 ```
   
+### 实现流程:
+<p align="center">
+  <a>
+   <img alt="Framework" src="Framework.jpg">
+  </a>
+</p>  
+
+### 构建项目:
+JDK 8+, Maven 3+ 
+
+### 支持的数据库:
+1.TableSchemaResolutionStrategy=DATA_BASE（直接查询数据库获取table schema），目前支持mysql 、mariaDB 、H2
+> 其他数据库需要实现特定的适配器（尚未开发）
+```java
+    /**
+    * @see com.github.ibatis.statement.register.database.TableSchemaQuery
+    */
+```
+2.TableSchemaResolutionStrategy=ENTITY（通过实体属性映射获取table schema），适用Mybatis支持的所有数据库
