@@ -1,5 +1,5 @@
 ### 简介：
-[Mybatis-Default-Statements-Register]基于MyBatis二次开发，在MyBatis的基础上只做增强不做改变，提高开发效率。
+基于MyBatis二次开发，在MyBatis的基础上只做增强不做改变，提高开发效率。
 
 ### 特征：
 -   1.无侵入：启动阶段为符合特定规则的mapper方法自动注入，启动成功之后完全委托Mybatis管理，与Mybatis有很好的兼容性。
