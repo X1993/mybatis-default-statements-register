@@ -1,6 +1,5 @@
 ### 简介：
-[Mybatis-Default-Statements-Register](../..)基于MyBatis二次开发，
-在MyBatis的基础上只做增强不做改变，提高开发效率。
+[Mybatis-Default-Statements-Register](.)基于MyBatis二次开发，在MyBatis的基础上只做增强不做改变，提高开发效率。
 
 ### 特征：
 -   1.无侵入：启动阶段为符合特定规则的mapper方法自动注入，启动成功之后完全委托Mybatis管理，与Mybatis有很好的兼容性。
@@ -11,11 +10,11 @@
     -   4.2. 支持基于注解的细粒度配置，提供全局匹配实现默认配置，并支持自由实现自定义解析器扩展配置
 -   5.功能：除自动注入特定方法外，支持逻辑列、复合主键、默认where条件、默认赋值、禁止特定列查询/修改/新增、动态条件查询、方法名称解析注册。
 
-## 详细介绍
--   核心模块：[mdsr-core](mdsr-core) 
->   直接使用比较繁琐，很多组件需要组装，建议直接使用spring-boot组装版本
+## 目录结构
 
--   基于spring-boot组装：[spring-boot-starter-mdsr](spring-boot-starter-mdsr) 
-
-
+```bash
+|-- mdsr-code                          ➜ 核心模块
+|-- spring-boot-starter-mdsr           ➜ 基于mybatis-spring-boot-starter组装可运行的[mdsr-core]
+|-- spring-boot-starter-mdsr-sample    ➜ 演示服务
+```
   

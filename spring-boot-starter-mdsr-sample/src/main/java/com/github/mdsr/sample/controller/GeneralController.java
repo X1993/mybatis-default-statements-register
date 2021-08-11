@@ -23,7 +23,7 @@ import java.util.*;
 
 /**
  * 通用查询
- * @Author: junjie
+ * @Author: X1993
  * @Date: 2020/10/18
  */
 @RestController

@@ -54,7 +54,8 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
      * @param mappedStatementMateData
      * @return
      */
-    private boolean selectEntity(MappedStatementMateData mappedStatementMateData){
+    private boolean selectEntity(MappedStatementMateData mappedStatementMateData)
+    {
         String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
         return SELECT_BY_PRIMARY_KEY.equals(methodName) || SELECT_BY_PRIMARY_KEY_ON_PHYSICAL.equals(methodName);
     }
