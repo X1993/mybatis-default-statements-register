@@ -38,4 +38,4 @@ JDK 8+, Maven 3+
 ```
 2.TableSchemaResolutionStrategy=ENTITY（通过实体属性映射获取table schema），适用Mybatis支持的所有数据库
 
-### [快速开始](./tree/master/spring-boot-starter-mdsr-sample)
+### [快速开始](./spring-boot-starter-mdsr-sample)
