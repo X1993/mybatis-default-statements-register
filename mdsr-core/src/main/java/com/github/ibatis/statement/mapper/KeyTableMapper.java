@@ -9,6 +9,7 @@ import com.github.ibatis.statement.register.factory.*;
 
 /**
  * 支持带主键的表
+ * @see <a href="http://gitlab.aseit.cn/elec/micro/commons/spring-boot-starter-ibatis-default-statement/blob/master/DOCUMENT.md">文档</a>
  * @see K 主键类型或实体类型{@link KeyParameterType}
  * @see T 映射的实体类型
  * @author X1993
