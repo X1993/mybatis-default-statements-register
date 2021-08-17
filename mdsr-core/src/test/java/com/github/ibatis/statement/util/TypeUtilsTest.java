@@ -1,8 +1,5 @@
 package com.github.ibatis.statement.util;
 
-import com.github.ibatis.statement.mapper.KeyTableMapper;
-import com.github.ibatis.statement.base.core.matedata.MapperMethodMateData;
-import com.github.ibatis.statement.mapper.EntityType;
 import org.junit.Assert;
 import org.junit.Test;
 import sun.reflect.generics.reflectiveObjects.GenericArrayTypeImpl;
@@ -12,68 +9,71 @@ import java.util.*;
 
 public class TypeUtilsTest {
 
-    interface Interface1<T ,C extends MapperMethodMateData, X> extends KeyTableMapper<T ,C> {}
+    interface Interface0<T>{}
 
-    interface Interface2<T> extends List<String>, KeyTableMapper<T, MapperMethodMateData> {}
+    interface Interface1<T0 ,T1>{}
 
-    interface Interface3 extends List<String>, KeyTableMapper<String, MapperMethodMateData> {}
+    interface Interface2<T> extends Interface0<String>, Interface1<T, Integer> {}
 
-    interface Interface4<K ,T> extends KeyTableMapper<K ,Map<String ,T>> {}
+    interface Interface3 extends Interface0<String>, Interface1<String, Integer> {}
 
-    interface Interface5 extends Interface4<String, List<Integer>> {}
+    interface Interface4<K ,T> extends Interface1<K ,Interface1<String ,T>> {}
 
-    interface Interface6<T> extends KeyTableMapper<String ,T[]> {}
+    interface Interface5 extends Interface4<String, Interface0<Integer>> {}
 
-    interface Interface7 extends Interface6<List<String>> {}
+    interface Interface6<T> extends Interface1<String ,T[]> {}
 
-    interface Interface8<T> extends Interface6<List<T[]>[]> {}
+    interface Interface7 extends Interface6<Interface0<String>> {}
 
-    interface Interface9<T> extends EntityType<T>
+    interface Interface8<T> extends Interface6<Interface0<T[]>[]> {}
+
+    interface Interface9<T> extends Interface0<T>
     {
-        <K> T method(K key ,List<? extends Map<? extends T ,K>> list);
+        <K> T method(K key ,Interface0<? extends Map<? extends T ,K>> interface0);
     }
 
-    interface Interface10 extends Interface9<List<String>> {}
+    interface Interface10 extends Interface9<Interface0<String>> {}
 
-    interface Interface11<T extends Interface9<List<String>>,T1 extends String ,D extends T1 ,T2 extends List<D[]>>{}
-    //<T::L_InterfaceF<L_List<L_String;>;>;T1:L_String;D:TT1;T2::L_List<[TD;>;>L_Object;
+    interface Interface11<T extends Interface9<Interface0<String>>,T1 extends String ,D extends T1 ,T2 extends Interface0<D[]>>{}
+    //<T::L_InterfaceF<L_Interface0<L_String;>;>;T1:L_String;D:TT1;T2::L_Interface0<[TD;>;>L_Object;
+
+    interface Interface22<T ,C extends Integer, X> extends Interface1<T ,C> {}
 
     @Test
     public void tryReplaceTypeVariable() throws NoSuchMethodException
     {
-        Method method = Interface9.class.getMethod("method", Object.class, List.class);
+        Method method = Interface9.class.getMethod("method", Object.class, Interface0.class);
         Type[] genericParameterTypes = method.getGenericParameterTypes();
         Assert.assertEquals(TypeUtils.tryReplaceTypeVariable(genericParameterTypes[1] ,"T" ,
-                TypeUtils.parseSuperTypeVariable(Interface10.class ,EntityType.class ,"T"))
-                .getTypeName() ,"java.util.List<? extends java.util.Map<? extends java.util.List<java.lang.String>, K>>");
+                TypeUtils.parseSuperTypeVariable(Interface10.class ,Interface0.class ,"T"))
+                .getTypeName() ,
+                "com.github.ibatis.statement.util.TypeUtilsTest$Interface0<? extends java.util.Map" +
+                        "<? extends com.github.ibatis.statement.util.TypeUtilsTest$Interface0<java.lang.String>, K>>");
     }
 
     @Test
     public void parseBaseClassTypeVariable()
     {
-       Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(Interface3.class ,
-               EntityType.class ,"T"));
-        Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(Interface2.class ,
-                EntityType.class.getTypeParameters()[0]));
+       Assert.assertEquals(String.class , TypeUtils.parseSuperTypeVariable(Interface3.class ,
+               Interface0.class ,"T"));
+        Assert.assertEquals(String.class , TypeUtils.parseSuperTypeVariable(Interface2.class ,
+                Interface0.class.getTypeParameters()[0]));
         Assert.assertTrue(TypeUtils.parseSuperTypeVariable(Interface1.class ,
-                EntityType.class ,"T") instanceof TypeVariable);
-
-        ParameterizedTypeImpl parameterizedType = ParameterizedTypeImpl.make(Map.class, new Type[]{
-                        String.class, ParameterizedTypeImpl.make(List.class, new Type[]{Integer.class}, null)},
-                null);
+                Interface0.class ,"T") instanceof TypeVariable);
 
         Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface5.class ,
-                EntityType.class.getTypeParameters()[0]) , parameterizedType);
+                Interface1.class.getTypeParameters()[0]) , String.class);
         Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface5.class ,
-                KeyTableMapper.class ,"T") , parameterizedType);
+                Interface1.class ,"T0") , String.class);
 
-        GenericArrayType genericArrayType = GenericArrayTypeImpl.make(ParameterizedTypeImpl.make(List.class,
+        GenericArrayType genericArrayType = GenericArrayTypeImpl.make(ParameterizedTypeImpl.make(Interface0.class,
                 new Type[]{String.class}, null));
 
-        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface7.class, EntityType.class,
-                "T") ,genericArrayType);
+        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface7.class, Interface1.class,
+                "T1") ,genericArrayType);
         Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface8.class,
-                EntityType.class.getTypeParameters()[0]).getTypeName() ,"java.util.List<T[]>[][]");
+                Interface1.class.getTypeParameters()[1]).getTypeName() ,
+                "com.github.ibatis.statement.util.TypeUtilsTest$Interface0<T[]>[][]");
     }
 
     interface Interface12<T1 ,T2>{
