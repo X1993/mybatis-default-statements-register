@@ -32,11 +32,12 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
     {
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
-        return methodSignature.isMatch(new MethodSignature(int.class , SELECT_COUNT_METHOD_NAME, DynamicParams.class))
+        return methodSignature.isMatch(new MethodSignature(int.class ,SELECT_COUNT_METHOD_NAME, DynamicParams.class))
                 || methodSignature.isMatch(new MethodSignature(ParameterizedTypeImpl.make(
                 List.class ,new Type[]{mappedStatementMateData.getEntityMateData().getEntityClass()} ,null) ,
                 SELECT_ALL_METHOD_NAME, DynamicParams.class));
     }
+
     @Override
     protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
         return SqlCommandType.SELECT;

@@ -115,10 +115,9 @@ public class MappedStatementMateData implements Cloneable{
      * @param isSelective
      * @return
      */
-    public SqlNode updateSqlNode(Function<String ,String> propertyNameFunction ,
-                                        boolean isSelective)
+    public SqlNode updateSqlNode(Function<String ,String> propertyNameFunction ,boolean isSelective)
     {
-        EntityMateData entityMateData = this.getEntityMateData();
+        EntityMateData entityMateData = getEntityMateData();
         List<SqlNode> sqlNodes = new ArrayList<>();
 
         sqlNodes.add(new StaticTextSqlNode(new StringBuilder("UPDATE `")
@@ -267,8 +266,8 @@ public class MappedStatementMateData implements Cloneable{
         }else if (resultMapType instanceof Class){
             return new ResultMap.Builder(
                     getConfiguration(),
-                    this.getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
-                    Collection.class.isAssignableFrom(returnType) ? Object.class : returnType,
+                    getMapperMethodMateData().getMappedStatementId() + "-ResultMap",
+                    (Class<?>) resultMapType,
                     Collections.EMPTY_LIST,
                     null).build();
         }

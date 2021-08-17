@@ -2,8 +2,6 @@ package com.github.ibatis.statement.register;
 
 import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
 import org.apache.ibatis.mapping.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
@@ -12,8 +10,6 @@ import java.util.*;
  * @Date: 2020/3/5
  */
 public abstract class AbstractMappedStatementFactory implements MappedStatementFactory {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMappedStatementFactory.class);
 
     @Override
     public Optional<MappedStatement> tryBuild(MappedStatementMateData mappedStatementMateData)
