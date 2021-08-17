@@ -9,20 +9,21 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 测试 定义 联合主键、逻辑列、默认赋值、默认过滤的实体注册的MappedStatement是否符合预期
+ * 测试 定义 联合主键、逻辑列、默认值 的实体注册的MappedStatement是否符合预期
  * @Author: X1993
  * @Date: 2020/9/8
  */
 public class Entity2Test {
 
     @Data
+    //逻辑列
     @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")
     static class Entity2 {
 
@@ -32,6 +33,7 @@ public class Entity2Test {
 
         private String valueOne;
 
+        //默认值
         @DefaultValue(commandTypes = SqlCommandType.UPDATE ,value = "&{column} + 1")
         @DefaultValue(commandTypes = SqlCommandType.INSERT ,value = "2")
         private Integer value2;
@@ -71,11 +73,16 @@ public class Entity2Test {
             ") DEFAULT CHARSET=utf8;";
 
     @Test
-    public void test(){
-        MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
-        environment.initTableSchema(SCHEMA_SQL);
-        environment.registerMappedStatementsForMappers(Entity2Mapper.class);
-        testMapper(environment);
+    public void test() throws IOException
+    {
+        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values())
+        {
+            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
+            environment.initTableSchema(SCHEMA_SQL);
+            environment.registerMappedStatementsForMappers(Entity2Mapper.class);
+            testMapper(environment);
+            environment.close();
+        }
     }
 
     private void testMapper(MybatisEnvironment environment)

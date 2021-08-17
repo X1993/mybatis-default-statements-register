@@ -10,22 +10,20 @@ import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.xmltags.*;
 import org.apache.ibatis.session.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 
 /**
- * @see KeyTableMapper#updateBatchSameValue(Collection, Object)
  * @Author: X1993
  * @Date: 2020/4/27
  */
 public class UpdateSameBatchMappedStatementFactory extends AbstractMappedStatementFactory {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateSameBatchMappedStatementFactory.class);
-
+    /**
+     * @see KeyTableMapper#updateBatchSameValue(Collection, Object)
+     */
     public static final String UPDATE_BATCH_SAME_VALUE = "updateBatchSameValue";
 
     @Override

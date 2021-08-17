@@ -13,15 +13,19 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * @see KeyTableMapper#deleteBatchByPrimaryKey(Collection)
- * @see KeyTableMapper#deleteBatchByPrimaryKeyOnPhysical(Collection)
  * @author X1993
  * @date 2020/3/14
  */
 public class DeleteBatchByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory
 {
+    /**
+     * @see KeyTableMapper#deleteBatchByPrimaryKey(Collection)
+     */
     public final static String DELETE_BATCH_ON_PHYSICAL = "deleteBatchByPrimaryKey";
 
+    /**
+     * @see KeyTableMapper#deleteBatchByPrimaryKeyOnPhysical(Collection)
+     */
     public final static String PHYSICAL_DELETE_BATCH_METHOD_NAME = "deleteBatchByPrimaryKeyOnPhysical";
 
     @Override

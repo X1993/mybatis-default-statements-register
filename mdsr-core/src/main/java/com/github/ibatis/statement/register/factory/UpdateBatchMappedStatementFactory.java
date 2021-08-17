@@ -12,12 +12,14 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
- * @see KeyTableMapper#updateBatch(Collection)
  * @Author: X1993
  * @Date: 2020/4/27
  */
 public class UpdateBatchMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see KeyTableMapper#updateBatch(Collection)
+     */
     public static final String UPDATE_BATCH = "updateBatch";
 
     @Override

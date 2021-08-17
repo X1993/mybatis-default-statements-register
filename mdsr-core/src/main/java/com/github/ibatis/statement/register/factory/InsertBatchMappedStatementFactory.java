@@ -12,12 +12,14 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * @see TableMapper#insertBatch(Collection)
  * @Author: X1993
  * @Date: 2020/3/13
  */
 public class InsertBatchMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see TableMapper#insertBatch(Collection)
+     */
     public final static String INSERT_BATCH = "insertBatch";
 
     @Override

@@ -3,7 +3,6 @@ package com.github.ibatis.statement.demo;
 import com.github.ibatis.statement.mapper.EntityType;
 import com.github.ibatis.statement.mapper.KeyParameterType;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
-
 import java.util.Collection;
 
 /**
@@ -20,12 +19,12 @@ public interface CustomUserMapper extends KeyParameterType<Integer> ,EntityType<
     User selectByPrimaryKey(Integer key);
 
     /**
-     * 与{@link com.github.ibatis.statement.mapper.SelectMapper#selectSelective(Object)}方法签名兼容，可以自动注册
+     * 与{@link com.github.ibatis.statement.mapper.SelectMapper#selectSelective(Object, boolean)}方法签名兼容，可以自动注册
      * @param condition
      * @param logicalExist
      * @return
      */
-    Collection<? extends User> selectSelective(User condition , boolean logicalExist);
+    Collection<User> selectSelective(User condition ,boolean logicalExist);
 
     Integer countByDynamicParams(DynamicParams dynamicParams);
 

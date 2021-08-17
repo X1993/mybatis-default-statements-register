@@ -18,15 +18,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @see KeyTableMapper#deleteByPrimaryKey(Object)
- * @see KeyTableMapper#deleteByPrimaryKeyOnPhysical(Object)
  * @Author: X1993
  * @Date: 2020/3/9
  */
 public class DeleteByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory
 {
+    /**
+     * @see KeyTableMapper#deleteByPrimaryKey(Object)
+     */
     public final static String DELETE_BY_PRIMARY_KEY = "deleteByPrimaryKey";
 
+    /**
+     * @see KeyTableMapper#deleteByPrimaryKeyOnPhysical(Object)
+     */
     public final static String DELETE_BY_PRIMARY_KEY_ON_PHYSICAL = "deleteByPrimaryKeyOnPhysical";
 
     @Override

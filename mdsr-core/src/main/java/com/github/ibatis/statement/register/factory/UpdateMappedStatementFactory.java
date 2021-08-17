@@ -9,15 +9,19 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
- * @see  KeyTableMapper#updateByPrimaryKey(Object)
- * @see KeyTableMapper#updateByPrimaryKeySelective(Object)
  * @Author: X1993
  * @Date: 2020/3/6
  */
 public class UpdateMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see  KeyTableMapper#updateByPrimaryKey(Object)
+     */
     public static final String UPDATE_BY_PRIMARY_KEY = "updateByPrimaryKey";
 
+    /**
+     * @see KeyTableMapper#updateByPrimaryKeySelective(Object)
+     */
     public static final String UPDATE_BY_PRIMARY_KEY_SELECTIVE = "updateByPrimaryKeySelective";
 
     @Override

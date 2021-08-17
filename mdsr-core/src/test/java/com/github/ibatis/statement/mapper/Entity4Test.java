@@ -6,6 +6,7 @@ import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,13 +14,14 @@ import java.util.stream.IntStream;
 
 /**
  *
- * 测试 定义 联合主键、逻辑列、默认排序的实体注册的MappedStatement是否符合预期
+ * 测试 定义 联合主键、逻辑列 的实体注册的MappedStatement是否符合预期
  * @Author: X1993
  * @Date: 2020/9/8
  */
 public class Entity4Test {
 
     @Data
+    //逻辑列
     @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")
     static class Entity4 {
 
@@ -58,11 +60,15 @@ public class Entity4Test {
             ") DEFAULT CHARSET=utf8;";
 
     @Test
-    public void test(){
-        MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
-        environment.initTableSchema(SCHEMA_SQL);
-        environment.registerMappedStatementsForMappers(Entity4Mapper.class);
-        testMapper(environment);
+    public void test() throws IOException {
+        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values())
+        {
+            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
+            environment.initTableSchema(SCHEMA_SQL);
+            environment.registerMappedStatementsForMappers(Entity4Mapper.class);
+            testMapper(environment);
+            environment.close();
+        }
     }
 
     private void testMapper(MybatisEnvironment environment)

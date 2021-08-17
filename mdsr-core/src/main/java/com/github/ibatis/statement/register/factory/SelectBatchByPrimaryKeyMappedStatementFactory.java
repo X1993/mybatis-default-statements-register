@@ -15,27 +15,39 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * @see KeyTableMapper#countByPrimaryKeys(Collection)
- * @see KeyTableMapper#countByPrimaryKeysOnPhysical(Collection)
- * @see KeyTableMapper#selectBatchByPrimaryKey(Collection)
- * @see KeyTableMapper#selectBatchByPrimaryKeyOnPhysical(Collection)
- * @see KeyTableMapper#getExistPrimaryKeys(Collection)
- * @see KeyTableMapper#getExistPrimaryKeysOnPhysical(Collection)
  * @Author: X1993
  * @Date: 2020/12/29
  */
 public class SelectBatchByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see KeyTableMapper#countByPrimaryKeys(Collection)
+     */
     public final static String COUNT_BY_PRIMARY_KEYS = "countByPrimaryKeys";
 
+    /**
+     * @see KeyTableMapper#countByPrimaryKeysOnPhysical(Collection)
+     */
     public final static String COUNT_BY_PRIMARY_KEYS_ON_PHYSICAL = "countByPrimaryKeysOnPhysical";
 
+    /**
+     * @see KeyTableMapper#selectBatchByPrimaryKey(Collection)
+     */
     public final static String SELECT_BATCH_BY_PRIMARY_KEY = "selectBatchByPrimaryKey";
 
+    /**
+     * @see KeyTableMapper#selectBatchByPrimaryKeyOnPhysical(Collection)
+     */
     public final static String SELECT_BATCH_BY_PRIMARY_KEY_ON_PHYSICAL = "selectBatchByPrimaryKeyOnPhysical";
 
+    /**
+     * @see KeyTableMapper#getExistPrimaryKeys(Collection)
+     */
     public final static String GET_EXIST_PRIMARY_KEYS = "getExistPrimaryKeys";
 
+    /**
+     * @see KeyTableMapper#getExistPrimaryKeysOnPhysical(Collection)
+     */
     public final static String GET_EXIST_PRIMARY_KEYS_ON_PHYSICAL = "getExistPrimaryKeysOnPhysical";
 
     @Override

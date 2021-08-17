@@ -13,6 +13,7 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -22,23 +23,12 @@ import java.util.Arrays;
  * @Author: X1993
  * @Date: 2020/9/8
  */
-public class MybatisEnvironment {
+public class MybatisEnvironment implements Closeable{
 
     /**
      * 读取配置文件初始化SqlSessionFactory
      */
-    final SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
-            .build(Resources.getResourceAsStream("SqlMapConfig.xml") ,DataSourceEnvironment.H2.name());
-
-    public static MybatisEnvironment ENVIRONMENT;
-
-    static {
-        try {
-            ENVIRONMENT = new MybatisEnvironment();
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
+    final SqlSessionFactory sqlSessionFactory;
 
     private final SqlSession sqlSession;
 
@@ -46,7 +36,11 @@ public class MybatisEnvironment {
         return sqlSession;
     }
 
-    private MybatisEnvironment() throws IOException {
+    public MybatisEnvironment(DataSourceEnvironment dataSourceEnvironment) throws IOException
+    {
+        sqlSessionFactory = new SqlSessionFactoryBuilder()
+                .build(Resources.getResourceAsStream("SqlMapConfig.xml") , dataSourceEnvironment.name());
+
         this.sqlSession = sqlSessionFactory.openSession();
     }
 
@@ -92,4 +86,8 @@ public class MybatisEnvironment {
         }
     }
 
+    @Override
+    public void close() throws IOException {
+        sqlSession.close();
+    }
 }

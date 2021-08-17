@@ -332,17 +332,24 @@ public class TypeUtils {
 
     /**
      * <p>
-     *     TypeUtils.isAssignableFrom(Object.class ,all); //true
-     *     TypeUtils.isAssignableFrom(List.class ,ArrayList.class); //true
-     *     TypeUtils.isAssignableFrom(List[].class ,ArrayList[].class); //true
-     *     TypeUtils.isAssignableFrom(List.class ,ArrayList<T>); //true
-     *     TypeUtils.isAssignableFrom(List.class ,< ? extend ArrayList>); //true
+     *     TypeUtils.isAssignableFrom(Integer.class ,int.class); //true
+     *     ``````省略其他基本类型
+     *
+     *     TypeUtils.isAssignableFrom(Object ,*); //true
+     *     TypeUtils.isAssignableFrom(List ,ArrayList.class); //true
+     *     TypeUtils.isAssignableFrom(List[] ,ArrayList[].class); //true
+     *     TypeUtils.isAssignableFrom(List ,ArrayList<T>); //true
+     *     TypeUtils.isAssignableFrom(List ,< ? extend ArrayList>); //true
      *     TypeUtils.isAssignableFrom(List<List<String>> ,List<ArrayList<String>>); //true
      *     TypeUtils.isAssignableFrom(List<String>[] ,ArrayList<String>[]); //true
-     *     TypeUtils.isAssignableFrom(< ?> ,all); //true
-     *     TypeUtils.isAssignableFrom(< ? extend List> ,ArrayList); //true
-     *     TypeUtils.isAssignableFrom(< ? extend List> ,ArrayList); //true
-     *     TypeUtils.isAssignableFrom(< ? extend List> ,< ? extend ArrayList>); //true
+     *
+     *     TypeUtils.isAssignableFrom(< ?> ,*); //true
+     *     TypeUtils.isAssignableFrom(< ? > ,*); //true
+     *     TypeUtils.isAssignableFrom(< ? super List> ,ArrayList); //true
+     *     TypeUtils.isAssignableFrom(< ? super Array> ,ArrayList); //true
+     *
+     *     TypeUtils.isAssignableFrom(< ? extend List> ,ArrayList); //false
+     *     TypeUtils.isAssignableFrom(< ? extend List> ,< ? extend ArrayList>); //false
      *     ...
      * </p>
      * 类型是否兼容
@@ -354,47 +361,100 @@ public class TypeUtils {
     {
         if (Object.class.equals(parentType) || parentType.equals(subType)){
             return true;
-        }else if (parentType instanceof Class){
+        }
+
+        if (parentType instanceof WildcardType){
+            WildcardType parentWildcardType = (WildcardType) parentType;
+            if (parentWildcardType.getLowerBounds().length > 0){
+                //使用了下边界 <? super T>
+                return Stream.of(parentWildcardType.getLowerBounds())
+                        .allMatch(lowerBound -> isAssignableFrom(lowerBound ,subType));
+            }else if (parentWildcardType.getUpperBounds().length > 0){
+                //使用了上边界<? extend T>
+                if (Stream.of(parentWildcardType.getUpperBounds())
+                        .allMatch(upperBound -> upperBound instanceof Class &&
+                                Modifier.isFinal(((Class) upperBound).getModifiers()))){
+                    //都是final类
+                    return Stream.of(parentWildcardType.getUpperBounds())
+                            .allMatch(upperBound -> isAssignableFrom(upperBound ,subType));
+                }
+                return false;
+            }else {
+                // <?> 等价于 Object.class
+                return isAssignableFrom(Object.class ,subType);
+            }
+        }
+
+        if (subType instanceof WildcardType){
+            WildcardType wildcardType = (WildcardType) subType;
+            if (wildcardType.getLowerBounds().length > 0){
+                //使用了下边界 <? super T> ,等价于 Object.class
+                return isAssignableFrom(parentType ,Object.class);
+            }else if (wildcardType.getUpperBounds().length > 0){
+                //使用了上边界<? extend T> ,等价于T
+                return Stream.of(wildcardType.getUpperBounds())
+                        .allMatch(upperBound -> isAssignableFrom(parentType ,upperBound));
+            }else {
+                // <?> 等价于 Object.class
+                return isAssignableFrom(parentType ,Object.class);
+            }
+        }
+
+        if (parentType instanceof Class){
             if (subType instanceof Class){
                 if (((Class) subType).isPrimitive()){
-                    if (Byte.class.equals(parentType) && short.class.equals(subType)){
+                    if (!Number.class.isAssignableFrom((Class<?>) parentType)){
+                        return false;
+                    }
+                    if (Byte.class == parentType && short.class == subType){
                         return true;
-                    }else if (Short.class.equals(parentType) && short.class.equals(subType)){
+                    }else if (Short.class == parentType && short.class == subType){
                         return true;
-                    }else if (Integer.class.equals(parentType) && int.class.equals(subType)){
+                    }else if (Integer.class == parentType && int.class == subType){
                         return true;
-                    }else if (Float.class.equals(parentType) && float.class.equals(subType)){
+                    }else if (Float.class == parentType && float.class == subType){
                         return true;
-                    }else if (Double.class.equals(parentType) && double.class.equals(subType)){
+                    }else if (Double.class == parentType && double.class == subType){
                         return true;
-                    }else if (Long.class.equals(parentType) && long.class.equals(subType)){
+                    }else if (Long.class == parentType && long.class == subType){
                         return true;
-                    }else if (Character.class.equals(parentType) && char.class.equals(subType)){
+                    }else if (Character.class == parentType && char.class == subType){
                         return true;
-                    }else if (Boolean.class.equals(parentType) && boolean.class.equals(subType)){
+                    }else if (Boolean.class == parentType && boolean.class == subType){
                         return true;
                     }
-                }if (((Class) parentType).isAssignableFrom((Class<?>) subType)){
+                }
+                if (((Class) parentType).isAssignableFrom((Class<?>) subType)){
                     // List ,ArrayList
                     return true;
-                } else if (((Class) parentType).isArray() && ((Class) subType).isArray()){
+                }
+                if (((Class) parentType).isArray() && ((Class) subType).isArray()){
                     // List[] ,ArrayList[]
                     return ((Class) parentType).getComponentType().isAssignableFrom(((Class) subType).getComponentType());
                 }
-            }else if (subType instanceof ParameterizedType){
+                return false;
+            }
+
+            if (subType instanceof ParameterizedType){
                 Type subRawType = ((ParameterizedType) subType).getRawType();
                 if (subRawType instanceof Class){
                     // List ,ArrayList<T>
                     return ((Class) parentType).isAssignableFrom((Class<?>) subRawType);
                 }
-            }else if (subType instanceof WildcardType){
-                // List ,<? extend ArrayList>
-                return Stream.of(((WildcardType) subType).getUpperBounds()).allMatch(upperBound -> isAssignableFrom(parentType ,upperBound));
             }
+
             return false;
-        }else if (parentType instanceof ParameterizedType && subType instanceof ParameterizedType){
+        }
+
+        if (parentType instanceof ParameterizedType)
+        {
+            if (!(subType instanceof ParameterizedType)){
+                return false;
+            }
+
             Type parentRawType = ((ParameterizedType) parentType).getRawType();
             Type subRawType = ((ParameterizedType) subType).getRawType();
+
             if (isAssignableFrom(parentRawType ,subRawType)) {
                 Type[] parentActualTypeArguments = ((ParameterizedType) parentType).getActualTypeArguments();
                 Type[] subActualTypeArguments = ((ParameterizedType) subType).getActualTypeArguments();
@@ -409,32 +469,19 @@ public class TypeUtils {
                 }
             }
             return false;
-        }else if (parentType instanceof GenericArrayType && subType instanceof GenericArrayType){
+        }
+
+        if (parentType instanceof GenericArrayType)
+        {
+            if (!(subType instanceof GenericArrayType)){
+                return false;
+            }
             // List<String>[] ,ArrayList<String>[]
             return isAssignableFrom(((GenericArrayType) parentType).getGenericComponentType() ,
                     ((GenericArrayType) subType).getGenericComponentType());
-        }else if (parentType instanceof WildcardType){
-            Type[] upperBounds = ((WildcardType) parentType).getUpperBounds();
-            if (upperBounds.length == 0){
-                // <?>
-                return true;
-            }else if (subType instanceof Class){
-                // <? extend List> ,ArrayList
-                return Stream.of(upperBounds).allMatch(upperBound -> isAssignableFrom(upperBound ,subType));
-            }else if (subType instanceof WildcardType){
-                // <? extend List> ,<? extend ArrayList>
-                WildcardType subWildcardType = (WildcardType) subType;
-                Type[] subUpperBounds = subWildcardType.getUpperBounds();
-                if (subUpperBounds.length == 0) {
-                    return false;
-                }else {
-                    return Stream.of(upperBounds)
-                            .allMatch(upperBound -> Stream.of(subUpperBounds)
-                            .anyMatch(subUpperBound -> isAssignableFrom(upperBound ,subUpperBound)));
-                }
-            }
-            return ((WildcardType) parentType).getLowerBounds().length == 0;
+
         }
+
         return false;
     }
 

@@ -7,13 +7,14 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.type.StringTypeHandler;
 import org.junit.Assert;
 import org.junit.Test;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * 测试 定义了复合主键、默认排序的实体注册的MappedStatement是否符合预期
+ * 测试 定义了复合主键的实体注册的MappedStatement是否符合预期
  * @Author: X1993
  * @Date: 2020/9/8
  */
@@ -22,9 +23,9 @@ public class Entity3Test {
     @Data
     static class Entity3 {
 
-        private int id1;
+        private Integer id1;
 
-        private int id2;
+        private Integer id2;
 
         @Column(typeHandler = StringTypeHandler.class)
         private String value;
@@ -42,7 +43,7 @@ public class Entity3Test {
 
     }
 
-    interface Entity3Mapper extends KeyTableMapper<Entity3, Entity3> {}
+    interface Entity3Mapper extends KeyTableMapper<Entity3, Entity3>{}
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity3`;\n" +
             "CREATE TABLE `entity3` (\n" +
@@ -55,11 +56,15 @@ public class Entity3Test {
             ") DEFAULT CHARSET=utf8;";
 
     @Test
-    public void test(){
-        MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
-        environment.initTableSchema(SCHEMA_SQL);
-        environment.registerMappedStatementsForMappers(Entity3Mapper.class);
-        testMapper(environment);
+    public void test() throws IOException {
+        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values())
+        {
+            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
+            environment.initTableSchema(SCHEMA_SQL);
+            environment.registerMappedStatementsForMappers(Entity3Mapper.class);
+            testMapper(environment);
+            environment.close();
+        }
     }
 
     private void testMapper(MybatisEnvironment environment)

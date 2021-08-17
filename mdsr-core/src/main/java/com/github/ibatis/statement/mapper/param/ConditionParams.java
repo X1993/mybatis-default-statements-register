@@ -29,6 +29,21 @@ public class ConditionParams {
     private boolean defaultAllowNull;
 
     /**
+     * 自定义条件
+     * such as : count(0) as `name`
+     */
+    private String customCondition;
+
+    /**
+     * 添加自定义条件
+     * @return
+     */
+    public ConditionParams customCondition(String customCondition){
+        setCustomCondition(customCondition);
+        return this;
+    }
+
+    /**
      * 两次调用之间的{@link ConditionParams#params}在构建sql时每个条件使用 or 连接，最外层嵌套括号
      * @return
      */
@@ -49,7 +64,7 @@ public class ConditionParams {
 
     public ConditionParams eq(String key ,Object value ,boolean allowNull){
         if (value != null || allowNull) {
-            addConditionParam(key,ConditionRule.EQ,value);
+            addConditionParam(key ,ConditionRule.EQ ,value);
         }
         return this;
     }
@@ -82,13 +97,13 @@ public class ConditionParams {
 
     public ConditionParams gt(String key ,Object value ,boolean allowNull){
         if (value != null || allowNull) {
-            addConditionParam(key,ConditionRule.GT,value);
+            addConditionParam(key, ConditionRule.GT, value);
         }
         return this;
     }
 
     public ConditionParams gt(String key ,Object value){
-        return gt(key,value, defaultAllowNull);
+        return gt(key, value, defaultAllowNull);
     }
 
     public ConditionParams ltEq(String key ,Object value ,boolean allowNull){

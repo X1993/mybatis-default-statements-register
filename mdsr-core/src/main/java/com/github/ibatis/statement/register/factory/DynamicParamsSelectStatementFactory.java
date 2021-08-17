@@ -7,7 +7,7 @@ import com.github.ibatis.statement.base.logical.LogicalColumnMateData;
 import com.github.ibatis.statement.mapper.DynamicSelectMapper;
 import com.github.ibatis.statement.mapper.param.DynamicParams;
 import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import com.github.ibatis.statement.util.TypeUtils;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.*;
@@ -16,26 +16,29 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * @see DynamicSelectMapper#selectByDynamicParams(DynamicParams)
- * @see DynamicSelectMapper#countByDynamicParams(DynamicParams)
+ * xxxClass xxxMethod(DynamicParams)
  *
  * @Author: X1993
  * @Date: 2020/4/5
  */
 public class DynamicParamsSelectStatementFactory extends AbstractMappedStatementFactory
 {
+    /**
+     * @see DynamicSelectMapper#selectByDynamicParams(DynamicParams)
+     */
     public static final String SELECT_ALL_METHOD_NAME = "selectByDynamicParams";
 
+    /**
+     * @see DynamicSelectMapper#countByDynamicParams(DynamicParams)
+     */
     public static final String SELECT_COUNT_METHOD_NAME = "countByDynamicParams";
 
     @Override
     protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
     {
         MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
-        return methodSignature.isMatch(new MethodSignature(int.class ,SELECT_COUNT_METHOD_NAME, DynamicParams.class))
-                || methodSignature.isMatch(new MethodSignature(ParameterizedTypeImpl.make(
-                List.class ,new Type[]{mappedStatementMateData.getEntityMateData().getEntityClass()} ,null) ,
-                SELECT_ALL_METHOD_NAME, DynamicParams.class));
+        Type[] genericParameterTypes = methodSignature.getGenericParameterTypes();
+        return genericParameterTypes.length == 1 && TypeUtils.isAssignableFrom(DynamicParams.class ,genericParameterTypes[0]);
     }
 
     @Override
@@ -54,6 +57,7 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
         List<SqlNode> sqlNodes = new ArrayList<>();
 
         sqlNodes.add(new StaticTextSqlNode("SELECT "));
+
         if (selectCount){
             sqlNodes.add(new StaticTextSqlNode("COUNT(0)"));
         }else {
@@ -61,6 +65,7 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
                     new TextSqlNode("${selectElements}") ,"selectElements != null")) ,
                     new StaticTextSqlNode(entityMateData.getBaseColumnListSqlContent())));
         }
+
         sqlNodes.add(new StaticTextSqlNode(new StringBuilder(" FROM `")
                 .append(entityMateData.getTableMateData().getTableName())
                 .append("` WHERE 1 = 1 ")
@@ -131,14 +136,18 @@ public class DynamicParamsSelectStatementFactory extends AbstractMappedStatement
                             new IfSqlNode(new StaticTextSqlNode(" #{condition.value.minVal} AND #{condition.value.maxVal}"),
                                 "condition.rule.name()=='BETWEEN'"),
                             new IfSqlNode(new StaticTextSqlNode(""),
-                                " condition.rule.name()=='NE' || condition.rule.name()=='IS_NULL' || condition.rule.name()=='NOT_NULL'")),
+                                " condition.rule.name()=='NE' || condition.rule.name()=='IS_NULL' " +
+                                        "|| condition.rule.name()=='NOT_NULL'")),
                             new StaticTextSqlNode(" #{condition.value} ")),
                         new IfSqlNode(new StaticTextSqlNode(" OR "), "condition.isOr() == true"),
                         new IfSqlNode(new StaticTextSqlNode(") "),
-                                "condition.isOr() == false and (proCondition != null and proCondition.isOr() ==true)"),
+                                "condition.isOr() == false and (proCondition != null and proCondition.isOr() == true)"),
                         new VarDeclSqlNode("proCondition", "condition")
                 )), conditionsExpression + ".getParams()", null, "condition",
-                        null, null, null))), conditionsExpression + " != null");
+                        null, null, null) ,
+                new IfSqlNode(new TextSqlNode(" AND ${" + conditionsExpression + ".customCondition} ") ,
+                        conditionsExpression + ".getCustomCondition() != null"))
+        ) ,conditionsExpression + " != null");
     }
 
 }

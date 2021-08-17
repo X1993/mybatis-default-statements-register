@@ -7,78 +7,76 @@ import org.junit.Assert;
 import org.junit.Test;
 import sun.reflect.generics.reflectiveObjects.GenericArrayTypeImpl;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
-
 import java.lang.reflect.*;
 import java.util.*;
 
 public class TypeUtilsTest {
 
-    interface InterfaceA<T ,C extends MapperMethodMateData, X> extends KeyTableMapper<T ,C> {}
+    interface Interface1<T ,C extends MapperMethodMateData, X> extends KeyTableMapper<T ,C> {}
 
-    interface InterfaceB<T> extends List<String>, KeyTableMapper<T, MapperMethodMateData> {}
+    interface Interface2<T> extends List<String>, KeyTableMapper<T, MapperMethodMateData> {}
 
-    interface InterfaceC extends List<String>, KeyTableMapper<String, MapperMethodMateData> {}
+    interface Interface3 extends List<String>, KeyTableMapper<String, MapperMethodMateData> {}
 
-    interface InterfaceD<K ,T> extends KeyTableMapper<K ,Map<String ,T>> {}
+    interface Interface4<K ,T> extends KeyTableMapper<K ,Map<String ,T>> {}
 
-    interface InterfaceD2 extends InterfaceD<String, List<Integer>> {}
+    interface Interface5 extends Interface4<String, List<Integer>> {}
 
-    interface InterfaceE<T> extends KeyTableMapper<String ,T[]> {}
+    interface Interface6<T> extends KeyTableMapper<String ,T[]> {}
 
-    interface InterfaceE2 extends InterfaceE<List<String>>{}
+    interface Interface7 extends Interface6<List<String>> {}
 
-    interface InterfaceE3<T> extends InterfaceE<List<T[]>[]>{}
+    interface Interface8<T> extends Interface6<List<T[]>[]> {}
 
-    interface InterfaceF<T> extends EntityType<T> {
-
+    interface Interface9<T> extends EntityType<T>
+    {
         <K> T method(K key ,List<? extends Map<? extends T ,K>> list);
-
     }
 
-    interface InterfaceF2 extends InterfaceF<List<String>>{}
+    interface Interface10 extends Interface9<List<String>> {}
 
-    interface InterfaceH1<T extends InterfaceF<List<String>> ,T1 extends String ,D extends T1 ,T2 extends List<D[]>>{}
+    interface Interface11<T extends Interface9<List<String>>,T1 extends String ,D extends T1 ,T2 extends List<D[]>>{}
     //<T::L_InterfaceF<L_List<L_String;>;>;T1:L_String;D:TT1;T2::L_List<[TD;>;>L_Object;
 
     @Test
     public void tryReplaceTypeVariable() throws NoSuchMethodException
     {
-        Method method = InterfaceF.class.getMethod("method", Object.class, List.class);
+        Method method = Interface9.class.getMethod("method", Object.class, List.class);
         Type[] genericParameterTypes = method.getGenericParameterTypes();
         Assert.assertEquals(TypeUtils.tryReplaceTypeVariable(genericParameterTypes[1] ,"T" ,
-                TypeUtils.parseSuperTypeVariable(InterfaceF2.class ,EntityType.class ,"T"))
+                TypeUtils.parseSuperTypeVariable(Interface10.class ,EntityType.class ,"T"))
                 .getTypeName() ,"java.util.List<? extends java.util.Map<? extends java.util.List<java.lang.String>, K>>");
     }
 
     @Test
     public void parseBaseClassTypeVariable()
     {
-       Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(InterfaceC.class ,
+       Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(Interface3.class ,
                EntityType.class ,"T"));
-        Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(InterfaceB.class ,
+        Assert.assertEquals(MapperMethodMateData.class , TypeUtils.parseSuperTypeVariable(Interface2.class ,
                 EntityType.class.getTypeParameters()[0]));
-        Assert.assertTrue(TypeUtils.parseSuperTypeVariable(InterfaceA.class ,
+        Assert.assertTrue(TypeUtils.parseSuperTypeVariable(Interface1.class ,
                 EntityType.class ,"T") instanceof TypeVariable);
 
         ParameterizedTypeImpl parameterizedType = ParameterizedTypeImpl.make(Map.class, new Type[]{
                         String.class, ParameterizedTypeImpl.make(List.class, new Type[]{Integer.class}, null)},
                 null);
 
-        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(InterfaceD2.class ,
+        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface5.class ,
                 EntityType.class.getTypeParameters()[0]) , parameterizedType);
-        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(InterfaceD2.class ,
+        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface5.class ,
                 KeyTableMapper.class ,"T") , parameterizedType);
 
         GenericArrayType genericArrayType = GenericArrayTypeImpl.make(ParameterizedTypeImpl.make(List.class,
                 new Type[]{String.class}, null));
 
-        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(InterfaceE2.class, EntityType.class,
+        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface7.class, EntityType.class,
                 "T") ,genericArrayType);
-        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(InterfaceE3.class,
+        Assert.assertEquals(TypeUtils.parseSuperTypeVariable(Interface8.class,
                 EntityType.class.getTypeParameters()[0]).getTypeName() ,"java.util.List<T[]>[][]");
     }
 
-    interface InterfaceG1<T1 ,T2>{
+    interface Interface12<T1 ,T2>{
 
         Collection<? extends Collection<?>> collection();
 
@@ -86,7 +84,7 @@ public class TypeUtilsTest {
 
     }
 
-    interface InterfaceG2 extends InterfaceG1<Collection<String> ,List<String>>{
+    interface Interface13 extends Interface12<Collection<String> ,List<String>> {
 
         @Override
         List<? extends List<?>> collection();
@@ -96,43 +94,87 @@ public class TypeUtilsTest {
 
     }
 
-    interface InterfaceG3 extends InterfaceG1<Map<String ,List[]> ,HashMap<String ,ArrayList[]>>{
+    interface Interface14 extends Interface12<Map<String ,List[]> ,HashMap<String ,ArrayList[]>> {
 
     }
 
-    interface InterfaceG4 extends InterfaceG1<Map<String ,? extends List[]> ,HashMap<String ,ArrayList[]>>{
+    interface Interface15 extends Interface12<Map<String ,? extends List[]> ,HashMap<String ,ArrayList[]>> {
+
+    }
+
+    interface Interface16 extends Interface12<Map<String ,? extends List> ,HashMap<String ,ArrayList>> {
+
+    }
+
+    interface Interface17 extends Interface12<Map<String ,? extends List> ,HashMap<String ,ArrayList>> {
+
+    }
+
+    interface Interface18 extends Interface12<Map<String ,? super List> ,HashMap<String ,ArrayList>> {
+
+    }
+
+    interface Interface19 extends Interface12<Map<String ,List> ,HashMap<String ,? super ArrayList>> {
+
+    }
+
+    interface Interface20 extends Interface12<Map<String ,? super ArrayList> ,HashMap<String ,List>> {
 
     }
 
     @Test
     public void isAssignableFrom() throws NoSuchMethodException
     {
-        Method collectionMethod = InterfaceG1.class.getMethod("collection");
-        Method listMethod = InterfaceG1.class.getMethod("list");
+        Method collectionMethod = Interface12.class.getMethod("collection");
+        Method listMethod = Interface12.class.getMethod("list");
+        // Collection<? extends Collection<?>>
         Type collectionReturnType = collectionMethod.getGenericReturnType();
+        // List<? extends List<?>>
         Type listReturnType = listMethod.getGenericReturnType();
-        Assert.assertTrue(TypeUtils.isAssignableFrom(collectionReturnType ,listReturnType));
-        Assert.assertFalse(TypeUtils.isAssignableFrom(listReturnType ,collectionReturnType));
+        Assert.assertFalse(TypeUtils.isAssignableFrom(collectionReturnType ,listReturnType));
 
-        ParameterizedType parentType = (ParameterizedType) InterfaceG2.class.getGenericInterfaces()[0];
+        ParameterizedType parentType = (ParameterizedType) Interface13.class.getGenericInterfaces()[0];
+        //Collection<String> ,List<String>
         Type[] actualTypeArguments = parentType.getActualTypeArguments();
         Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
         Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[1] ,actualTypeArguments[0]));
 
-        ParameterizedType parentType2 = (ParameterizedType) InterfaceG3.class.getGenericInterfaces()[0];
-        Type[] actualTypeArguments2 = parentType2.getActualTypeArguments();
-        Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments2[0] ,actualTypeArguments2[1]));
-        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments2[1] ,actualTypeArguments2[0]));
+        parentType = (ParameterizedType) Interface14.class.getGenericInterfaces()[0];
+        // Map<String ,List[]> ,HashMap<String ,ArrayList[]>
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
+        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[1] ,actualTypeArguments[0]));
 
-        ParameterizedType parentType3 = (ParameterizedType) InterfaceG4.class.getGenericInterfaces()[0];
-        Type[] actualTypeArguments3 = parentType3.getActualTypeArguments();
-        Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments3[0] ,actualTypeArguments3[1]));
-        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments3[1] ,actualTypeArguments3[0]));
+        // Map<String ,? extends List[]> ,HashMap<String ,ArrayList[]>
+        parentType = (ParameterizedType) Interface15.class.getGenericInterfaces()[0];
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
+        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[1] ,actualTypeArguments[0]));
 
-        ParameterizedType parentType4 = (ParameterizedType) InterfaceG4.class.getGenericInterfaces()[0];
-        Type[] actualTypeArguments4 = parentType4.getActualTypeArguments();
-        Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments4[0] ,actualTypeArguments4[1]));
-        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments4[1] ,actualTypeArguments4[0]));
+        // Map<String ,? extends List> ,HashMap<String ,ArrayList>
+        parentType = (ParameterizedType) Interface16.class.getGenericInterfaces()[0];
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
+
+        // Map<String ,? extends List> ,HashMap<String ,ArrayList>
+        parentType = (ParameterizedType) Interface17.class.getGenericInterfaces()[0];
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
+
+        // Map<String ,? super List> ,HashMap<String ,ArrayList>
+        parentType = (ParameterizedType) Interface18.class.getGenericInterfaces()[0];
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertTrue(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
+
+        // Map<String ,List> ,HashMap<String ,? super ArrayList>
+        parentType = (ParameterizedType) Interface19.class.getGenericInterfaces()[0];
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
+
+        // Map<String ,? super ArrayList> ,HashMap<String ,List>
+        parentType = (ParameterizedType) Interface20.class.getGenericInterfaces()[0];
+        actualTypeArguments = parentType.getActualTypeArguments();
+        Assert.assertFalse(TypeUtils.isAssignableFrom(actualTypeArguments[0] ,actualTypeArguments[1]));
     }
 
 }

@@ -8,15 +8,19 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
- * @see TableMapper#insert(Object)
- * @see TableMapper#insertSelective(Object)
  * @Author: X1993
  * @Date: 2020/3/6
  */
 public class InsertMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see TableMapper#insert(Object)
+     */
     public static final String INSERT = "insert";
 
+    /**
+     * @see TableMapper#insertSelective(Object)
+     */
     public static final String INSERT_SELECTIVE = "insertSelective";
 
     @Override

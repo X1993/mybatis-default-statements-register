@@ -10,12 +10,14 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 
 /**
- * @see KeyTableMapper#selectMaxPrimaryKey()
  * @Author: X1993
  * @Date: 2020/12/18
  */
 public class SelectMaxKeyStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see KeyTableMapper#selectMaxPrimaryKey()
+     */
     public static final String SELECT_MAX_PRIMARY_KEY = "selectMaxPrimaryKey";
 
     @Override

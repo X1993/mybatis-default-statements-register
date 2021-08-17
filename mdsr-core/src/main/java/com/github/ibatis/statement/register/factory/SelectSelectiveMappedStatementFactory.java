@@ -12,20 +12,24 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.*;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
 
 /**
- * @see {@link SelectMapper#selectSelective(Object, boolean)}
  * @Author: X1993
  * @Date: 2020/3/13
  */
 public class SelectSelectiveMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see {@link SelectMapper#selectSelective(Object, boolean)}
+     */
     public final static String SELECT_SELECTIVE = "selectSelective";
 
+    /**
+     * @see {@link SelectMapper#totalSelective(Object, boolean)}
+     */
     public final static String TOTAL_SELECTIVE = "totalSelective";
 
     @Override

@@ -13,21 +13,29 @@ import org.apache.ibatis.session.Configuration;
 import java.util.*;
 
 /**
- * @see KeyTableMapper#selectByPrimaryKey(Object)
- * @see KeyTableMapper#selectByPrimaryKeyOnPhysical(Object)
- * @see KeyTableMapper#existByPrimaryKey(Object)
- * @see KeyTableMapper#existByPrimaryKeyOnPhysical(Object)
  * @author X1993
  * @date 2020/2/22
  */
 public class SelectByPrimaryKeyMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see KeyTableMapper#selectByPrimaryKey(Object)
+     */
     public static final String SELECT_BY_PRIMARY_KEY = "selectByPrimaryKey";
 
+    /**
+     * @see KeyTableMapper#selectByPrimaryKeyOnPhysical(Object)
+     */
     public static final String SELECT_BY_PRIMARY_KEY_ON_PHYSICAL = "selectByPrimaryKeyOnPhysical";
 
+    /**
+     * @see KeyTableMapper#existByPrimaryKey(Object)
+     */
     public static final String EXIST_BY_PRIMARY_KEY = "existByPrimaryKey";
 
+    /**
+     * @see KeyTableMapper#existByPrimaryKeyOnPhysical(Object)
+     */
     public static final String EXIST_BY_PRIMARY_KEY_ON_PHYSICAL = "existByPrimaryKeyOnPhysical";
 
     @Override
@@ -49,17 +57,6 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
                 && entityMateData.getPrimaryKeyCount() > 0;
     }
 
-    /**
-     * 查询的是实体
-     * @param mappedStatementMateData
-     * @return
-     */
-    private boolean selectEntity(MappedStatementMateData mappedStatementMateData)
-    {
-        String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
-        return SELECT_BY_PRIMARY_KEY.equals(methodName) || SELECT_BY_PRIMARY_KEY_ON_PHYSICAL.equals(methodName);
-    }
-
     @Override
     protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData)
     {
@@ -67,7 +64,7 @@ public class SelectByPrimaryKeyMappedStatementFactory extends AbstractMappedStat
         String methodName = mappedStatementMateData.getMapperMethodMateData().getMappedMethod().getName();
 
         boolean logicalConditional = SELECT_BY_PRIMARY_KEY.equals(methodName) || EXIST_BY_PRIMARY_KEY.equals(methodName);
-        boolean selectEntity = selectEntity(mappedStatementMateData);
+        boolean selectEntity = SELECT_BY_PRIMARY_KEY.equals(methodName) || SELECT_BY_PRIMARY_KEY_ON_PHYSICAL.equals(methodName);
 
         Configuration configuration = mappedStatementMateData.getConfiguration();
 

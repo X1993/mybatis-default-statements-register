@@ -1,5 +1,6 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.condition.Condition;
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.dv.DefaultValue;
@@ -14,6 +15,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -21,10 +23,11 @@ import java.util.Set;
 
 /**
  * 测试列名中包含关键字时方法名解析是否正常
+ * @see com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory
  * @Author: X1993
  * @Date: 2020/11/27
  */
-public class Entity6Test{
+public class MethodNameParseTest {
 
     @Removed
     @Data
@@ -42,6 +45,7 @@ public class Entity6Test{
         @Column(commandTypeMappings = {SqlCommandType.INSERT ,SqlCommandType.SELECT})
         private String and;
 
+        //使用关键字判断是否兼容
         private String like;
 
         private String by;
@@ -53,9 +57,12 @@ public class Entity6Test{
         @Column(value = "lo_code")
         private String locationCode;
 
+        //默认值
         @DefaultValue(value = "&{column} + 1" ,commandTypes = SqlCommandType.UPDATE)
         @DefaultValue(value = "1" ,commandTypes = SqlCommandType.INSERT)
-        @Condition(rule = ConditionRule.GT ,value = "0" ,commandTypes = {SqlCommandType.UPDATE ,SqlCommandType.DELETE ,SqlCommandType.SELECT})
+        //默认where条件
+        @Condition(rule = ConditionRule.GT ,value = "0" ,
+                commandTypes = {SqlCommandType.UPDATE ,SqlCommandType.DELETE ,SqlCommandType.SELECT})
         private int version;
 
         public Entity6(String id, String id2) {
@@ -187,18 +194,17 @@ public class Entity6Test{
 
     }
 
-    private static final Entity6Mapper mapper = entity6Mapper();
+    private static Entity6Mapper mapper;
 
-    private static Entity6Mapper entity6Mapper(){
-        MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
+    @BeforeClass
+    public static void beforeClass() throws IOException
+    {
+        MybatisEnvironment environment = new MybatisEnvironment(DataSourceEnvironment.H2);
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity6Mapper.class);
         SqlSession sqlSession = environment.getSqlSession();
-        return sqlSession.getMapper(Entity6Mapper.class);
-    }
+        mapper = sqlSession.getMapper(Entity6Mapper.class);
 
-    @BeforeClass
-    public static void beforeClass(){
         Entity6 entity61 = new Entity6();
         entity61.setId("1");
         entity61.setId2("2");

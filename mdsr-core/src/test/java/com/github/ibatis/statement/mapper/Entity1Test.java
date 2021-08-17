@@ -1,10 +1,12 @@
 package com.github.ibatis.statement.mapper;
 
+import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.core.Column;
 import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +24,7 @@ public class Entity1Test {
     @Data
     static class Entity1 {
 
-        private String id;
+        private Integer id;
 
         private String value;
 
@@ -32,12 +34,17 @@ public class Entity1Test {
         public Entity1() {
         }
 
-        public Entity1(String id, String value) {
+        public Entity1(Integer id, String value) {
             this.id = id;
             this.value = value;
         }
     }
 
+    /**
+     * 只需要方法前面匹配，并没有要求实现指定接口
+     * @param <K>
+     * @param <T>
+     */
     interface CustomMapper<K ,T> {
 
         /**
@@ -147,21 +154,21 @@ public class Entity1Test {
 
     }
 
-    interface Entity1Mapper extends CustomMapper<String, Entity1>, EntityType<Entity1> {
+    interface Entity1Mapper extends CustomMapper<Integer, Entity1>, EntityType<Entity1> {
 
         /**
          * 根据主键查询 (如果有逻辑列，只查询逻辑存在的)
          * @param key 主键
          * @return
          */
-        Entity1 selectByPrimaryKey(String key);
+        Entity1 selectByPrimaryKey(Integer key);
 
         /**
          * 根据主键物理查询
          * @param key
          * @return
          */
-        Entity1 selectByPrimaryKeyOnPhysical(String key);
+        Entity1 selectByPrimaryKeyOnPhysical(Integer key);
 
         /**
          * 修改属性不为空的数据
@@ -182,56 +189,56 @@ public class Entity1Test {
          * @param key
          * @return
          */
-        boolean existByPrimaryKey(String key);
+        boolean existByPrimaryKey(Integer key);
 
         /**
          * 判断指定主键的数据是否物理存在
          * @param key
          * @return
          */
-        boolean existByPrimaryKeyOnPhysical(String key);
+        boolean existByPrimaryKeyOnPhysical(Integer key);
 
         /**
          * 根据主键集查询匹配的行数(如果有逻辑列，只统计逻辑存在的)
          * @param keys
          * @return
          */
-        int countByPrimaryKeys(Collection<String> keys);
+        int countByPrimaryKeys(Collection<Integer> keys);
 
         /**
          * 根据主键集查询匹配的行数（包含逻辑删除的行）
          * @param keys
          * @return
          */
-        int countByPrimaryKeysOnPhysical(Collection<String> keys);
+        int countByPrimaryKeysOnPhysical(Collection<Integer> keys);
 
         /**
          * 返回已存在的主键 (如果有逻辑列，只统计逻辑存在的)
          * @param keys
          * @return
          */
-        Set<String> getExistPrimaryKeys(Collection<? extends String> keys);
+        Set<Integer> getExistPrimaryKeys(Collection<Integer> keys);
 
         /**
          * 返回已存在的主键（包含逻辑删除的行）
          * @param keys
          * @return
          */
-        Set<String> getExistPrimaryKeysOnPhysical(Collection<? extends String> keys);
+        Set<Integer> getExistPrimaryKeysOnPhysical(Collection<Integer> keys);
 
         /**
          * 根据主键集批量查询(如果有逻辑列，只查询逻辑存在的)
          * @param keys
          * @return
          */
-        List<Entity1> selectBatchByPrimaryKey(Collection<String> keys);
+        List<Entity1> selectBatchByPrimaryKey(Collection<Integer> keys);
 
         /**
          * 根据主键集批量物理查询
          * @param keys
          * @return
          */
-        List<Entity1> selectBatchByPrimaryKeyOnPhysical(Collection<String> keys);
+        List<Entity1> selectBatchByPrimaryKeyOnPhysical(Collection<Integer> keys);
 
         /**
          * 批量修改，set值为每个元素不为空的值
@@ -246,7 +253,7 @@ public class Entity1Test {
          * @param update
          * @return
          */
-        int updateBatchSameValue(Collection<String> list, Entity1 update);
+        int updateBatchSameValue(Collection<Integer> list, Entity1 update);
 
         /**
          * 批量删除（根据有无逻辑列执行逻辑删除或物理删除）
@@ -266,41 +273,46 @@ public class Entity1Test {
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity1`;\n" +
             "CREATE TABLE `entity1` (\n" +
-            "  `id` varchar(255) PRIMARY KEY NOT NULL,\n" +
+            "  `id` int(32) PRIMARY KEY NOT NULL,\n" +
             "  `value` varchar(255) DEFAULT NULL,\n" +
             "  `value_one` varchar(255) DEFAULT NULL\n" +
             ") DEFAULT CHARSET=utf8;";
 
     @Test
-    public void test(){
-        MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
-        environment.initTableSchema(SCHEMA_SQL);
-        environment.registerMappedStatementsForMappers(Entity1Mapper.class);
-        testMapper(environment.getSqlSession());
+    public void test() throws IOException
+    {
+        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values()) {
+
+            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
+            environment.initTableSchema(SCHEMA_SQL);
+            environment.registerMappedStatementsForMappers(Entity1Mapper.class);
+            testMapper(environment.getSqlSession());
+            environment.close();
+        }
     }
 
     private void testMapper(SqlSession sqlSession)
     {
         Entity1Mapper mapper = sqlSession.getMapper(Entity1Mapper.class);
-        Entity1 entity1 = new Entity1("1" ,"1");
-        Entity1 entity12 = new Entity1("2" ,"2");
+        Entity1 entity1 = new Entity1(1 ,"1");
+        Entity1 entity12 = new Entity1(2 ,"2");
 
         Assert.assertFalse(mapper.existByPrimaryKey(entity1.getId()));
         mapper.insert(entity1);
         mapper.insert(entity12);
         Assert.assertTrue(mapper.existByPrimaryKey(entity1.getId()));
 
-        Assert.assertEquals(mapper.selectBatchByPrimaryKey(Arrays.asList("1" ,"2")).size() ,2);
-        Assert.assertEquals(mapper.getExistPrimaryKeys(Arrays.asList("1","4")).stream().findFirst().get() ,"1");
-        Assert.assertEquals(mapper.getExistPrimaryKeysOnPhysical(Arrays.asList("1","4")).stream().findFirst().get() ,"1");
-        Assert.assertEquals(mapper.countByPrimaryKeys(Arrays.asList("1" ,"2")) ,2);
-        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(Arrays.asList("1" ,"4")).size() ,1);
-        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(Arrays.asList("3" ,"2")) ,1);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKey(Arrays.asList(1 ,2)).size() ,2);
+        Assert.assertTrue(mapper.getExistPrimaryKeys(Arrays.asList(1 ,4)).stream().findFirst().get() == 1);
+        Assert.assertTrue(mapper.getExistPrimaryKeysOnPhysical(Arrays.asList(1 ,4)).stream().findFirst().get() == 1);
+        Assert.assertEquals(mapper.countByPrimaryKeys(Arrays.asList(1 ,2)) ,2);
+        Assert.assertEquals(mapper.selectBatchByPrimaryKeyOnPhysical(Arrays.asList(1 ,4)).size() ,1);
+        Assert.assertEquals(mapper.countByPrimaryKeysOnPhysical(Arrays.asList(3 ,2)) ,1);
 
         Assert.assertNotNull(mapper.selectByPrimaryKey(entity1.getId()));
         Assert.assertEquals(mapper.total() ,2);
 
-        Assert.assertEquals(mapper.selectMaxPrimaryKey() ,"2");
+        Assert.assertTrue(mapper.selectMaxPrimaryKey() == 2);
 
         entity1.setValue1("12");
         mapper.updateByPrimaryKey(entity1);
@@ -322,14 +334,14 @@ public class Entity1Test {
         Assert.assertNull(mapper.selectByPrimaryKey(entity12.getId()));
 
         Assert.assertEquals(mapper.insertBatch(entity1s) , entity1s.size());
-        List<String> ids = entity1s.stream().map(s -> s.getId()).collect(Collectors.toList());
+        List<Integer> ids = entity1s.stream().map(s -> s.getId()).collect(Collectors.toList());
         Assert.assertEquals(mapper.deleteBatchByPrimaryKey(ids) , entity1s.size());
         Assert.assertEquals(mapper.deleteBatchByPrimaryKeyOnPhysical(ids) ,0);
         mapper.deleteSelective(entity1);
         mapper.deleteSelectiveOnPhysical(entity1);
 
         List<Entity1> list = IntStream.range(10, 20)
-                .mapToObj(i -> new Entity1(String.valueOf(i), String.valueOf(i)))
+                .mapToObj(i -> new Entity1(i, String.valueOf(i)))
                 .collect(Collectors.toList());
         mapper.insertBatch(list);
         Assert.assertEquals(mapper.selectSelective(null ,true).size() ,10);

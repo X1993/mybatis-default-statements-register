@@ -13,15 +13,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * @see  TableMapper#deleteSelectiveOnPhysical(Object)
- * @see  TableMapper#deleteSelective(Object)
  * @Author: X1993
  * @Date: 2020/4/27
  */
 public class DeleteSelectiveMappedStatementFactory extends AbstractMappedStatementFactory {
 
+    /**
+     * @see  TableMapper#deleteSelective(Object)
+     */
     public static final String DELETE_SELECTIVE = "deleteSelective";
 
+    /**
+     * @see  TableMapper#deleteSelectiveOnPhysical(Object)
+     */
     public static final String DELETE_SELECTIVE_ON_PHYSICAL = "deleteSelectiveOnPhysical";
 
     @Override

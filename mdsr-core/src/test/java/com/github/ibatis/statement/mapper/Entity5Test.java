@@ -11,6 +11,7 @@ import lombok.Data;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Assert;
 import org.junit.Test;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,14 +26,18 @@ import static com.github.ibatis.statement.mapper.Entity5Test.Entity5.Value2.V2;
  */
 public class Entity5Test {
 
-    @Removed
     @Data
+    //逻辑列 removed
+    @Removed
+    //通过实体类解析获取table-schema
     @Entity(resolutionStrategy = TableSchemaResolutionStrategy.ENTITY)
     static class Entity5 {
 
+        //定义为主键
         @Column(mappingStrategy = MappingStrategy.PRIMARY_KEY)
         private String id;
 
+        //定义为主键
         @Column(mappingStrategy = MappingStrategy.PRIMARY_KEY)
         private String id2;
 
@@ -62,7 +67,9 @@ public class Entity5Test {
 
     }
 
-    interface Entity5Mapper extends KeyTableMapper<Entity5,Entity5> {}
+    interface Entity5Mapper extends KeyTableMapper<Entity5,Entity5> {
+
+    }
 
     final static String SCHEMA_SQL = "DROP TABLE IF EXISTS `entity5`;\n" +
             "CREATE TABLE `entity5` (\n" +
@@ -76,11 +83,15 @@ public class Entity5Test {
             ") DEFAULT CHARSET=utf8; ";
 
     @Test
-    public void test(){
-        MybatisEnvironment environment = MybatisEnvironment.ENVIRONMENT;
-        environment.initTableSchema(SCHEMA_SQL);
-        environment.registerMappedStatementsForMappers(Entity5Mapper.class);
-        testMapper(environment);
+    public void test() throws IOException
+    {
+        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values()) {
+            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
+            environment.initTableSchema(SCHEMA_SQL);
+            environment.registerMappedStatementsForMappers(Entity5Mapper.class);
+            testMapper(environment);
+            environment.close();
+        }
     }
 
     private void testMapper(MybatisEnvironment environment)
