@@ -24,6 +24,6 @@ public interface CustomUserMapper extends KeyParameterType<Integer> ,EntityType<
      * @param logicalExist
      * @return
      */
-    Collection<? extends User> selectSelective(User condition, boolean logicalExist);
+    Collection<User> selectSelective(User condition, boolean logicalExist);
 
 }
