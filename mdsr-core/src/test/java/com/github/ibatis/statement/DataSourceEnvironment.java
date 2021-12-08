@@ -9,6 +9,10 @@ public enum DataSourceEnvironment {
 
     H2,
 
-    MYSQL
+    MYSQL;
+
+    public static DataSourceEnvironment defaultDatabase(){
+        return H2;
+    }
 
 }

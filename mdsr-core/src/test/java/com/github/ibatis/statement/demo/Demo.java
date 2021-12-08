@@ -43,7 +43,7 @@ public class Demo {
 
     static {
         try {
-            sqlSession = initSqlSessionFactory(DataSourceEnvironment.H2.name()).openSession();
+            sqlSession = initSqlSessionFactory(DataSourceEnvironment.defaultDatabase().name()).openSession();
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

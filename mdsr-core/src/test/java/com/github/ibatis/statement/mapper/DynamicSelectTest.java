@@ -56,20 +56,11 @@ public class DynamicSelectTest {
     @Test
     public void test() throws IOException
     {
-        MybatisEnvironment environment2 = new MybatisEnvironment(DataSourceEnvironment.MYSQL);
+        MybatisEnvironment environment2 = new MybatisEnvironment(DataSourceEnvironment.defaultDatabase());
         environment2.initTableSchema(SCHEMA_SQL);
         environment2.registerMappedStatementsForMappers(Entity10Mapper.class);
         testMapper(environment2);
         environment2.close();
-
-        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values())
-        {
-            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
-            environment.initTableSchema(SCHEMA_SQL);
-            environment.registerMappedStatementsForMappers(Entity10Mapper.class);
-            testMapper(environment);
-            environment.close();
-        }
     }
 
     private void testMapper(MybatisEnvironment environment)

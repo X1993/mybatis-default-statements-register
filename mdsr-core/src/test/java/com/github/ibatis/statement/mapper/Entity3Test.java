@@ -57,14 +57,11 @@ public class Entity3Test {
 
     @Test
     public void test() throws IOException {
-        for (DataSourceEnvironment dataSourceEnvironment : DataSourceEnvironment.values())
-        {
-            MybatisEnvironment environment = new MybatisEnvironment(dataSourceEnvironment);
-            environment.initTableSchema(SCHEMA_SQL);
-            environment.registerMappedStatementsForMappers(Entity3Mapper.class);
-            testMapper(environment);
-            environment.close();
-        }
+        MybatisEnvironment environment = new MybatisEnvironment(DataSourceEnvironment.defaultDatabase());
+        environment.initTableSchema(SCHEMA_SQL);
+        environment.registerMappedStatementsForMappers(Entity3Mapper.class);
+        testMapper(environment);
+        environment.close();
     }
 
     private void testMapper(MybatisEnvironment environment)

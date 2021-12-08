@@ -199,7 +199,7 @@ public class MethodNameParseTest {
     @BeforeClass
     public static void beforeClass() throws IOException
     {
-        MybatisEnvironment environment = new MybatisEnvironment(DataSourceEnvironment.H2);
+        MybatisEnvironment environment = new MybatisEnvironment(DataSourceEnvironment.defaultDatabase());
         environment.initTableSchema(SCHEMA_SQL);
         environment.registerMappedStatementsForMappers(Entity6Mapper.class);
         SqlSession sqlSession = environment.getSqlSession();
