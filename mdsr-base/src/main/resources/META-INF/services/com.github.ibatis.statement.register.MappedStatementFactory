@@ -1,0 +1,9 @@
+com.github.ibatis.statement.register.factory.common.DeleteBatchByPrimaryKeyMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.DeleteByPrimaryKeyMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.DeleteSelectiveMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.InsertMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.SelectBatchByPrimaryKeyMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.SelectByPrimaryKeyMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.SelectSelectiveMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.UpdateMappedStatementFactory
+com.github.ibatis.statement.register.factory.common.UpdateSameBatchMappedStatementFactory

@@ -2,6 +2,7 @@ package com.github.ibatis.statement.base.core.parse;
 
 import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.util.Sorter;
+
 import java.util.Optional;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Optional;
  * @author X1993
  * @date 2020/2/23
  */
-public interface TableSourceParser extends Sorter{
+public interface TableSourceParser extends Sorter {
 
     /**
      * 解析

@@ -12,10 +12,8 @@ import com.github.ibatis.statement.mapper.param.DynamicParams;
 import com.github.ibatis.statement.mapper.param.OrderRule;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.StatementAutoRegister;
-import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-import com.github.ibatis.statement.register.database.H2TableSchemaQuery;
-import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
+import com.github.ibatis.statement.register.schema.DefaultTableSchemaQueryRegister;
+import com.github.ibatis.statement.register.schema.TableSchemaQueryRegister;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -67,7 +65,6 @@ public class Demo {
 
         //不同数据库需要使用不同的MysqlTableSchemaQuery实现
         TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-        tableSchemaQueryRegister.register(new MysqlTableSchemaQuery() ,new H2TableSchemaQuery());
 
         //列名为`update_time`的列在执行新增和修改指令时，如果没有指定值，使用默认值now()
         ColumnValueParser updateTimeColumnValueParser = new SpecificColumnValueParser(
@@ -132,7 +129,6 @@ public class Demo {
 //                            )
 //                        ))
                                 .build())
-                .addDefaultMappedStatementFactories()
                 .addMappedStatementFactory(new SelectMaxIdMappedStatementFactory())
                 .addDefaultListeners()
                 .build();

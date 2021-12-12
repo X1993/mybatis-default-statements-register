@@ -12,6 +12,8 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>mdsr-base</module>
+        <module>mdsr-mysql-adapter</module>
         <module>mdsr-core</module>
         <module>spring-boot-starter-mdsr</module>
         <module>spring-boot-starter-mdsr-sample</module>

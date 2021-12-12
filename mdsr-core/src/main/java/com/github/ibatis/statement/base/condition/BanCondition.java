@@ -1,12 +1,10 @@
 package com.github.ibatis.statement.base.condition;
 
-import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import org.apache.ibatis.mapping.SqlCommandType;
 import java.lang.annotation.*;
 
 /**
  * 对指定的列禁用默认查询，优先级大于{@link Condition}
- * @see DefaultColumnConditionParser#parse(EntityMateData)
  * @Author: X1993
  * @Date: 2020/7/24
  */

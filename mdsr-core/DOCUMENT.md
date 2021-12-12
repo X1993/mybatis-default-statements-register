@@ -49,15 +49,16 @@
 JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 *支持的数据库*:
-  
-1.TableSchemaResolutionStrategy=DATA_BASE，适用mysql 、mariaDB 、H2
-> 其他数据库只需实现特定的适配器
-```java
-    /**
-    * @see com.github.ibatis.statement.register.database.TableSchemaQuery
-    */
-```
-2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
+部分mapper方法支持标准sql实现,适用所有数据库(参考*com.github.ibatis.statement.mapper.method.MapperMethodEnum*#common=true),
+其他需要使用数据库自定义语法的接口目前仅实现了mysql 、mariaDB 、H2(MODE=MySql)的适配
+> 其他数据库需实现适配器,参考mysql适配模块,通过SPI机制获取服务提供者
+```xml
+    <dependency>
+        <groupId>com.github.X1993</groupId>
+        <artifactId>mdsr-mysql-adapter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+```    
 
 ## 快速开始
 ### 配置参数
@@ -141,79 +142,70 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ### 项目启动
 -   初始化SqlSessionFactory 
 [mybatis入门](https://mybatis.org/mybatis-3/zh/getting-started.html)
+
 ```java
     package com.github.ibatis.statement.demo;
-    
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.H2TableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    
-    public class Demo{
-        
-        private static SqlSession sqlSession;
-        
-        private final UserMapper userMapper;
-    
-        private final CustomUserMapper customUserMapper;
-    
-        static {
-            try {
-                sqlSession = initSqlSessionFactory("H2").openSession();
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
+
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import com.github.ibatis.statement.register.schema.DefaultTableSchemaQueryRegister;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.jdbc.ScriptRunner;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.Test;
+
+import java.io.IOException;
+
+public class Demo {
+
+    private static SqlSession sqlSession;
+
+    private final UserMapper userMapper;
+
+    private final CustomUserMapper customUserMapper;
+
+    static {
+        try {
+            sqlSession = initSqlSessionFactory("H2").openSession();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
-    
-        public Demo() {
-            userMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(UserMapper.class ,sqlSession);
-            customUserMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(CustomUserMapper.class ,sqlSession);
-        }
-    
-        public static SqlSessionFactory initSqlSessionFactory(String environment) throws IOException
-        {
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
-                    .build(Resources.getResourceAsStream("demo/SqlMapConfig.xml") ,environment);
-            SqlSession sqlSession = sqlSessionFactory.openSession();
-   
-           ScriptRunner scriptRunner = new ScriptRunner(sqlSession.getConnection());
-           scriptRunner.setAutoCommit(true);
-           scriptRunner.setStopOnError(true);
-           scriptRunner.runScript(Resources.getResourceAsReader("demo/schema.sql"));
-   
-           //不同数据库需要使用不同的MysqlTableSchemaQuery实现
-           TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-           tableSchemaQueryRegister.register(new MysqlTableSchemaQuery() ,new H2TableSchemaQuery());
-   
-           StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                   .setEntityMateDataParser(
-                           new DefaultEntityMateDataParser.Builder()
-                           .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                           .build())
-                   .addDefaultMappedStatementFactories()
-                   .build();
-   
-           register.registerDefaultMappedStatement(sqlSession);
-           sqlSession.close();
-   
-           return sqlSessionFactory;
-       }
     }
+
+    public Demo() {
+        userMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(UserMapper.class, sqlSession);
+        customUserMapper = sqlSession.getConfiguration().getMapperRegistry().getMapper(CustomUserMapper.class, sqlSession);
+    }
+
+    public static SqlSessionFactory initSqlSessionFactory(String environment) throws IOException {
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder()
+                .build(Resources.getResourceAsStream("demo/SqlMapConfig.xml"), environment);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        ScriptRunner scriptRunner = new ScriptRunner(sqlSession.getConnection());
+        scriptRunner.setAutoCommit(true);
+        scriptRunner.setStopOnError(true);
+        scriptRunner.runScript(Resources.getResourceAsReader("demo/schema.sql"));
+
+        //不同数据库需要使用不同的MysqlTableSchemaQuery实现
+        TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(
+                        new DefaultEntityMateDataParser.Builder()
+                                .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                                .build())
+                .build();
+
+        register.registerDefaultMappedStatement(sqlSession);
+        sqlSession.close();
+
+        return sqlSessionFactory;
+    }
+}
 ```
 -   User实体类
 ```java
@@ -241,58 +233,59 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
         // ... (ellipsis get/set methods)
     }
 ```
+
 ```java
     package com.github.ibatis.statement.base.core;
-    
-    import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
-    import com.github.ibatis.statement.base.core.parse.DefaultPropertyMateDataParser;
-    import com.github.ibatis.statement.register.MappedStatementFactory;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import org.apache.ibatis.type.TypeHandler;
-    import org.apache.ibatis.type.UnknownTypeHandler;
-    import java.lang.annotation.*;
-    
+
+import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
+import com.github.ibatis.statement.base.core.parse.DefaultPropertyMateDataParser;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.UnknownTypeHandler;
+
+import java.lang.annotation.*;
+
+/**
+ * 实体类属性映射的列信息
+ * @Author: X1993
+ * @Date: 2020/2/21
+ */
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface Column {
+
     /**
-     * 实体类属性映射的列信息
-     * @Author: X1993
-     * @Date: 2020/2/21
+     * 列名，缺省时默认通过{@link DefaultPropertyMateDataParser#getDefaultNameFunction()}获取
+     * @see PropertyMateData#mappingColumnName
+     * @return
      */
-    @Target({ElementType.FIELD})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Documented
-    public @interface Column {
-    
-        /**
-         * 列名，缺省时默认通过{@link DefaultPropertyMateDataParser#getDefaultNameFunction()}获取
-         * @see PropertyMateData#mappingColumnName
-         * @return
-         */
-        String value() default "";
-    
-        /**
-         * 列匹配策略
-         * @return
-         */
-        MappingStrategy mappingStrategy() default MappingStrategy.AUTO;
-    
-        /**
-         * 如果不包含{@link SqlCommandType#INSERT},则自动注入的插入语句会过滤该列的插入
-         * 如果不包含{@link SqlCommandType#UPDATE}, ...修改...过滤该列的修改
-         * 如果不包含{@link SqlCommandType#SELECT}, ...查询...过滤该列的查询
-         * （具体实现逻辑由每个{@link MappedStatementFactory}自定义，也可不实现）
-         * @see PropertyMateData#commandTypeMappings
-         * @return
-         */
-        SqlCommandType[] commandTypeMappings() default {SqlCommandType.INSERT ,SqlCommandType.UPDATE ,SqlCommandType.SELECT};
-    
-        /**
-         * 类型转换器类型
-         * @see PropertyMateData#typeHandlerClass
-         * @return
-         */
-        Class<? extends TypeHandler<?>> typeHandler() default UnknownTypeHandler.class;
-    
-    }
+    String value() default "";
+
+    /**
+     * 列匹配策略
+     * @return
+     */
+    MappingStrategy mappingStrategy() default MappingStrategy.AUTO;
+
+    /**
+     * 如果不包含{@link SqlCommandType#INSERT},则自动注入的插入语句会过滤该列的插入
+     * 如果不包含{@link SqlCommandType#UPDATE}, ...修改...过滤该列的修改
+     * 如果不包含{@link SqlCommandType#SELECT}, ...查询...过滤该列的查询
+     * （具体实现逻辑由每个{@link MappedStatementFactory}自定义，也可不实现）
+     * @see PropertyMateData#commandTypeMappings
+     * @return
+     */
+    SqlCommandType[] commandTypeMappings() default {SqlCommandType.INSERT, SqlCommandType.UPDATE, SqlCommandType.SELECT};
+
+    /**
+     * 类型转换器类型
+     * @see PropertyMateData#typeHandlerClass
+     * @return
+     */
+    Class<? extends TypeHandler<?>> typeHandler() default UnknownTypeHandler.class;
+
+}
 ```
 -   UserMapper接口
 ```java
@@ -498,125 +491,112 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 #### 2.2.自定义解析规则 
 -   实现*com.github.ibatis.statement.base.core.parse.TableSourceParser*自定义全局解析规则
+
 ```java
     package com.github.ibatis.statement.base.core.parse;
-    
-    import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
-    import com.github.ibatis.statement.util.Sorter;
-    import java.util.Optional;
-    
+
+import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
+
+import java.util.Optional;
+
+/**
+ * 解析实体类映射的表来源信息
+ * @author X1993
+ * @date 2020/2/23
+ */
+public interface TableSourceParser extends Sorter {
+
     /**
-     * 解析实体类映射的表来源信息
-     * @author X1993
-     * @date 2020/2/23
+     * 解析
+     * @param entityClass
+     * @return
      */
-    public interface TableSourceParser extends Sorter{
-    
+    Optional<Source> parse(Class<?> entityClass);
+
+    /**
+     * 表来源
+     * @author X1993
+     * @date 2020/9/26
+     */
+    class Source {
+
         /**
-         * 解析
-         * @param entityClass
-         * @return
+         * 表名
          */
-        Optional<Source> parse(Class<?> entityClass);
-    
+        private String tableName;
+
         /**
-         * 表来源
-         * @author X1993
-         * @date 2020/9/26
+         * 表结构解析策略
          */
-        class Source {
-    
-            /**
-             * 表名
-             */
-            private String tableName;
-    
-            /**
-             * 表结构解析策略
-             */
-            private TableSchemaResolutionStrategy tableSchemaResolutionStrategy;
-    
-            public Source(String tableName, TableSchemaResolutionStrategy tableSchemaResolutionStrategy) {
-                this.tableName = tableName;
-                this.tableSchemaResolutionStrategy = tableSchemaResolutionStrategy;
-            }
-    
-            public Source(String tableName) {
-                this.tableName = tableName;
-            }
-    
-            public Source() {
-            }
-    
-            public String getTableName() {
-                return tableName;
-            }
-    
-            public void setTableName(String tableName) {
-                this.tableName = tableName;
-            }
-    
-            public TableSchemaResolutionStrategy getTableSchemaResolutionStrategy() {
-                return tableSchemaResolutionStrategy;
-            }
-    
-            public void setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy tableSchemaResolutionStrategy) {
-                this.tableSchemaResolutionStrategy = tableSchemaResolutionStrategy;
-            }
+        private TableSchemaResolutionStrategy tableSchemaResolutionStrategy;
+
+        public Source(String tableName, TableSchemaResolutionStrategy tableSchemaResolutionStrategy) {
+            this.tableName = tableName;
+            this.tableSchemaResolutionStrategy = tableSchemaResolutionStrategy;
+        }
+
+        public Source(String tableName) {
+            this.tableName = tableName;
+        }
+
+        public Source() {
+        }
+
+        public String getTableName() {
+            return tableName;
+        }
+
+        public void setTableName(String tableName) {
+            this.tableName = tableName;
+        }
+
+        public TableSchemaResolutionStrategy getTableSchemaResolutionStrategy() {
+            return tableSchemaResolutionStrategy;
+        }
+
+        public void setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy tableSchemaResolutionStrategy) {
+            this.tableSchemaResolutionStrategy = tableSchemaResolutionStrategy;
         }
     }
+}
 
 ```
 -   注册实现类
+
 ```java
     package com.github.ibatis.statement.demo;
-    
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import com.github.ibatis.statement.util.StringUtils;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    import java.util.Optional;
-    
-    public class Demo{
-        /*
-         初始化SqlSessionFactory
-         */
-        public SqlSessionFactory init()
-        {   
-            // ...
-            
-               StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                            .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
-                                    .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                                    .setTableSourceParser(new DefaultTableSourceParser(
-                                    Arrays.asList(
-                                            entityClass -> Optional.of(new TableSourceParser.Source(
+
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import org.apache.ibatis.session.SqlSessionFactory;
+import java.util.Arrays;
+import java.util.Optional;
+
+public class Demo {
+    /*
+     初始化SqlSessionFactory
+     */
+    public SqlSessionFactory init() {
+        // ...
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
+                        .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                        .setTableSourceParser(new DefaultTableSourceParser(
+                                Arrays.asList(
+                                        entityClass -> Optional.of(new TableSourceParser.Source(
                                                 "act_" + StringUtils.camelCaseToUnderscore(entityClass.getSimpleName())
-                                            ))
-                                        )
-                                    ))
-                                    .build())
-                            .addDefaultMappedStatementFactories()
-                            .build();
-            
-            // ...
-        }
+                                        ))
+                                )
+                        ))
+                        .build())
+                .addDefaultMappedStatementFactories()
+                .build();
+
+        // ...
     }
+}
 ```
 -   映射结果
 
@@ -675,29 +655,31 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 #### 3.2.自定义解析规则 
 -   实现*com.github.ibatis.statement.base.core.parse.PropertyMateDataParser*自定义全局解析规则
+
 ```java
     package com.github.ibatis.statement.base.core.parse;
-    import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
-    import com.github.ibatis.statement.util.Sorter;
-    import java.lang.reflect.Field;
-    import java.util.Optional;
-    
+
+import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
+
+import java.lang.reflect.Field;
+import java.util.Optional;
+
+/**
+ * 解析类属性对应列名
+ * @Author: X1993
+ * @Date: 2020/2/21
+ */
+public interface PropertyMateDataParser extends Sorter {
+
     /**
-     * 解析类属性对应列名
-     * @Author: X1993
-     * @Date: 2020/2/21
+     * 解析
+     * @param entityClass 实体类
+     * @param field 类型属性
+     * @return
      */
-    public interface PropertyMateDataParser extends Sorter {
-        
-        /**
-         * 解析
-         * @param entityClass 实体类
-         * @param field 类型属性
-         * @return
-         */
-        Optional<PropertyMateData> parse(Class<?> entityClass ,Field field);
-    
-    }
+    Optional<PropertyMateData> parse(Class<?> entityClass, Field field);
+
+}
 ```
 -   注册实现类
 ```java
@@ -733,7 +715,6 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
                                         )
                                     )
                                     .build())
-                            .addDefaultMappedStatementFactories()
                             .build();
             
             // ...
@@ -764,63 +745,63 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     
     }
 ```
+
 ```java
     package com.github.ibatis.statement.base.core.parse;
-    
-    import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
-    import com.github.ibatis.statement.util.StringUtils;
-    import lombok.Data;
-    import java.lang.reflect.Field;
-    import java.util.Objects;
-    import java.util.Optional;
-    
+
+import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
+import lombok.Data;
+
+import java.lang.reflect.Field;
+import java.util.Objects;
+import java.util.Optional;
+
+/**
+ * 默认为每一个属性需要尝试映射列
+ * @Author: X1993
+ * @Date: 2020/9/8
+ */
+@Data
+public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataParser {
+
     /**
-     * 默认为每一个属性需要尝试映射列
-     * @Author: X1993
-     * @Date: 2020/9/8
+     * 属性名 -> 列名映射
      */
-    @Data
-    public class TryMappingEveryPropertyMateDataParser implements PropertyMateDataParser {
-    
-        /**
-         * 属性名 -> 列名映射
-         */
-        private PropertyToColumnNameFunction defaultNameFunction = (propertyName) ->
-                StringUtils.camelCaseToUnderscore(propertyName);
-    
-        /**
-         * 默认每个实体类每个属性都需要尝试映射列
-         */
-        private boolean eachPropertyMappingColumn = true;
-    
-        @Override
-        public int order() {
-            return Integer.MAX_VALUE - 100;
-        }
-    
-        @Override
-        public Optional<PropertyMateData> parse(Class<?> entityClass ,Field field)
-        {
-            AutoMappingColumns autoMappingColumns = entityClass.getAnnotation(AutoMappingColumns.class);
-            if (autoMappingColumns != null){
-                if (autoMappingColumns.enable()){
-                    return Optional.of(new PropertyMateData(defaultNameFunction.apply(field.getName()) ,field));
-                }else {
-                    return Optional.empty();
-                }
-            }
-            if (isEachPropertyMappingColumn()){
-                return Optional.of(new PropertyMateData(defaultNameFunction.apply(field.getName()) ,field));
-            }
-            return Optional.empty();
-        }
-    
-        public void setDefaultNameFunction(PropertyToColumnNameFunction defaultNameFunction) {
-            Objects.requireNonNull(defaultNameFunction);
-            this.defaultNameFunction = defaultNameFunction;
-        }
-    
+    private PropertyToColumnNameFunction defaultNameFunction = (propertyName) ->
+            StringUtils.camelCaseToUnderscore(propertyName);
+
+    /**
+     * 默认每个实体类每个属性都需要尝试映射列
+     */
+    private boolean eachPropertyMappingColumn = true;
+
+    @Override
+    public int order() {
+        return Integer.MAX_VALUE - 100;
     }
+
+    @Override
+    public Optional<PropertyMateData> parse(Class<?> entityClass, Field field) {
+        AutoMappingColumns autoMappingColumns = entityClass.getAnnotation(AutoMappingColumns.class);
+        if (autoMappingColumns != null) {
+            if (autoMappingColumns.enable()) {
+                return Optional.of(new PropertyMateData(defaultNameFunction.apply(field.getName()), field));
+            } else {
+                return Optional.empty();
+            }
+        }
+        if (isEachPropertyMappingColumn()) {
+            return Optional.of(new PropertyMateData(defaultNameFunction.apply(field.getName()), field));
+        }
+        return Optional.empty();
+    }
+
+    public void setDefaultNameFunction(PropertyToColumnNameFunction defaultNameFunction) {
+        Objects.requireNonNull(defaultNameFunction);
+        this.defaultNameFunction = defaultNameFunction;
+    }
+
+}
 ```
 -   映射结果
 
@@ -840,101 +821,87 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 ### 4.逻辑列
 #### 4.1.注解声明
+
 ```java
     package com.github.ibatis.statement.demo;
-    import com.github.ibatis.statement.base.core.Column;
-    import com.github.ibatis.statement.base.core.Entity;
-    import com.github.ibatis.statement.base.logical.Logical;
-    import java.util.Date;
 
-    @Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列
-    @Entity(tableName = "user")//申明实体映射的表
-    public class User {
-        @Column(value = "id")//申明字段映射的列
-        private Integer id;
-        
-        //... column
-        
-        // ... (ellipsis get/set methods)
-        
-    }
+import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.base.core.Entity;
+
+//定义逻辑列
+@Entity(tableName = "user")//申明实体映射的表
+        public class User {
+    @Column(value = "id")//申明字段映射的列
+    private Integer id;
+
+    //... column
+
+    // ... (ellipsis get/set methods)
+
+}
 ```
 #### 4.2.自定义解析
 -   实现*com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser*自定义全局解析规则
+
 ```java
     package com.github.ibatis.statement.base.logical;
-    
-    import com.github.ibatis.statement.base.core.matedata.EntityMateData;
-    import com.github.ibatis.statement.util.Sorter;
+
+import com.github.ibatis.statement.base.core.matedata.EntityMateData;
+
+/**
+ * 逻辑列元数据解析
+ * @Author: X1993
+ * @Date: 2020/3/4
+ */
+public interface LogicalColumnMateDataParser extends Sorter {
 
     /**
-     * 逻辑列元数据解析
-     * @Author: X1993
-     * @Date: 2020/3/4
+     * 解析
+     * @param entityMateData
      */
-    public interface LogicalColumnMateDataParser extends Sorter{
-    
-        /**
-         * 解析
-         * @param entityMateData
-         */
-        void parse(EntityMateData entityMateData);
-    
-    }
+    void parse(EntityMateData entityMateData);
+
+}
 ```
 -   注册实现类
+
 ```java
     package com.github.ibatis.statement.demo;
 
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataParser;
-    import com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import com.github.ibatis.statement.util.StringUtils;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    import java.util.Optional;
-    
-    public class Demo{
-        
-        /*
-         初始化SqlSessionFactory
-         */
-        public SqlSessionFactory init() throws IOException 
-        {   
-            // ...
-            
-            StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                            .setEntityMateDataParser(
-                                    new DefaultEntityMateDataParser.Builder()
-                                    .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                                    .setLogicalColumnMateDataParser(new DefaultLogicalColumnMateDataParser(
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataParser;
+import com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+public class Demo {
+
+    /*
+     初始化SqlSessionFactory
+     */
+    public SqlSessionFactory init() throws IOException {
+        // ...
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(
+                        new DefaultEntityMateDataParser.Builder()
+                                .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                                .setLogicalColumnMateDataParser(new DefaultLogicalColumnMateDataParser(
                                         //列名为removed的列,默认为逻辑列
                                         Arrays.asList(
-                                            new SpecificLogicalColumnMateDataParser("removed" ,"1" ,"0")
+                                                new SpecificLogicalColumnMateDataParser("removed", "1", "0")
                                         ))
-                                    )
-                                    .build())
-                            .addDefaultMappedStatementFactories()
-                            .build();
-            
-            // ...
-        }
+                                )
+                                .build())
+                .build();
+
+        // ...
     }
+}
 ```
 >   效果演示
 -   insert
@@ -1156,72 +1123,55 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     }
 ```
 -   注册实现类
+
 ```java
 
-    import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.base.dv.ColumnValueParser;
-    import com.github.ibatis.statement.base.dv.DefaultColumnValueParser;
-    import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
-    import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataParser;
-    import com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import com.github.ibatis.statement.util.StringUtils;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    import java.util.Optional;
-    
-    public class Demo{
-        
-        /*
-         初始化SqlSessionFactory
-         */
-        public SqlSessionFactory init() throws IOException 
-        {   
-            // ...
-            
-            //列名为`update_time`的列在执行新增和修改指令时，如果没有指定值，使用默认值now()
-            ColumnValueParser updateTimeColumnValueParser = new SpecificColumnValueParser(
-                    columnMateData -> "update_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.UPDATE ,SqlCommandType.INSERT} ,"now()" ,false);
-    
-            //列名为`create_time`的列在执行新增指令时，如果没有指定值，使用默认值now()
-            ColumnValueParser createTimeColumnValueParser = new SpecificColumnValueParser(columnMateData ->
-                    "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.INSERT} ,"now()" ,false);
-    
-            StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                            .setEntityMateDataParser(
-                                    new DefaultEntityMateDataParser.Builder()
-                                    .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                                    .setColumnValueParser(new DefaultColumnValueParser(
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.base.dv.ColumnValueParser;
+import com.github.ibatis.statement.base.dv.DefaultColumnValueParser;
+import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+public class Demo {
+
+    /*
+     初始化SqlSessionFactory
+     */
+    public SqlSessionFactory init() throws IOException {
+        // ...
+
+        //列名为`update_time`的列在执行新增和修改指令时，如果没有指定值，使用默认值now()
+        ColumnValueParser updateTimeColumnValueParser = new SpecificColumnValueParser(
+                columnMateData -> "update_time".equals(columnMateData.getColumnName()),
+                new SqlCommandType[]{SqlCommandType.UPDATE, SqlCommandType.INSERT}, "now()", false);
+
+        //列名为`create_time`的列在执行新增指令时，如果没有指定值，使用默认值now()
+        ColumnValueParser createTimeColumnValueParser = new SpecificColumnValueParser(columnMateData ->
+                "create_time".equals(columnMateData.getColumnName()),
+                new SqlCommandType[]{SqlCommandType.INSERT}, "now()", false);
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(
+                        new DefaultEntityMateDataParser.Builder()
+                                .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                                .setColumnValueParser(new DefaultColumnValueParser(
                                         Arrays.asList(
-                                            updateTimeColumnValueParser ,
-                                            createTimeColumnValueParser
+                                                updateTimeColumnValueParser,
+                                                createTimeColumnValueParser
                                         ))
-                                    )
-                                    .build())
-                            .addDefaultMappedStatementFactories()
-                            .build();
-            
-            // ...
-        }
+                                )
+                                .build())
+                .build();
+
+        // ...
     }
+}
 ```
 >   效果演示
 -   insert
@@ -1281,36 +1231,37 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 >   仅支持修改/删除/查询指令，各方法注册器*MappedStatementFactory*提供实现，不保证所有方法都支持
 
 #### 7.1.注解声明
+
 ```java
     import com.github.ibatis.statement.base.condition.Condition;
-    import com.github.ibatis.statement.base.condition.Strategy;
-    import com.github.ibatis.statement.base.core.Column;
-    import com.github.ibatis.statement.base.core.Entity;
-    import com.github.ibatis.statement.base.logical.Logical;
-    import com.github.ibatis.statement.mapper.param.ConditionRule;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import java.util.Date;
-    
-    //@Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列
-    @Entity(tableName = "user")//申明实体映射的表
-    public class User {
-        
-        // ... columns    
-    
-        //执行查询指令时，添加默认查询条件 create_time > '2020-08-12 00:00:00'
-        @Condition(commandTypes = SqlCommandType.SELECT, rule = ConditionRule.GT , value = "2020-08-12 00:00:00")
-        //执行删除指令时，添加默认查询条件 create_time < '2020-08-12 00:00:00'
-        @Condition(commandTypes = SqlCommandType.DELETE, rule = ConditionRule.LT , value = "2020-08-11 00:00:00")
-        //执行修改指令时，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
-        @Condition(commandTypes = SqlCommandType.UPDATE, rule = ConditionRule.BETWEEN ,value = "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'")
-        @Column("create_time")
-        private Date createTime;
-        
-        // ... columns    
-        
-        // ... (ellipsis get/set methods)
-    
-    }
+import com.github.ibatis.statement.base.condition.Strategy;
+import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.base.core.Entity;
+import com.github.ibatis.statement.mapper.param.ConditionRule;
+import org.apache.ibatis.mapping.SqlCommandType;
+
+import java.util.Date;
+
+//@Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")//定义逻辑列
+@Entity(tableName = "user")//申明实体映射的表
+public class User {
+
+    // ... columns    
+
+    //执行查询指令时，添加默认查询条件 create_time > '2020-08-12 00:00:00'
+    @Condition(commandTypes = SqlCommandType.SELECT, rule = ConditionRule.GT, value = "2020-08-12 00:00:00")
+    //执行删除指令时，添加默认查询条件 create_time < '2020-08-12 00:00:00'
+    @Condition(commandTypes = SqlCommandType.DELETE, rule = ConditionRule.LT, value = "2020-08-11 00:00:00")
+    //执行修改指令时，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
+    @Condition(commandTypes = SqlCommandType.UPDATE, rule = ConditionRule.BETWEEN, value = "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'")
+    @Column("create_time")
+    private Date createTime;
+
+    // ... columns    
+
+    // ... (ellipsis get/set methods)
+
+}
 ```
 ```java
     package com.github.ibatis.statement.base.condition;
@@ -1380,83 +1331,65 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
     }
 ```
 -   注册实现类
+
 ```java
     import com.github.ibatis.statement.base.condition.ColumnConditionParser;
-    import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
-    import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.base.dv.ColumnValueParser;
-    import com.github.ibatis.statement.base.dv.DefaultColumnValueParser;
-    import com.github.ibatis.statement.base.dv.SpecificColumnValueParser;
-    import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataParser;
-    import com.github.ibatis.statement.base.logical.SpecificLogicalColumnMateDataParser;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.ConditionRule;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import com.github.ibatis.statement.util.StringUtils;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    import java.util.Optional;
-    
-    public class Demo{
-        
-        /*
-         初始化SqlSessionFactory
-         */
-        public SqlSessionFactory init() throws IOException 
-        {   
-            // ...
-            
-            //执行修改指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
-            ColumnConditionParser updateColumnConditionParser = new SpecificColumnConditionParser(
-                    columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN, 
-                    "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
-            
-            //执行查询指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time > '2020-08-12 00:00:00'
-            ColumnConditionParser selectColumnConditionParser = new SpecificColumnConditionParser(
-                    columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT, 
-                    "2020-08-12 00:00:00");
-            
-            //执行删除指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time < '2020-08-12 00:00:00'
-            ColumnConditionParser deleteColumnConditionParser = new SpecificColumnConditionParser(
-                    columnMateData -> "create_time".equals(columnMateData.getColumnName()) ,
-                    new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT, 
-                    "2020-08-11 00:00:00");
-            
-             StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                    .setEntityMateDataParser(
-                            new DefaultEntityMateDataParser.Builder()
-                            .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                            .setColumnConditionParser(new DefaultColumnConditionParser(
-                                    Arrays.asList(
-                                            updateColumnConditionParser ,
-                                            selectColumnConditionParser,
-                                            deleteColumnConditionParser
-                                    )
-                            ))
-                            .build())
-                    .addDefaultMappedStatementFactories()
-                    .build();
-            
-            // ...
-        }
+import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
+import com.github.ibatis.statement.base.condition.SpecificColumnConditionParser;
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.mapper.param.ConditionRule;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+public class Demo {
+
+    /*
+     初始化SqlSessionFactory
+     */
+    public SqlSessionFactory init() throws IOException {
+        // ...
+
+        //执行修改指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time between '2020-08-11 00:00:00' AND '2020-08-12 00:00:00'
+        ColumnConditionParser updateColumnConditionParser = new SpecificColumnConditionParser(
+                columnMateData -> "create_time".equals(columnMateData.getColumnName()),
+                new SqlCommandType[]{SqlCommandType.UPDATE}, ConditionRule.BETWEEN,
+                "'2020-08-11 00:00:00' AND '2020-08-12 00:00:00'");
+
+        //执行查询指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time > '2020-08-12 00:00:00'
+        ColumnConditionParser selectColumnConditionParser = new SpecificColumnConditionParser(
+                columnMateData -> "create_time".equals(columnMateData.getColumnName()),
+                new SqlCommandType[]{SqlCommandType.SELECT}, ConditionRule.GT,
+                "2020-08-12 00:00:00");
+
+        //执行删除指令时，如果`create_time`列没有指定查询条件，添加默认查询条件 create_time < '2020-08-12 00:00:00'
+        ColumnConditionParser deleteColumnConditionParser = new SpecificColumnConditionParser(
+                columnMateData -> "create_time".equals(columnMateData.getColumnName()),
+                new SqlCommandType[]{SqlCommandType.DELETE}, ConditionRule.LT,
+                "2020-08-11 00:00:00");
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(
+                        new DefaultEntityMateDataParser.Builder()
+                                .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                                .setColumnConditionParser(new DefaultColumnConditionParser(
+                                        Arrays.asList(
+                                                updateColumnConditionParser,
+                                                selectColumnConditionParser,
+                                                deleteColumnConditionParser
+                                        )
+                                ))
+                                .build())
+                .addDefaultMappedStatementFactories()
+                .build();
+
+        // ...
     }
+}
 ```
 >   效果演示
 -   select
@@ -1543,30 +1476,30 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 ### 8.禁止特定列查询/修改/新增
 -   使用@Column#commandTypeMappings属性指定允许的指令
+
 ```java
-    import com.github.ibatis.statement.base.condition.Condition;
-    import com.github.ibatis.statement.base.condition.Strategy;
-    import com.github.ibatis.statement.base.core.Column;
-    import com.github.ibatis.statement.base.core.Entity;
-    import com.github.ibatis.statement.base.logical.Logical;
-    import com.github.ibatis.statement.mapper.param.ConditionRule;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import java.util.Date;
-    
-    @Entity(tableName = "user")//申明实体映射的表
-    public class User {
-        
-        // ... columns    
-        
-        //禁止修改该列
-        @Column(value = "create_time" ,commandTypeMappings = {SqlCommandType.SELECT ,SqlCommandType.INSERT})
-        private Date createTime;
-        
-        // ... columns    
-        
-        // ... (ellipsis get/set methods)
-    
-    }
+
+import com.github.ibatis.statement.base.condition.Strategy;
+import com.github.ibatis.statement.base.core.Column;
+import com.github.ibatis.statement.base.core.Entity;
+import org.apache.ibatis.mapping.SqlCommandType;
+
+import java.util.Date;
+
+@Entity(tableName = "user")//申明实体映射的表
+public class User {
+
+    // ... columns    
+
+    //禁止修改该列
+    @Column(value = "create_time", commandTypeMappings = {SqlCommandType.SELECT, SqlCommandType.INSERT})
+    private Date createTime;
+
+    // ... columns    
+
+    // ... (ellipsis get/set methods)
+
+}
 ```
 
 >   效果演示
@@ -1709,42 +1642,37 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 
 ### 10.table schema解析策略
+
 ```java
     package com.github.ibatis.statement.base.core;
 
-    import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
-    
-    /**
-     * 表结构来源
-     */
-    public enum TableSchemaResolutionStrategy {
-    
-        /**
-         * 查询数据库schema
-         * 不同的数据需要实现各自的{@link com.github.ibatis.statement.register.database.TableSchemaQuery}
-         * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
-         */
-        DATA_BASE,
-    
-        /**
-         * 解析实体类
-         * 类似 hibernate/jpa 
-         */
-        ENTITY,
+import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
 
-        /**
-         * {@link TableSchemaResolutionStrategy#DATA_BASE}优先，获取失败使用{@link TableSchemaResolutionStrategy#ENTITY}
-         * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
-         */
-        DATA_BASE_PRIORITY,
-    
-        /**
-         * 默认使用全局配置
-         * @see com.github.ibatis.statement.base.core.parse.DefaultEntityMateDataParser#defaultTableSchemaResolutionStrategy
-         */
-        GLOBAL,
-    
-    }
+/**
+ * 表结构来源
+ */
+public enum TableSchemaResolutionStrategy {
+
+    /**
+     * 查询数据库schema
+     * 不同的数据需要实现各自的{@link com.github.ibatis.statement.register.schema.TableSchemaQuery}
+     * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
+     */
+    DATA_BASE,
+
+    /**
+     * 解析实体类
+     * 类似 hibernate/jpa 
+     */
+    ENTITY,
+
+    /**
+     * 默认使用全局配置
+     * @see com.github.ibatis.statement.base.core.parse.DefaultEntityMateDataParser#defaultTableSchemaResolutionStrategy
+     */
+    GLOBAL,
+
+}
 ```
 
 #### 10.1.注解声明
@@ -1796,50 +1724,36 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 >   java.sql.SQLException: Unknown column 'not_exist_column' in 'field list'
 
 #### 10.2.默认配置
+
 ```java
     package com.github.ibatis.statement.demo;
-    
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import com.github.ibatis.statement.util.StringUtils;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    import java.util.Optional;
-    import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
-    
-    public class Demo{
-        /*
-         初始化SqlSessionFactory
-         */
-        public SqlSessionFactory init() throws IOException 
-        {   
-            // ...
-            
-               StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                            .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
-                                    .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                                    .setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy.ENTITY)
-                                    .build())
-                            .addDefaultMappedStatementFactories()
-                            .build();
-            
-            // ...
-        }
+
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import java.io.IOException;
+
+import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
+
+public class Demo {
+    /*
+     初始化SqlSessionFactory
+     */
+    public SqlSessionFactory init() throws IOException {
+        // ...
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
+                        .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                        .setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy.ENTITY)
+                        .build())
+                .build();
+
+        // ...
     }
+}
 ```
 #### 10.3.优先级
    @Entity > 全局默认配置
@@ -1865,106 +1779,90 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ```
 
 -   构建工厂
+
 ```java
     package com.github.ibatis.statement.demo;
-    
-    import com.github.ibatis.statement.base.core.MethodSignature;
-    import com.github.ibatis.statement.base.core.matedata.EntityMateData;
-    import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
-    import com.github.ibatis.statement.base.core.matedata.TableMateData;
-    import com.github.ibatis.statement.register.AbstractMappedStatementFactory;
-    import org.apache.ibatis.builder.StaticSqlSource;
-    import org.apache.ibatis.mapping.SqlCommandType;
-    import org.apache.ibatis.mapping.SqlSource;
-    
-    /**
-     * @author X1993
-     * @date 2020/9/27
-     */
-    public class SelectMaxIdMappedStatementFactory extends AbstractMappedStatementFactory {
-    
-        @Override
-        protected boolean isMatch(MappedStatementMateData mappedStatementMateData)
-        {
-            MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
-            EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
-    
-            if (entityMateData.getPrimaryKeyCount() != 1) {
-                return false;
-            }
-    
-            return methodSignature.isMatch(new MethodSignature(
-                    entityMateData.getReasonableKeyParameterClass() ,selectMaxPrimaryKey));
+
+import com.github.ibatis.statement.base.core.MethodSignature;
+import com.github.ibatis.statement.base.core.matedata.EntityMateData;
+import com.github.ibatis.statement.base.core.matedata.MappedStatementMateData;
+import com.github.ibatis.statement.base.core.matedata.TableMateData;
+import org.apache.ibatis.builder.StaticSqlSource;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.mapping.SqlSource;
+
+/**
+ * @author X1993
+ * @date 2020/9/27
+ */
+public class SelectMaxIdMappedStatementFactory extends AbstractMappedStatementFactory {
+
+    @Override
+    protected boolean isMatch(MappedStatementMateData mappedStatementMateData) {
+        MethodSignature methodSignature = mappedStatementMateData.getMapperMethodMateData().getMethodSignature();
+        EntityMateData entityMateData = mappedStatementMateData.getEntityMateData();
+
+        if (entityMateData.getPrimaryKeyCount() != 1) {
+            return false;
         }
-    
-        @Override
-        protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData) {
-            TableMateData tableMateData = mappedStatementMateData.getEntityMateData().getTableMateData();
-            String keyName = tableMateData.getKeyColumnMateDataMap().values()
-                    .stream()
-                    .findFirst()
-                    .get()
-                    .getEscapeColumnName();
-            StringBuilder content = new StringBuilder("select ")
-                    .append(keyName)
-                    .append(" from ")
-                    .append(tableMateData.getEscapeTableName()).append(" order by ")
-                    .append(keyName)
-                    .append(" desc limit 1");
-            return new StaticSqlSource(mappedStatementMateData.getConfiguration() ,content.toString());
-        }
-    
-        @Override
-        protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
-            return SqlCommandType.SELECT;
-        }
-    
+
+        return methodSignature.isMatch(new MethodSignature(
+                entityMateData.getReasonableKeyParameterClass(), selectMaxPrimaryKey));
     }
+
+    @Override
+    protected SqlSource sqlSource(MappedStatementMateData mappedStatementMateData) {
+        TableMateData tableMateData = mappedStatementMateData.getEntityMateData().getTableMateData();
+        String keyName = tableMateData.getKeyColumnMateDataMap().values()
+                .stream()
+                .findFirst()
+                .get()
+                .getEscapeColumnName();
+        StringBuilder content = new StringBuilder("select ")
+                .append(keyName)
+                .append(" from ")
+                .append(tableMateData.getEscapeTableName()).append(" order by ")
+                .append(keyName)
+                .append(" desc limit 1");
+        return new StaticSqlSource(mappedStatementMateData.getConfiguration(), content.toString());
+    }
+
+    @Override
+    protected SqlCommandType sqlCommandType(MappedStatementMateData mappedStatementMateData) {
+        return SqlCommandType.SELECT;
+    }
+
+}
 ```
 -   注册工厂
+
 ```java
     package com.github.ibatis.statement.demo;
-    
-    import com.github.ibatis.statement.base.core.parse.*;
-    import com.github.ibatis.statement.mapper.param.ConditionParams;
-    import com.github.ibatis.statement.mapper.param.DynamicParams;
-    import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
-    import com.github.ibatis.statement.register.StatementAutoRegister;
-    import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-    import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-    import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
-    import com.github.ibatis.statement.util.StringUtils;
-    import org.apache.ibatis.io.Resources;
-    import org.apache.ibatis.jdbc.ScriptRunner;
-    import org.apache.ibatis.session.SqlSession;
-    import org.apache.ibatis.session.SqlSessionFactory;
-    import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-    import org.junit.Test;
-    import java.io.IOException;
-    import java.util.Arrays;
-    import java.util.Date;
-    import java.util.List;
-    import java.util.Optional;
-    
-    public class Demo{
-        /*
-         初始化SqlSessionFactory
-         */
-        public SqlSessionFactory init() throws IOException 
-        {   
-            // ...
-            
-               StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
-                            .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
-                                    .setTableSchemaQueryRegister(tableSchemaQueryRegister)
-                                    .build())
-                            .addDefaultMappedStatementFactories()
-                            .addMappedStatementFactory(new SelectMaxIdMappedStatementFactory())
-                            .build();
-            
-            // ...
-        }
+
+import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
+import com.github.ibatis.statement.register.StatementAutoRegister;
+import org.apache.ibatis.session.SqlSessionFactory;
+
+import java.io.IOException;
+
+public class Demo {
+    /*
+     初始化SqlSessionFactory
+     */
+    public SqlSessionFactory init() throws IOException {
+        // ...
+
+        StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
+                .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
+                        .setTableSchemaQueryRegister(tableSchemaQueryRegister)
+                        .build())
+                .addMappedStatementFactory(new SelectMaxIdMappedStatementFactory())
+                .build();
+
+        // ...
     }
+}
 ```
 
 >   效果演示
@@ -1991,7 +1889,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 ### 12.方法名解析自动注册
 -   实现类
 ```java
-    /** @see  com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory*/
+    /** @see  com.github.ibatis.statement.register.mysql.factory.MethodNameParseMappedStatementFactory*/
 ```
 
 
@@ -2053,7 +1951,7 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
    
 #### 12.2.If注解
 ```java
-    package com.github.ibatis.statement.register.factory;
+    package com.github.ibatis.statement.mapper.param;
     
     import com.github.ibatis.statement.base.condition.DefaultColumnConditionParser;
     import com.github.ibatis.statement.base.core.matedata.EntityMateData;
@@ -2093,20 +1991,17 @@ JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
 >   效果演示
  mapper方法定义
+
 ```java
     package com.github.ibatis.statement.demo;
-    
-    import com.github.ibatis.statement.mapper.EntityType;
-    import com.github.ibatis.statement.register.factory.If;
-    import java.util.Collection;
-    import java.util.Date;
-    import java.util.List;
-    
-    public interface UserMapper extends EntityType<User> {
-   
-        User selectByNameAndAddressIn(@If(otherwise = "'jack'") String name ,@If String ... address);
-    
-    }
+
+import com.github.ibatis.statement.mapper.EntityType;
+
+public interface UserMapper extends EntityType<User> {
+
+    User selectByNameAndAddressIn(@If(otherwise = "'jack'") String name , @If String ... address);
+
+}
 ``` 
 
 方法调用

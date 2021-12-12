@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 默认条件列解析器
@@ -87,12 +88,12 @@ public class DefaultColumnConditionParser implements ColumnConditionParser {
 
         Conditions conditionsAnnotation = entityClass.getAnnotation(Conditions.class);
         if (conditionsAnnotation != null){
-            conditionBiConsumer.accept(ColumnCondition.build(conditionsAnnotation, null));
+            conditionBiConsumer.accept(build(conditionsAnnotation, null));
         }
 
         Condition conditionAnnotation = entityClass.getAnnotation(Condition.class);
         if (conditionAnnotation != null){
-            conditionBiConsumer.accept(ColumnCondition.build(conditionAnnotation, null));
+            conditionBiConsumer.accept(build(conditionAnnotation, null));
         }
 
         for (ColumnPropertyMapping columnPropertyMapping : columnPropertyMappings.values())
@@ -102,12 +103,12 @@ public class DefaultColumnConditionParser implements ColumnConditionParser {
             String defaultColumnName = propertyMateData.getMappingColumnName();
             conditionsAnnotation = field.getAnnotation(Conditions.class);
             if (conditionsAnnotation != null){
-                conditionBiConsumer.accept(ColumnCondition.build(conditionsAnnotation, defaultColumnName));
+                conditionBiConsumer.accept(build(conditionsAnnotation, defaultColumnName));
             }
 
             conditionAnnotation = field.getAnnotation(Condition.class);
             if (conditionAnnotation != null){
-                conditionBiConsumer.accept(ColumnCondition.build(conditionAnnotation, defaultColumnName));
+                conditionBiConsumer.accept(build(conditionAnnotation, defaultColumnName));
             }
         }
 
@@ -210,4 +211,29 @@ public class DefaultColumnConditionParser implements ColumnConditionParser {
         Objects.requireNonNull(expressionParser);
         this.expressionParser = expressionParser;
     }
+
+    private List<ColumnCondition> build(Condition condition ,String defaultColumnName) {
+        int length = condition.commandTypes().length;
+        String columnName = condition.columnName();
+        columnName = columnName == null || "".equals(columnName) ? defaultColumnName : columnName;
+        List<ColumnCondition> columnConditions = new ArrayList<>(length + 1);
+        for (int i = 0; i < length; i++) {
+            SqlCommandType sqlCommandType = condition.commandTypes()[i];
+            ColumnCondition columnCondition = new ColumnCondition();
+            columnCondition.setColumnName(columnName);
+            columnCondition.setSqlCommandType(sqlCommandType);
+            columnCondition.setRule(condition.rule());
+            columnCondition.setValue(condition.value());
+            columnConditions.add(columnCondition);
+        }
+        return columnConditions;
+    }
+
+    private List<ColumnCondition> build(Conditions conditions ,String defaultColumnName){
+        return Stream.of(conditions.value())
+                .map(condition -> build(condition ,defaultColumnName))
+                .flatMap(columnConditions -> columnConditions.stream())
+                .collect(Collectors.toList());
+    }
+
 }

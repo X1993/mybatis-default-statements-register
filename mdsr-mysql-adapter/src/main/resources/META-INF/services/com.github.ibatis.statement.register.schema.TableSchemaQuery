@@ -1,0 +1,2 @@
+com.github.ibatis.statement.register.mysql.schema.MysqlTableSchemaQuery
+com.github.ibatis.statement.register.mysql.schema.H2ModeMySqlTableSchemaQuery

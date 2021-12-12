@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Author: X1993
@@ -94,12 +95,12 @@ public class DefaultColumnValueParser implements ColumnValueParser {
 
         DefaultValues defaultValuesAnnotation = entityClass.getAnnotation(DefaultValues.class);
         if (defaultValuesAnnotation != null){
-            defaultValueBiConsumer.accept(ColumnDefaultValue.build(defaultValuesAnnotation, null));
+            defaultValueBiConsumer.accept(build(defaultValuesAnnotation, null));
         }
 
         DefaultValue defaultValueAnnotation = entityClass.getAnnotation(DefaultValue.class);
         if (defaultValueAnnotation != null){
-            defaultValueBiConsumer.accept(ColumnDefaultValue.build(defaultValueAnnotation, null));
+            defaultValueBiConsumer.accept(build(defaultValueAnnotation, null));
         }
 
         for (ColumnPropertyMapping columnPropertyMapping : columnPropertyMappings.values())
@@ -109,12 +110,12 @@ public class DefaultColumnValueParser implements ColumnValueParser {
             String defaultColumnName = propertyMateData.getMappingColumnName();
             defaultValuesAnnotation = field.getAnnotation(DefaultValues.class);
             if (defaultValuesAnnotation != null){
-                defaultValueBiConsumer.accept(ColumnDefaultValue.build(defaultValuesAnnotation, defaultColumnName));
+                defaultValueBiConsumer.accept(build(defaultValuesAnnotation, defaultColumnName));
             }
 
             defaultValueAnnotation = field.getAnnotation(DefaultValue.class);
             if (defaultValueAnnotation != null){
-                defaultValueBiConsumer.accept(ColumnDefaultValue.build(defaultValueAnnotation, defaultColumnName));
+                defaultValueBiConsumer.accept(build(defaultValueAnnotation, defaultColumnName));
             }
         }
 
@@ -201,6 +202,31 @@ public class DefaultColumnValueParser implements ColumnValueParser {
         return noDefaultValueMap;
     }
 
+    private List<ColumnDefaultValue> build(DefaultValue defaultValue, String defaultColumnName)
+    {
+        int length = defaultValue.commandTypes().length;
+        String columnName = defaultValue.columnName();
+        columnName = columnName == null || "".equals(columnName) ? defaultColumnName : columnName;
+        List<ColumnDefaultValue> columnDefaultValues = new ArrayList<>(length + 1);
+        for (int i = 0; i < length; i++) {
+            SqlCommandType sqlCommandType = defaultValue.commandTypes()[i];
+            ColumnDefaultValue columnDefaultValue = new ColumnDefaultValue();
+            columnDefaultValue.setColumnName(columnName);
+            columnDefaultValue.setValue(defaultValue.value());
+            columnDefaultValue.setSqlCommandType(sqlCommandType);
+            columnDefaultValue.setOverwriteCustom(defaultValue.overwriteCustom());
+            columnDefaultValues.add(columnDefaultValue);
+        }
+        return columnDefaultValues;
+    }
+
+    private List<ColumnDefaultValue> build(DefaultValues defaultValues, String defaultColumnName){
+        return Stream.of(defaultValues.value())
+                .map(condition -> build(condition ,defaultColumnName))
+                .flatMap(columnDefaultValues -> columnDefaultValues.stream())
+                .collect(Collectors.toList());
+    }
+    
     public List<ColumnValueParser> getCustomParsers() {
         return customParsers;
     }

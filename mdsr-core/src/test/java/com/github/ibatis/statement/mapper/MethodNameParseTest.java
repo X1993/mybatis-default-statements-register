@@ -6,8 +6,8 @@ import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.dv.DefaultValue;
 import com.github.ibatis.statement.mapper.param.BetweenParam;
 import com.github.ibatis.statement.mapper.param.ConditionRule;
+import com.github.ibatis.statement.mapper.param.If;
 import com.github.ibatis.statement.mapper.param.LimitParam;
-import com.github.ibatis.statement.register.factory.If;
 import lombok.Data;
 import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * @see com.github.ibatis.statement.register.mysql.factory.MethodNameParseMappedStatementFactory
  * 测试列名中包含关键字时方法名解析是否正常
- * @see com.github.ibatis.statement.register.factory.MethodNameParseMappedStatementFactory
  * @Author: X1993
  * @Date: 2020/11/27
  */

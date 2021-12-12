@@ -8,7 +8,7 @@ import com.github.ibatis.statement.util.Sorter;
  * @Author: X1993
  * @Date: 2020/3/4
  */
-public interface LogicalColumnMateDataParser extends Sorter{
+public interface LogicalColumnMateDataParser extends Sorter {
 
     /**
      * 解析

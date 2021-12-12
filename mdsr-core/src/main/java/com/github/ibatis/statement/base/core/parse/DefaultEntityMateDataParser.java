@@ -9,16 +9,19 @@ import com.github.ibatis.statement.base.dv.ColumnValueParser;
 import com.github.ibatis.statement.base.dv.DefaultColumnValueParser;
 import com.github.ibatis.statement.base.logical.DefaultLogicalColumnMateDataParser;
 import com.github.ibatis.statement.base.logical.LogicalColumnMateDataParser;
-import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-import com.github.ibatis.statement.register.database.TableSchemaQuery;
-import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
+import com.github.ibatis.statement.register.schema.DefaultTableSchemaQueryRegister;
+import com.github.ibatis.statement.register.schema.TableSchemaQuery;
+import com.github.ibatis.statement.register.schema.TableSchemaQueryRegister;
 import com.github.ibatis.statement.util.ClassUtils;
+import com.github.ibatis.statement.util.SqlSessionUtils;
 import lombok.Data;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -43,7 +46,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
     private TableSchemaQueryRegister tableSchemaQueryRegister;
 
-    private TableSchemaResolutionStrategy defaultTableSchemaResolutionStrategy = TableSchemaResolutionStrategy.DATA_BASE_PRIORITY;
+    private TableSchemaResolutionStrategy defaultTableSchemaResolutionStrategy = TableSchemaResolutionStrategy.DATA_BASE_SCHEMA;
 
     public DefaultEntityMateDataParser() {
         this(new DefaultTableSourceParser() ,
@@ -94,18 +97,9 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
 
             Collection<PropertyMateData> propertyMateDataCollection = parsePropertyMateData(entityClass);
 
-            if (TableSchemaResolutionStrategy.DATA_BASE.equals(strategy)) {
+            if (TableSchemaResolutionStrategy.DATA_BASE_SCHEMA.equals(strategy)) {
                 return parseEntityMateDataByDatabase(entityClass ,tableName ,
                         sqlSession ,propertyMateDataCollection);
-            }
-            if (TableSchemaResolutionStrategy.DATA_BASE_PRIORITY.equals(strategy)) {
-                EntityMateData entityMateData = parseEntityMateDataByDatabase(entityClass ,tableName ,
-                        sqlSession ,propertyMateDataCollection);
-                if (entityMateData == null){
-                    entityMateData = parseEntityMateDataByEntity(entityClass ,tableName ,
-                            sqlSession ,propertyMateDataCollection);
-                }
-                return entityMateData;
             }
             if (TableSchemaResolutionStrategy.ENTITY.equals(strategy)) {
                 return parseEntityMateDataByEntity(entityClass ,tableName ,
@@ -140,58 +134,70 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
                                                          Collection<PropertyMateData> propertyMateDataSet)
     {
         LOGGER.debug("parse EntityMateData for [{}] from database table [{}]" ,entityClass ,tableName);
-        TableSchemaQuery tableSchemaQuery = tableSchemaQueryRegister.getTableSchemaQuery(sqlSession).orElse(null);
-        if (tableSchemaQuery != null){
-            TableMateData tableMateData = tableSchemaQuery.queryTable(sqlSession, tableName).orElse(null);
-            if (tableMateData != null){
-                Map<String, ColumnMateData> columnMateDataMap = tableMateData.getColumnMateDataMap();
-                final Map<String ,ColumnPropertyMapping> columnPropertyMappings = new HashMap<>();
+        String databaseProductName = SqlSessionUtils.getDatabaseProductName(sqlSession);
+        TableSchemaQuery tableSchemaQuery = tableSchemaQueryRegister.getTableSchemaQuery(
+                sqlSession ,databaseProductName).orElse(null);
 
-                for (PropertyMateData propertyMateData : propertyMateDataSet) {
-                    String mappingColumnName = propertyMateData.getMappingColumnName();
-                    ColumnMateData columnMateData = columnMateDataMap.get(mappingColumnName);
-                    if (columnMateData != null)
-                    {
-                        if (columnMateData.isPrimaryKey()){
-                            if (propertyMateData.isIgnore()){
-                                throw new IllegalArgumentException("primary key column can't ignore");
-                            }
-                            propertyMateData.setMappingStrategy(MappingStrategy.PRIMARY_KEY);
-                        }else if (propertyMateData.isPrimaryKey()){
-                            throw new IllegalArgumentException("property [" + propertyMateData.getField()
-                                    + "] mapping column is't primary key");
-                        }
+        if (tableSchemaQuery == null){
+            throw new IllegalStateException(MessageFormat.format("Lacking the necessary TableSchemaQuery " +
+                    "for databaseProductName [{0}]" ,databaseProductName));
+        }
 
-                        ColumnPropertyMapping repeat = columnPropertyMappings.put(mappingColumnName,
-                                new ColumnPropertyMapping(propertyMateData, columnMateDataMap.get(mappingColumnName)));
-                        if (repeat != null)
-                        {
-                            throw new IllegalArgumentException("entity [" + entityClass + "] multiple property mapping to "
-                                    + "the same column "  + mappingColumnName);
-                        }
-                    }else if (propertyMateData.isRequiredMappingColumn()){
-                        throw new IllegalArgumentException("property [" + propertyMateData.getField().toGenericString()
-                                + "] mapping column " + mappingColumnName + " is " + propertyMateData.getMappingStrategy()
-                                + " ,but don't exist match column on table " + tableMateData.getTableName());
+        TableMateData tableMateData = tableSchemaQuery.queryTable(sqlSession, tableName).orElse(null);
+        if (tableMateData == null){
+            throw new IllegalStateException(MessageFormat.format("can't query TableMateData by param " +
+                    "tableName:[{0}] ,entityClass:[{1}] ,tableSchemaQuery:[{2}]" ,
+                    tableName ,entityClass ,tableSchemaQuery));
+        }
+
+        tableMateData.setDatabaseProductName(databaseProductName);
+
+        Map<String, ColumnMateData> columnMateDataMap = tableMateData.getColumnMateDataMap();
+        final Map<String ,ColumnPropertyMapping> columnPropertyMappings = new HashMap<>();
+
+        for (PropertyMateData propertyMateData : propertyMateDataSet) {
+            String mappingColumnName = propertyMateData.getMappingColumnName();
+            ColumnMateData columnMateData = columnMateDataMap.get(mappingColumnName);
+            if (columnMateData != null)
+            {
+                if (columnMateData.isPrimaryKey()){
+                    if (propertyMateData.isIgnore()){
+                        throw new IllegalArgumentException("primary key column can't ignore");
                     }
+                    propertyMateData.setMappingStrategy(MappingStrategy.PRIMARY_KEY);
+                }else if (propertyMateData.isPrimaryKey()){
+                    throw new IllegalArgumentException("property [" + propertyMateData.getField()
+                            + "] mapping column is't primary key");
                 }
 
-                for (String keyColumnName : tableMateData.getKeyColumnMateDataMap().keySet()) {
-                    if (!columnPropertyMappings.containsKey(keyColumnName)){
-                        throw new IllegalArgumentException(MessageFormat.format("unable to map entity " +
-                                "attributes for primary key column [{0}]" , keyColumnName));
-                    }
+                ColumnPropertyMapping repeat = columnPropertyMappings.put(mappingColumnName,
+                        new ColumnPropertyMapping(propertyMateData, columnMateDataMap.get(mappingColumnName)));
+                if (repeat != null)
+                {
+                    throw new IllegalArgumentException("entity [" + entityClass + "] multiple property mapping to "
+                            + "the same column "  + mappingColumnName);
                 }
-
-                tableMateData.setSchemaResolutionStrategy(TableSchemaResolutionStrategy.DATA_BASE);
-                return buildEntityMateData(
-                        entityClass ,
-                        tableMateData ,
-                        sqlSession ,
-                        columnPropertyMappings);
+            }else if (propertyMateData.isRequiredMappingColumn()){
+                throw new IllegalArgumentException("property [" + propertyMateData.getField().toGenericString()
+                        + "] mapping column " + mappingColumnName + " is " + propertyMateData.getMappingStrategy()
+                        + " ,but don't exist match column on table " + tableMateData.getTableName());
             }
         }
-        return null;
+
+        for (String keyColumnName : tableMateData.getKeyColumnMateDataMap().keySet()) {
+            if (!columnPropertyMappings.containsKey(keyColumnName)){
+                throw new IllegalArgumentException(MessageFormat.format("unable to map entity " +
+                        "attributes for primary key column [{0}]" , keyColumnName));
+            }
+        }
+
+        tableMateData.setSchemaResolutionStrategy(TableSchemaResolutionStrategy.DATA_BASE_SCHEMA);
+
+        return buildEntityMateData(
+                entityClass ,
+                tableMateData ,
+                sqlSession ,
+                columnPropertyMappings);
     }
 
     private EntityMateData parseEntityMateDataByEntity(Class entityClass ,
@@ -226,10 +232,17 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
         }
 
         TableMateData tableMateData = new TableMateData();
+        String databaseProductName = SqlSessionUtils.getDatabaseProductName(sqlSession);
+        tableMateData.setDatabaseProductName(databaseProductName);
         tableMateData.setTableName(tableName);
         tableMateData.setType(TableMateData.Type.UNDEFINED);
         tableMateData.setSchemaResolutionStrategy(TableSchemaResolutionStrategy.ENTITY);
         tableMateData.setColumnMateDataList(columnMateDataList);
+
+        tableSchemaQueryRegister.getTableSchemaQuery(sqlSession ,databaseProductName)
+                .ifPresent(tableSchemaQuery -> tableMateData.setSqlMode(
+                        tableSchemaQuery.getSqlMode(sqlSession ,databaseProductName)
+                ));
 
         List<KeyColumnUsage> keyColumnUsages = new ArrayList<>();
         int i = 1;
@@ -242,6 +255,7 @@ public class DefaultEntityMateDataParser implements EntityMateDataParser{
                 break;
             }
         }
+
         tableMateData.setKeyColumnUsages(keyColumnUsages);
 
         return buildEntityMateData(

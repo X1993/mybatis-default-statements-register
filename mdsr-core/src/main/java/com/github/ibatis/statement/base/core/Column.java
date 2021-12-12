@@ -2,7 +2,6 @@ package com.github.ibatis.statement.base.core;
 
 import com.github.ibatis.statement.base.core.matedata.PropertyMateData;
 import com.github.ibatis.statement.base.core.parse.DefaultPropertyMateDataParser;
-import com.github.ibatis.statement.register.MappedStatementFactory;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;

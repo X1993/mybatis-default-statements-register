@@ -2,8 +2,6 @@ package com.github.mdsr.sample.model;
 
 import com.github.ibatis.statement.base.core.Column;
 import com.github.ibatis.statement.base.core.Entity;
-import com.github.ibatis.statement.base.dv.DefaultValue;
-import com.github.ibatis.statement.base.logical.Logical;
 import org.apache.ibatis.mapping.SqlCommandType;
 import java.util.Date;
 
@@ -12,7 +10,6 @@ import java.util.Date;
  * @date 2020/9/9
  */
 //列名为`removed`的列为逻辑列
-@Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")
 @Entity(tableName = "user")
 public class User
 {
@@ -22,13 +19,11 @@ public class User
     private String name;
 
     //列名为`create_time`的列在执行新增指令时，如果没有指定值，使用默认值now()
-    @DefaultValue(commandTypes = SqlCommandType.INSERT, value = "now()")
     //禁止create_time列的修改
     @Column(value = "create_time" ,commandTypeMappings = {SqlCommandType.SELECT ,SqlCommandType.INSERT})
     private Date createTime;
 
     //列名为`update_time`的列在执行新增/修改指令时，如果没有指定值，使用默认值now()
-    @DefaultValue(commandTypes = {SqlCommandType.INSERT ,SqlCommandType.UPDATE}, value = "now()")
     private Date updateTime;
 
     private String address;
@@ -36,7 +31,6 @@ public class User
     private String note;
 
     //利用默认赋值和默认更新条件实现乐观锁
-    @DefaultValue(commandTypes = {SqlCommandType.UPDATE} ,value = "&{column} + 1")
     private int version;
 
     public Integer getId() {

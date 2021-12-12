@@ -19,12 +19,12 @@ public enum MappingStrategy {
     PRIMARY_KEY,
 
     /**
-     * 如果不存在映射的列自动忽略，适用{@link TableSchemaResolutionStrategy#DATA_BASE}策略
+     * 如果不存在映射的列自动忽略，适用{@link TableSchemaResolutionStrategy#DATA_BASE_SCHEMA}策略
      */
     AUTO,
 
     /**
-     * 如果不存在匹配的列会报错，适用{@link TableSchemaResolutionStrategy#DATA_BASE}策略
+     * 如果不存在匹配的列会报错，适用{@link TableSchemaResolutionStrategy#DATA_BASE_SCHEMA}策略
      */
     REQUIRED,
 

@@ -1,9 +1,18 @@
+#spring:
+#  datasource:
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://localhost:3306/test?allowMultiQueries=true
+#    username: root
+#    password: 123456
+#    schema: classpath:db/schema.sql
+#    initialization-mode: always
+#
+
 spring:
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/test?allowMultiQueries=true
-    username: root
-    password: 123456
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:Test;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password:
     schema: classpath:db/schema.sql
     initialization-mode: always
-

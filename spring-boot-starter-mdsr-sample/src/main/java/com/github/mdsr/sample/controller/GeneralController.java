@@ -26,7 +26,7 @@ import java.util.*;
  * @Author: X1993
  * @Date: 2020/10/18
  */
-@RestController
+//@RestController
 public class GeneralController implements ApplicationContextAware{
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GeneralController.class);

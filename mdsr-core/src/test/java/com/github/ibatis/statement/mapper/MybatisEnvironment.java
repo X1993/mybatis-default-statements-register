@@ -4,10 +4,8 @@ import com.github.ibatis.statement.DataSourceEnvironment;
 import com.github.ibatis.statement.base.core.parse.*;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.StatementAutoRegister;
-import com.github.ibatis.statement.register.database.DefaultTableSchemaQueryRegister;
-import com.github.ibatis.statement.register.database.H2TableSchemaQuery;
-import com.github.ibatis.statement.register.database.MysqlTableSchemaQuery;
-import com.github.ibatis.statement.register.database.TableSchemaQueryRegister;
+import com.github.ibatis.statement.register.schema.DefaultTableSchemaQueryRegister;
+import com.github.ibatis.statement.register.schema.TableSchemaQueryRegister;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
@@ -65,7 +63,6 @@ public class MybatisEnvironment implements Closeable{
     {
         //不同数据库需要使用不同的TableMateDataQueryRegister实现
         TableSchemaQueryRegister tableSchemaQueryRegister = new DefaultTableSchemaQueryRegister();
-        tableSchemaQueryRegister.register(new MysqlTableSchemaQuery() ,new H2TableSchemaQuery());
 
         StatementAutoRegister register = new DefaultStatementAutoRegister.Builder()
                 .setEntityMateDataParser(new DefaultEntityMateDataParser.Builder()
@@ -73,7 +70,6 @@ public class MybatisEnvironment implements Closeable{
                         .setPropertyMateDataParser(
                                 new DefaultPropertyMateDataParser(Arrays.asList(new TryMappingEveryPropertyMateDataParser()))
                         ).build())
-                .addDefaultMappedStatementFactories()
                 .addDefaultListeners()
                 .build();
 

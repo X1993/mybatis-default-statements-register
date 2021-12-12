@@ -44,13 +44,7 @@ public class MappedStatementProperties {
     /**
      * 默认table schema解析策略
      */
-    private TableSchemaResolutionStrategy tableSchemaResolutionStrategy = TableSchemaResolutionStrategy.DATA_BASE_PRIORITY;
-
-    /**
-     * 注册默认工厂
-     * @see DefaultStatementAutoRegister.Builder#addDefaultMappedStatementFactories()
-     */
-    private boolean addDefaultMappedStatementFactories = true;
+    private TableSchemaResolutionStrategy tableSchemaResolutionStrategy = TableSchemaResolutionStrategy.DATA_BASE_SCHEMA;
 
     /**
      * 注册默认监听
@@ -80,14 +74,6 @@ public class MappedStatementProperties {
 
     public void setTableSchemaResolutionStrategy(TableSchemaResolutionStrategy tableSchemaResolutionStrategy) {
         this.tableSchemaResolutionStrategy = tableSchemaResolutionStrategy;
-    }
-
-    public boolean isAddDefaultMappedStatementFactories() {
-        return addDefaultMappedStatementFactories;
-    }
-
-    public void setAddDefaultMappedStatementFactories(boolean addDefaultMappedStatementFactories) {
-        this.addDefaultMappedStatementFactories = addDefaultMappedStatementFactories;
     }
 
     public boolean isAddDefaultListeners() {

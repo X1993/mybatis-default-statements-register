@@ -1,15 +1,17 @@
 ### 运行环境:
-JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有特殊要求)
+JDK 8+, Maven, Mysql/MariaDB/H2/(OTHER有要求)
 
-### 支持的数据库:  
-1.TableSchemaResolutionStrategy=DATA_BASE，适用mysql 、mariaDB 、H2
-> 其他数据库只需实现特定的适配器
-```java
-    /**
-    * @see com.github.ibatis.statement.register.database.TableSchemaQuery
-    */
-```
-2.TableSchemaResolutionStrategy=ENTITY，适用Mybatis支持的所有数据库
+*支持的数据库*:
+部分mapper方法支持标准sql实现,适用所有数据库(参考*com.github.ibatis.statement.mapper.method.MapperMethodEnum*#common=true),
+其他需要使用数据库自定义语法的接口目前仅实现了mysql 、mariaDB 、H2(MODE=MySql)的适配
+> 其他数据库需实现适配器,参考mysql适配模块,通过SPI机制获取服务提供者
+```xml
+    <dependency>
+        <groupId>com.github.X1993</groupId>
+        <artifactId>mdsr-mysql-adapter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+```    
 
 ### 流程框架:
 <p align="center">

@@ -4,7 +4,6 @@ import com.github.ibatis.statement.base.core.TableSchemaResolutionStrategy;
 import com.github.ibatis.statement.base.core.matedata.ColumnMateData;
 import com.github.ibatis.statement.base.core.matedata.EntityMateData;
 import com.github.ibatis.statement.base.core.matedata.TableMateData;
-import org.apache.ibatis.type.JdbcType;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +42,7 @@ public class DefaultLogicalColumnMateDataParser implements LogicalColumnMateData
             TableSchemaResolutionStrategy schemaResolutionStrategy = entityMateData.getSchemaResolutionStrategy();
             ColumnMateData logicalColumnMateData = tableMateData.getColumnMateDataMap().get(logicalColumnName);
             if (logicalColumnMateData == null) {
-                if (TableSchemaResolutionStrategy.DATA_BASE.equals(schemaResolutionStrategy)) {
+                if (TableSchemaResolutionStrategy.DATA_BASE_SCHEMA.equals(schemaResolutionStrategy)) {
                     //表上没有对应的列
                     throw new IllegalArgumentException(new StringBuilder("table [")
                             .append(tableMateData.getTableName())

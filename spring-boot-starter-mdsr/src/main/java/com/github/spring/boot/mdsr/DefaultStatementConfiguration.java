@@ -11,8 +11,9 @@ import com.github.ibatis.statement.base.logical.LogicalColumnMateDataParser;
 import com.github.ibatis.statement.register.DefaultStatementAutoRegister;
 import com.github.ibatis.statement.register.MappedStatementFactory;
 import com.github.ibatis.statement.register.StatementAutoRegister;
-import com.github.ibatis.statement.register.database.*;
+import com.github.ibatis.statement.register.schema.*;
 import com.github.ibatis.statement.base.core.parse.*;
+import com.github.ibatis.statement.register.schema.TableSchemaQueryRegister;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,19 +153,6 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public MysqlTableSchemaQuery mysqlTableSchemaQuery()
-    {
-        return new MysqlTableSchemaQuery();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public H2TableSchemaQuery h2TableSchemaQuery(){
-        return new H2TableSchemaQuery();
-    }
-
-    @Bean
     @ConditionalOnMissingBean(value = TableSchemaQueryRegister.class)
     public DefaultTableSchemaQueryRegister defaultTableSchemaQueryRegister(
             @Autowired(required = false) List<TableSchemaQuery> tableSchemaQueries)
@@ -213,10 +201,6 @@ public class DefaultStatementConfiguration implements ApplicationContextAware{
         DefaultStatementAutoRegister.Builder builder = new DefaultStatementAutoRegister.Builder()
                 .setEntityMateDataParser(defaultEntityMateDataParser)
                 .setMapperEntityParser(defaultMapperEntityParser);
-
-        if (mappedStatementProperties.isAddDefaultMappedStatementFactories()){
-            builder.addDefaultMappedStatementFactories();
-        }
 
         if (mappedStatementFactories != null) {
             for (MappedStatementFactory mappedStatementFactory : mappedStatementFactories) {

@@ -1,9 +1,7 @@
 package com.github.mdsr.sample.model;
 
 import com.github.ibatis.statement.base.core.Column;
-import com.github.ibatis.statement.base.logical.Logical;
 
-@Logical(columnName = "removed" ,existValue = "0" ,notExistValue = "1")
 public class Entity6 {
 
     private String id;

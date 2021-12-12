@@ -1,0 +1,5 @@
+com.github.ibatis.statement.register.mysql.factory.DynamicParamsSelectStatementFactory
+com.github.ibatis.statement.register.mysql.factory.InsertBatchMappedStatementFactory
+com.github.ibatis.statement.register.mysql.factory.MethodNameParseMappedStatementFactory
+com.github.ibatis.statement.register.mysql.factory.SelectMaxKeyStatementFactory
+com.github.ibatis.statement.register.mysql.factory.UpdateBatchMappedStatementFactory

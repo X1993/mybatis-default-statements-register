@@ -11,22 +11,16 @@ public enum TableSchemaResolutionStrategy {
 
     /**
      * 查询数据库schema
-     * 不同的数据需要实现各自的{@link com.github.ibatis.statement.register.database.TableSchemaQuery}
+     * 不同的数据需要实现各自的{@link com.github.ibatis.statement.register.schema.TableSchemaQuery}
      * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
      */
-    DATA_BASE,
+    DATA_BASE_SCHEMA,
 
     /**
      * 解析实体类
      * 类似 hibernate/jpa
      */
     ENTITY,
-
-    /**
-     * {@link TableSchemaResolutionStrategy#DATA_BASE}优先，获取失败使用{@link TableSchemaResolutionStrategy#ENTITY}
-     * 如果{@link PropertyMateData#getMappingStrategy()} == {@link MappingStrategy#AUTO}，允许类属性映射的列不存在，会忽略
-     */
-    DATA_BASE_PRIORITY,
 
     /**
      * 默认使用全局配置
